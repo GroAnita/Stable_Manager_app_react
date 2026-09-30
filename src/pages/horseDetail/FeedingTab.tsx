@@ -283,15 +283,26 @@ export function FeedingTab({
                   </span>
                 )}
               </div>
-              <p className="mt-3 text-sm text-slate-500">
-                {t('horseDetail.hay')}: {entry.hay || '—'}
-              </p>
-              <p className="text-sm text-slate-500">
-                {t('horseDetail.grain')}: {entry.feed || '—'}
-              </p>
-              <p className="text-sm text-slate-500">
-                {t('horseDetail.supplements')}: {entry.supplements || '—'}
-              </p>
+              <div className="mt-3 space-y-1.5">
+                <p className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-600">
+                  <span className="font-medium text-slate-800">
+                    {t('horseDetail.hay')}:
+                  </span>{' '}
+                  {entry.hay || '—'}
+                </p>
+                <p className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-600">
+                  <span className="font-medium text-slate-800">
+                    {t('horseDetail.grain')}:
+                  </span>{' '}
+                  {entry.feed || '—'}
+                </p>
+                <p className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-600">
+                  <span className="font-medium text-slate-800">
+                    {t('horseDetail.supplements')}:
+                  </span>{' '}
+                  {entry.supplements || '—'}
+                </p>
+              </div>
             </button>
           ))}
         </div>

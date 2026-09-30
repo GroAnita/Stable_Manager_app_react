@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { Icon, type IconName } from '../components/Icon'
 import { signOut } from '../lib/authService'
@@ -22,6 +23,7 @@ export default function AppLayout() {
   const { session } = useAuth()
   const { t } = usePreferences()
   const navigate = useNavigate()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   async function handleSignOut() {
     await signOut()
@@ -30,13 +32,33 @@ export default function AppLayout() {
 
   return (
     <div className="min-h-screen lg:flex">
-      <aside className="flex w-72 flex-shrink-0 flex-col gap-6 border-r border-white/70 bg-cream px-5 py-6">
-        <h1 className="text-2xl font-semibold text-forest">Stable Manager</h1>
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-slate-900/40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 flex w-72 shrink-0 flex-col gap-6 overflow-y-auto border-r border-white/70 bg-cream px-5 py-6 transition-transform duration-300 lg:static lg:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold text-forest">Stable Manager</h1>
+          <button
+            type="button"
+            className="rounded-full p-2 text-ink/60 hover:bg-white lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <Icon name="x" className="h-5 w-5" />
+          </button>
+        </div>
         <nav className="flex flex-1 flex-col gap-1">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
+              onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-ink/70 hover:bg-white hover:text-forest ${
                   isActive ? 'bg-white text-forest shadow-soft' : ''
@@ -63,13 +85,20 @@ export default function AppLayout() {
           </button>
         </div>
       </aside>
-      <div className="flex min-h-screen flex-1 flex-col">
-        <header className="border-b border-white/70 bg-cream/90 px-6 py-5 backdrop-blur">
+      <div className="flex min-h-screen flex-1 flex-col lg:min-w-0">
+        <header className="flex items-center gap-3 border-b border-white/70 bg-cream/90 px-4 py-5 backdrop-blur md:px-6">
+          <button
+            type="button"
+            className="rounded-2xl border border-slate-200 bg-white p-2.5 text-ink/70 lg:hidden"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <Icon name="menu" className="h-5 w-5" />
+          </button>
           <p className="text-xs font-medium tracking-[0.25em] text-ink/40 uppercase">
             {t('nav.overview')}
           </p>
         </header>
-        <main className="flex-1 px-6 py-6">
+        <main className="flex-1 overflow-x-hidden px-4 py-6 md:px-6">
           <Outlet />
         </main>
       </div>
