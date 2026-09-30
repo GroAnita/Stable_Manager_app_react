@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { HorseAvatar } from '../components/HorseAvatar'
 import { Icon } from '../components/Icon'
 import {
   deleteHorse,
@@ -96,18 +97,25 @@ export default function HorseDetail() {
   return (
     <div className="page-shell">
       <div className="page-header">
-        <div>
-          <p className="text-sm tracking-[0.25em] text-slate-400 uppercase">
-            {t('horseDetail.profile')}
-          </p>
-          <h1 className="mt-2 text-3xl font-semibold text-slate-900">
-            {horse.name}
-          </h1>
-          <p className="mt-2 text-sm text-slate-500">
-            {[horse.breed, horse.gender, horse.color]
-              .filter(Boolean)
-              .join(' · ') || '—'}
-          </p>
+        <div className="flex items-center gap-4">
+          <HorseAvatar
+            name={horse.name}
+            photoUrl={horse.photo_url}
+            className="h-20 w-20 text-3xl"
+          />
+          <div>
+            <p className="text-sm tracking-[0.25em] text-slate-400 uppercase">
+              {t('horseDetail.profile')}
+            </p>
+            <h1 className="mt-2 text-3xl font-semibold text-slate-900">
+              {horse.name}
+            </h1>
+            <p className="mt-2 text-sm text-slate-500">
+              {[horse.breed, horse.gender, horse.color]
+                .filter(Boolean)
+                .join(' · ') || '—'}
+            </p>
+          </div>
         </div>
         <div className="flex flex-wrap gap-3">
           <Link to={`/horses/${horse.id}/edit`} className="btn-ghost">
