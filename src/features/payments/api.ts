@@ -4,6 +4,8 @@ import type { Database } from '../../types/supabase'
 export type Payment = Database['public']['Tables']['payments']['Row']
 export type PaymentInsert = Database['public']['Tables']['payments']['Insert']
 export type PaymentUpdate = Database['public']['Tables']['payments']['Update']
+export type PaymentSummary =
+  Database['public']['Views']['payment_summary']['Row']
 
 export type PaymentListItem = Pick<
   Payment,
@@ -26,6 +28,15 @@ export type PaymentListItem = Pick<
       'id' | 'name'
     > | null
   } | null
+}
+
+export async function getPaymentSummary(): Promise<PaymentSummary> {
+  const { data, error } = await supabase
+    .from('payment_summary')
+    .select('*')
+    .single()
+  if (error) throw error
+  return data
 }
 
 export async function listPayments(): Promise<PaymentListItem[]> {

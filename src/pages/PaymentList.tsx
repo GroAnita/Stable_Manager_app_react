@@ -5,9 +5,11 @@ import { EmptyState } from '../components/EmptyState'
 import { Icon } from '../components/Icon'
 import { Modal } from '../components/Modal'
 import {
+  getPaymentSummary,
   listPayments,
   markPaymentPaid,
   type PaymentListItem,
+  type PaymentSummary,
 } from '../features/payments/api'
 import { usePreferences } from '../lib/PreferencesContext'
 
@@ -16,6 +18,7 @@ type StatusFilter = 'all' | 'paid' | 'due' | 'overdue'
 export default function PaymentList() {
   const { t, formatCurrency, formatDate } = usePreferences()
   const [payments, setPayments] = useState<PaymentListItem[]>([])
+  const [summary, setSummary] = useState<PaymentSummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
@@ -25,9 +28,12 @@ export default function PaymentList() {
 
   useEffect(() => {
     let cancelled = false
-    listPayments()
-      .then((data) => {
-        if (!cancelled) setPayments(data)
+    Promise.all([listPayments(), getPaymentSummary()])
+      .then(([paymentsData, summaryData]) => {
+        if (!cancelled) {
+          setPayments(paymentsData)
+          setSummary(summaryData)
+        }
       })
       .catch((err: Error) => {
         if (!cancelled) setError(err.message)
@@ -56,21 +62,6 @@ export default function PaymentList() {
     })
   }, [payments, search, statusFilter])
 
-  const summary = useMemo(() => {
-    const monthKey = new Date().toISOString().slice(0, 7)
-    return {
-      paid: payments
-        .filter((p) => p.status === 'paid' && p.paid_date?.startsWith(monthKey))
-        .reduce((sum, p) => sum + p.amount, 0),
-      due: payments
-        .filter((p) => p.status === 'due')
-        .reduce((sum, p) => sum + p.amount, 0),
-      overdue: payments
-        .filter((p) => p.status === 'overdue')
-        .reduce((sum, p) => sum + p.amount, 0),
-    }
-  }, [payments])
-
   async function handleMarkPaid(id: string) {
     setMarkingPaid(id)
     try {
@@ -81,6 +72,7 @@ export default function PaymentList() {
           p.id === id ? { ...p, status: 'paid', paid_date: paidDate } : p,
         ),
       )
+      setSummary(await getPaymentSummary())
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -104,17 +96,17 @@ export default function PaymentList() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card
           label={t('paymentList.paidThisMonth')}
-          value={formatCurrency(summary.paid)}
+          value={formatCurrency(summary?.paid_this_month ?? 0)}
           icon={<Icon name="dollar" className="h-5 w-5" />}
         />
         <Card
           label={t('paymentList.currentlyDue')}
-          value={formatCurrency(summary.due)}
+          value={formatCurrency(summary?.total_due ?? 0)}
           icon={<Icon name="calendar" className="h-5 w-5" />}
         />
         <Card
           label={t('paymentList.overdueTotal')}
-          value={formatCurrency(summary.overdue)}
+          value={formatCurrency(summary?.total_overdue ?? 0)}
           icon={<Icon name="alert" className="h-5 w-5" />}
         />
       </div>

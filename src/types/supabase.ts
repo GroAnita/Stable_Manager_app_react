@@ -1057,6 +1057,14 @@ export type Database = {
           },
         ]
       }
+      payment_summary: {
+        Row: {
+          paid_this_month: number | null
+          total_due: number | null
+          total_overdue: number | null
+        }
+        Relationships: []
+      }
       recent_activity: {
         Row: {
           activity_type: string | null
