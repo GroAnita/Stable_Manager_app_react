@@ -31,3 +31,23 @@ export function hayValueIncVat(
 export function beddingAmountIncVat(unitPrice: number, quantity: number) {
   return Math.round(unitPrice * quantity * VAT_MULTIPLIER * 100) / 100
 }
+
+export function amountIncVat(unitPrice: number, quantity: number) {
+  return Math.round(unitPrice * quantity * VAT_MULTIPLIER * 100) / 100
+}
+
+function toIsoDate(date: Date): string {
+  const pad = (value: number) => String(value).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+}
+
+// Stable fees are due the 25th of every month, covering the cycle from the
+// 26th of the previous month through the 25th. A charge dated inside that
+// window belongs on the invoice due at the window's end.
+export function billingCycleDueDate(dateStr: string): string {
+  return toIsoDate(currentBillingCycleDueDate(new Date(dateStr)))
+}
+
+export function daysInBillingCycleFor(dueDateIso: string): number {
+  return daysInBillingCycle(new Date(dueDateIso))
+}

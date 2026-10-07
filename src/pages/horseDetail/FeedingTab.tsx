@@ -10,6 +10,7 @@ import {
   type FeedingTime,
 } from '../../features/horses/api'
 import { usePreferences } from '../../lib/PreferencesContext'
+import { FeedingExtras } from './FeedingExtras'
 
 type FeedingTimeFormState = {
   label: string
@@ -311,6 +312,13 @@ export function FeedingTab({
       <div className="mt-4 rounded-2xl border border-dashed border-slate-200 p-4 text-sm text-slate-500">
         {plan?.special_instructions || t('horseDetail.noSpecialFeeding')}
       </div>
+
+      <FeedingExtras
+        horseId={horseId}
+        stableId={stableId}
+        plan={plan}
+        onPlanSaved={onPlanSaved}
+      />
 
       <Modal
         open={addOpen}

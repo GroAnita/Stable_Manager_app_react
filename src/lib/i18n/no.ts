@@ -7,6 +7,7 @@ export const no: typeof en = {
     cancel: 'Avbryt',
     edit: 'Rediger',
     delete: 'Slett',
+    remove: 'Fjern',
     add: 'Legg til',
     loading: 'Laster…',
     search: 'Søk',
@@ -154,6 +155,36 @@ export const no: typeof en = {
     editFeedingTime: 'Rediger fôringstidspunkt',
     deleteFeedingTimeConfirm: 'Slette dette fôringstidspunktet?',
     noFeedingTimes: 'Ingen fôringstidspunkter lagt til ennå.',
+    extraFeedTitle: 'Ekstra fôr og tilskudd',
+    extraFeedDescription:
+      'Registrer kjøp fra prislisten utover det fôringskontrakten dekker. Hver oppføring oppretter en utestående kostnad mot hestens aktive kontrakt.',
+    logExtraFeed: 'Registrer ekstra fôr',
+    noExtrasLogged: 'Ingen ekstrakostnader registrert ennå.',
+    extraEmptyCategories:
+      'Prislisten din har ingen varer i kategoriene Høy, Kraftfôr eller Tilskudd ennå. Legg til noen der først.',
+    goToPriceList: 'Gå til prisliste',
+    extraItem: 'Vare',
+    extraQuantity: 'Antall',
+    extraDate: 'Dato',
+    extraEstimatedCharge: 'Estimert kostnad (inkl. 25% MVA):',
+    extraBilledOn:
+      'Faktureres på fakturaen som forfaller {date} (stallavgifter løper fra 26. til 25.).',
+    extraSubmit: 'Registrer og fakturer',
+    extraRemoveConfirmWithPayment:
+      'Fjerne denne ekstrakostnaden? Dette trekker {amount} fra fakturaen som forfaller {date}.',
+    extraRemoveConfirmPlain: 'Fjerne denne registrerte ekstrakostnaden?',
+    extraNoActiveContract:
+      'Denne hesten har ingen aktiv kontrakt, så ingen kostnad kunne opprettes.',
+    extraAddedToInvoice: '{item} lagt til på fakturaen som forfaller {date}.',
+    extraCreatedInvoice:
+      'Opprettet fakturaen for {date} med denne månedens leie pluss {item}.',
+    extraAlreadyPaid:
+      'Fakturaen for den perioden var allerede betalt — opprettet en egen kostnad på {amount} for {item}.',
+    extraInvoiceLine: 'Ekstra: {item} × {quantity}{unit} — {amount} ({date})',
+    extraMonthlyBoardLine: 'Månedlig fôringsavgift — {amount}',
+    extraMonthlyHayLine: 'Høy (inkl. 25% MVA) — {amount}',
+    extraMonthlyBeddingLine: 'Flis/strø (inkl. 25% MVA) — {amount}',
+    extraLogError: 'Kunne ikke registrere denne ekstrakostnaden: {error}',
     docPassport: 'Pass',
     docInsurance: 'Forsikring',
     docMicrochip: 'Mikrochip-registrering',

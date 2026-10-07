@@ -5,6 +5,7 @@ export const en = {
     cancel: 'Cancel',
     edit: 'Edit',
     delete: 'Delete',
+    remove: 'Remove',
     add: 'Add',
     loading: 'Loading…',
     search: 'Search',
@@ -151,6 +152,36 @@ export const en = {
     editFeedingTime: 'Edit feeding time',
     deleteFeedingTimeConfirm: 'Delete this feeding time?',
     noFeedingTimes: 'No feeding times added yet.',
+    extraFeedTitle: 'Extra feed & supplements',
+    extraFeedDescription:
+      "Log purchases from the price list beyond what the boarding contract covers. Each entry creates a due charge against the horse's active contract.",
+    logExtraFeed: 'Log extra feed',
+    noExtrasLogged: 'No extras logged yet.',
+    extraEmptyCategories:
+      'Your price list has no Hay, Grain or Supplements items yet. Add some there first.',
+    goToPriceList: 'Go to price list',
+    extraItem: 'Item',
+    extraQuantity: 'Quantity',
+    extraDate: 'Date',
+    extraEstimatedCharge: 'Estimated charge (incl. 25% VAT):',
+    extraBilledOn:
+      'Billed on the invoice due {date} (stable fees run the 26th to the 25th).',
+    extraSubmit: 'Log extra & bill it',
+    extraRemoveConfirmWithPayment:
+      'Remove this extra? This will subtract {amount} from the invoice due {date}.',
+    extraRemoveConfirmPlain: 'Remove this logged extra?',
+    extraNoActiveContract:
+      'This horse has no active contract, so no charge could be created.',
+    extraAddedToInvoice: 'Added {item} to the invoice due {date}.',
+    extraCreatedInvoice:
+      "Created the {date} invoice with this month's rent plus {item}.",
+    extraAlreadyPaid:
+      "That cycle's invoice was already paid — created a separate {amount} charge for {item}.",
+    extraInvoiceLine: 'Extra: {item} × {quantity}{unit} — {amount} ({date})',
+    extraMonthlyBoardLine: 'Monthly board — {amount}',
+    extraMonthlyHayLine: 'Hay (incl. 25% VAT) — {amount}',
+    extraMonthlyBeddingLine: 'Bedding (incl. 25% VAT) — {amount}',
+    extraLogError: 'Could not log this extra: {error}',
     docPassport: 'Passport',
     docInsurance: 'Insurance',
     docMicrochip: 'Microchip record',

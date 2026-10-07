@@ -1,5 +1,22 @@
+import {
+  amountIncVat,
+  billingCycleDueDate,
+  beddingAmountIncVat,
+  daysInBillingCycleFor,
+  hayValueIncVat,
+} from '../../lib/billing'
 import { supabase } from '../../lib/supabaseClient'
 import type { Database } from '../../types/supabase'
+import { getActiveContractForHorse } from '../contracts/api'
+import {
+  countPaymentsDueOn,
+  createPayment,
+  deletePayment,
+  findOpenPayment,
+  getPayment,
+  hasPaidPayment,
+  updatePayment,
+} from '../payments/api'
 
 export type Horse = Database['public']['Tables']['horses']['Row']
 export type HorseInsert = Database['public']['Tables']['horses']['Insert']
@@ -178,6 +195,206 @@ export async function upsertFeedingPlan(
     .single()
   if (error) throw error
   return data
+}
+
+export type FeedingExtraEntry = {
+  id: string
+  priceListItemId: string
+  item: string
+  category: string
+  unit: string
+  price: number
+  quantity: number
+  amount: number
+  date: string
+  paymentId: string
+  invoiceLine: string
+}
+
+export function parseFeedingExtras(raw: string | null): FeedingExtraEntry[] {
+  if (!raw) return []
+  try {
+    const parsed: unknown = JSON.parse(raw)
+    return Array.isArray(parsed) ? (parsed as FeedingExtraEntry[]) : []
+  } catch {
+    return []
+  }
+}
+
+type Translate = (key: string, vars?: Record<string, string | number>) => string
+
+export async function logFeedingExtra(params: {
+  horseId: string
+  stableId: string
+  priceListItemId: string
+  quantity: number
+  date: string
+  extras: FeedingExtraEntry[]
+  t: Translate
+  formatCurrency: (amount: number) => string
+  formatDate: (date: string) => string
+}): Promise<{ plan: FeedingPlan; message: string }> {
+  const { horseId, stableId, priceListItemId, quantity, date, extras, t, formatCurrency, formatDate } =
+    params
+
+  const { data: item, error: itemError } = await supabase
+    .from('price_list_items')
+    .select('id, item, category, unit, price')
+    .eq('id', priceListItemId)
+    .single()
+  if (itemError) throw itemError
+
+  const contract = await getActiveContractForHorse(horseId)
+  if (!contract) throw new Error(t('horseDetail.extraNoActiveContract'))
+
+  const amount = amountIncVat(item.price ?? 0, quantity)
+  const dueDate = billingCycleDueDate(date)
+  const invoiceLine = t('horseDetail.extraInvoiceLine', {
+    item: item.item,
+    quantity,
+    unit: item.unit ? ` ${item.unit}` : '',
+    amount: formatCurrency(amount),
+    date: formatDate(date),
+  })
+
+  const openPayment = await findOpenPayment(contract.id, dueDate)
+
+  let paymentId: string
+  let message: string
+  if (openPayment) {
+    const updated = await updatePayment(openPayment.id, {
+      amount: Math.round((openPayment.amount + amount) * 100) / 100,
+      notes: openPayment.notes
+        ? `${openPayment.notes}\n${invoiceLine}`
+        : invoiceLine,
+    })
+    paymentId = updated.id
+    message = t('horseDetail.extraAddedToInvoice', {
+      item: item.item,
+      date: formatDate(dueDate),
+    })
+  } else {
+    const alreadyPaid = await hasPaidPayment(contract.id, dueDate)
+    const baseRent = alreadyPaid ? 0 : (contract.monthly_rent ?? 0)
+
+    let hayCharge = 0
+    if (!alreadyPaid && contract.hay_price_list_item_id) {
+      const { data: hayItem } = await supabase
+        .from('price_list_items')
+        .select('price')
+        .eq('id', contract.hay_price_list_item_id)
+        .maybeSingle()
+      hayCharge = hayValueIncVat(
+        hayItem?.price ?? 0,
+        contract.included_hay_kg ?? 0,
+        daysInBillingCycleFor(dueDate),
+      )
+    }
+
+    let beddingCharge = 0
+    if (!alreadyPaid && contract.bedding_price_list_item_id) {
+      const { data: beddingItem } = await supabase
+        .from('price_list_items')
+        .select('price')
+        .eq('id', contract.bedding_price_list_item_id)
+        .maybeSingle()
+      beddingCharge = beddingAmountIncVat(
+        beddingItem?.price ?? 0,
+        contract.bedding_quantity ?? 0,
+      )
+    }
+
+    const sequence = (await countPaymentsDueOn(dueDate)) + 1
+    const boardLines: string[] = []
+    if (baseRent)
+      boardLines.push(
+        t('horseDetail.extraMonthlyBoardLine', { amount: formatCurrency(baseRent) }),
+      )
+    if (hayCharge)
+      boardLines.push(
+        t('horseDetail.extraMonthlyHayLine', { amount: formatCurrency(hayCharge) }),
+      )
+    if (beddingCharge)
+      boardLines.push(
+        t('horseDetail.extraMonthlyBeddingLine', {
+          amount: formatCurrency(beddingCharge),
+        }),
+      )
+
+    const created = await createPayment({
+      contract_id: contract.id,
+      owner_id: contract.owner_id,
+      stable_id: stableId,
+      amount: Math.round((baseRent + hayCharge + beddingCharge + amount) * 100) / 100,
+      due_date: dueDate,
+      status: 'due',
+      invoice_number: `INV-${dueDate.slice(0, 7).replace('-', '')}-${String(sequence).padStart(3, '0')}${alreadyPaid ? '-EXTRA' : ''}`,
+      notes: boardLines.length ? `${boardLines.join('\n')}\n${invoiceLine}` : invoiceLine,
+    })
+    paymentId = created.id
+    message = alreadyPaid
+      ? t('horseDetail.extraAlreadyPaid', {
+          amount: formatCurrency(amount),
+          item: item.item,
+        })
+      : t('horseDetail.extraCreatedInvoice', {
+          date: formatDate(dueDate),
+          item: item.item,
+        })
+  }
+
+  const entry: FeedingExtraEntry = {
+    id: crypto.randomUUID(),
+    priceListItemId: item.id,
+    item: item.item,
+    category: item.category ?? '',
+    unit: item.unit ?? '',
+    price: item.price ?? 0,
+    quantity,
+    amount,
+    date,
+    paymentId,
+    invoiceLine,
+  }
+
+  const plan = await upsertFeedingPlan({
+    horse_id: horseId,
+    stable_id: stableId,
+    extras: JSON.stringify([...extras, entry]),
+  })
+
+  return { plan, message }
+}
+
+export async function removeFeedingExtra(params: {
+  horseId: string
+  stableId: string
+  entry: FeedingExtraEntry
+  extras: FeedingExtraEntry[]
+}): Promise<FeedingPlan> {
+  const { horseId, stableId, entry, extras } = params
+
+  const payment = await getPayment(entry.paymentId)
+  if (payment) {
+    const remaining = Math.round((payment.amount - entry.amount) * 100) / 100
+    if (remaining <= 0) {
+      await deletePayment(payment.id)
+    } else {
+      await updatePayment(payment.id, {
+        amount: remaining,
+        notes: (payment.notes ?? '')
+          .split('\n')
+          .filter((line) => line !== entry.invoiceLine)
+          .join('\n'),
+      })
+    }
+  }
+
+  return upsertFeedingPlan({
+    horse_id: horseId,
+    stable_id: stableId,
+    extras: JSON.stringify(extras.filter((item) => item.id !== entry.id)),
+  })
 }
 
 export async function getHorseFeedingTimes(

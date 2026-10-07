@@ -1,27 +1,36 @@
+import { lazy, Suspense } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import AppLayout from './layouts/AppLayout'
 import { RequireAuth } from './lib/RequireAuth'
-import Auth from './pages/Auth'
-import Dashboard from './pages/Dashboard'
-import HorseList from './pages/HorseList'
-import HorseDetail from './pages/HorseDetail'
-import HorseForm from './pages/HorseForm'
-import OwnerList from './pages/OwnerList'
-import OwnerDetail from './pages/OwnerDetail'
-import OwnerForm from './pages/OwnerForm'
-import StallView from './pages/StallView'
-import ContractList from './pages/ContractList'
-import ContractForm from './pages/ContractForm'
-import PaymentList from './pages/PaymentList'
-import PriceList from './pages/PriceList'
-import CalendarView from './pages/CalendarView'
-import TaskList from './pages/TaskList'
-import Reports from './pages/Reports'
-import Settings from './pages/Settings'
-import NotFound from './pages/NotFound'
+
+const Auth = lazy(() => import('./pages/Auth'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const HorseList = lazy(() => import('./pages/HorseList'))
+const HorseDetail = lazy(() => import('./pages/HorseDetail'))
+const HorseForm = lazy(() => import('./pages/HorseForm'))
+const OwnerList = lazy(() => import('./pages/OwnerList'))
+const OwnerDetail = lazy(() => import('./pages/OwnerDetail'))
+const OwnerForm = lazy(() => import('./pages/OwnerForm'))
+const StallView = lazy(() => import('./pages/StallView'))
+const ContractList = lazy(() => import('./pages/ContractList'))
+const ContractForm = lazy(() => import('./pages/ContractForm'))
+const PaymentList = lazy(() => import('./pages/PaymentList'))
+const PriceList = lazy(() => import('./pages/PriceList'))
+const CalendarView = lazy(() => import('./pages/CalendarView'))
+const TaskList = lazy(() => import('./pages/TaskList'))
+const Reports = lazy(() => import('./pages/Reports'))
+const Settings = lazy(() => import('./pages/Settings'))
+const NotFound = lazy(() => import('./pages/NotFound'))
 
 export const router = createBrowserRouter([
-  { path: '/auth', element: <Auth /> },
+  {
+    path: '/auth',
+    element: (
+      <Suspense fallback={null}>
+        <Auth />
+      </Suspense>
+    ),
+  },
   {
     path: '/',
     element: (

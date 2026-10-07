@@ -53,6 +53,19 @@ export async function listContracts(): Promise<ContractListItem[]> {
   return data
 }
 
+export async function getActiveContractForHorse(
+  horseId: string,
+): Promise<Contract | null> {
+  const { data, error } = await supabase
+    .from('contracts')
+    .select('*')
+    .eq('horse_id', horseId)
+    .eq('status', 'active')
+    .maybeSingle()
+  if (error) throw error
+  return data
+}
+
 export async function getContract(id: string): Promise<Contract> {
   const { data, error } = await supabase
     .from('contracts')
