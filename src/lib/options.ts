@@ -13,6 +13,10 @@ export type HorseOption = Pick<
   Database['public']['Tables']['horses']['Row'],
   'id' | 'name'
 >
+export type StaffOption = Pick<
+  Database['public']['Tables']['profiles']['Row'],
+  'id' | 'full_name'
+>
 
 export async function listOwnerOptions(): Promise<OwnerOption[]> {
   const { data, error } = await supabase
@@ -38,6 +42,15 @@ export async function listHorseOptions(): Promise<HorseOption[]> {
     .select('id, name')
     .eq('active', true)
     .order('name')
+  if (error) throw error
+  return data
+}
+
+export async function listStaffOptions(): Promise<StaffOption[]> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, full_name')
+    .order('full_name')
   if (error) throw error
   return data
 }
