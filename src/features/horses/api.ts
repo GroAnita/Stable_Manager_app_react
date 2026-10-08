@@ -73,6 +73,20 @@ export type HorseEvent = Pick<
   Database['public']['Tables']['calendar_events']['Row'],
   'id' | 'title' | 'description' | 'event_type' | 'start_time' | 'end_time'
 >
+export type CalendarEvent = HorseEvent & {
+  horse: Pick<Database['public']['Tables']['horses']['Row'], 'id' | 'name'> | null
+}
+
+export async function listAllEvents(): Promise<CalendarEvent[]> {
+  const { data, error } = await supabase
+    .from('calendar_events')
+    .select(
+      'id, title, description, event_type, start_time, end_time, horse:horses(id, name)',
+    )
+    .order('start_time')
+  if (error) throw error
+  return data
+}
 export type HorseEventInsert =
   Database['public']['Tables']['calendar_events']['Insert']
 export type HorseEventUpdate =
