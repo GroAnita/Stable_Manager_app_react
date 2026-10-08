@@ -21,6 +21,7 @@ export type IconName =
   | 'menu'
   | 'alert'
   | 'priceList'
+  | 'box'
 
 const strokeIcons: Record<IconName, ReactNode> = {
   home: (
@@ -142,6 +143,13 @@ const strokeIcons: Record<IconName, ReactNode> = {
     <>
       <path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.6 3H4a1 1 0 0 0-1 1v5.6a2 2 0 0 0 .83 1.41l9.58 9.58a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.83z" />
       <circle cx="7.5" cy="7.5" r="1.5" />
+    </>
+  ),
+  box: (
+    <>
+      <path d="M21 8 12 3 3 8l9 5 9-5z" />
+      <path d="M3 8v8l9 5 9-5V8" />
+      <line x1="12" y1="13" x2="12" y2="21" />
     </>
   ),
 }

@@ -38,6 +38,27 @@ export type ContractListItem = Pick<
   > | null
 }
 
+export type ContractAllocation = Pick<
+  Contract,
+  | 'hay_price_list_item_id'
+  | 'included_hay_kg'
+  | 'bedding_price_list_item_id'
+  | 'bedding_quantity'
+>
+
+export async function listActiveContractAllocations(): Promise<
+  ContractAllocation[]
+> {
+  const { data, error } = await supabase
+    .from('contracts')
+    .select(
+      'hay_price_list_item_id, included_hay_kg, bedding_price_list_item_id, bedding_quantity',
+    )
+    .eq('status', 'active')
+  if (error) throw error
+  return data
+}
+
 export async function listContracts(): Promise<ContractListItem[]> {
   const { data, error } = await supabase
     .from('contracts')

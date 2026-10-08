@@ -515,6 +515,96 @@ export type Database = {
           },
         ]
       }
+      inventory_deliveries: {
+        Row: {
+          created_at: string
+          delivered_on: string
+          id: string
+          inventory_item_id: string
+          notes: string | null
+          quantity: number
+          stable_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivered_on: string
+          id?: string
+          inventory_item_id: string
+          notes?: string | null
+          quantity: number
+          stable_id: string
+        }
+        Update: {
+          created_at?: string
+          delivered_on?: string
+          id?: string
+          inventory_item_id?: string
+          notes?: string | null
+          quantity?: number
+          stable_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'inventory_deliveries_inventory_item_id_fkey'
+            columns: ['inventory_item_id']
+            isOneToOne: false
+            referencedRelation: 'inventory_items'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'inventory_deliveries_stable_id_fkey'
+            columns: ['stable_id']
+            isOneToOne: false
+            referencedRelation: 'stables'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      inventory_items: {
+        Row: {
+          created_at: string
+          id: string
+          low_stock_days_threshold: number
+          notes: string | null
+          price_list_item_id: string
+          stable_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          low_stock_days_threshold?: number
+          notes?: string | null
+          price_list_item_id: string
+          stable_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          low_stock_days_threshold?: number
+          notes?: string | null
+          price_list_item_id?: string
+          stable_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'inventory_items_price_list_item_id_fkey'
+            columns: ['price_list_item_id']
+            isOneToOne: false
+            referencedRelation: 'price_list_items'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'inventory_items_stable_id_fkey'
+            columns: ['stable_id']
+            isOneToOne: false
+            referencedRelation: 'stables'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       medical_records: {
         Row: {
           created_at: string

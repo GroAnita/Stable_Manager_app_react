@@ -16,6 +16,7 @@ const ContractList = lazy(() => import('./pages/ContractList'))
 const ContractForm = lazy(() => import('./pages/ContractForm'))
 const PaymentList = lazy(() => import('./pages/PaymentList'))
 const PriceList = lazy(() => import('./pages/PriceList'))
+const Inventory = lazy(() => import('./pages/Inventory'))
 const CalendarView = lazy(() => import('./pages/CalendarView'))
 const TaskList = lazy(() => import('./pages/TaskList'))
 const Reports = lazy(() => import('./pages/Reports'))
@@ -55,6 +56,7 @@ export const router = createBrowserRouter([
       { path: 'contracts/:id/edit', element: <ContractForm /> },
       { path: 'payments', element: <PaymentList /> },
       { path: 'price-list', element: <PriceList /> },
+      { path: 'inventory', element: <Inventory /> },
       { path: 'calendar', element: <CalendarView /> },
       { path: 'tasks', element: <TaskList /> },
       { path: 'reports', element: <Reports /> },

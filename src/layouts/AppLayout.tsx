@@ -5,19 +5,54 @@ import { signOut } from '../lib/authService'
 import { useAuth } from '../lib/AuthContext'
 import { usePreferences } from '../lib/PreferencesContext'
 
-const navItems: { key: string; to: string; icon: IconName | 'horse' }[] = [
-  { key: 'dashboard', to: '/dashboard', icon: 'home' },
-  { key: 'horses', to: '/horses', icon: 'horse' },
-  { key: 'owners', to: '/owners', icon: 'users' },
-  { key: 'stalls', to: '/stalls', icon: 'grid' },
-  { key: 'contracts', to: '/contracts', icon: 'fileText' },
-  { key: 'payments', to: '/payments', icon: 'dollar' },
-  { key: 'calendar', to: '/calendar', icon: 'calendar' },
-  { key: 'tasks', to: '/tasks', icon: 'checkSquare' },
-  { key: 'reports', to: '/reports', icon: 'chart' },
-  { key: 'priceList', to: '/price-list', icon: 'priceList' },
-  { key: 'settings', to: '/settings', icon: 'settings' },
+type NavItem = { key: string; to: string; icon: IconName | 'horse' }
+
+const dashboardItem: NavItem = { key: 'dashboard', to: '/dashboard', icon: 'home' }
+
+const navGroups: { labelKey: string; items: NavItem[] }[] = [
+  {
+    labelKey: 'nav.groupStableOperations',
+    items: [
+      { key: 'horses', to: '/horses', icon: 'horse' },
+      { key: 'owners', to: '/owners', icon: 'users' },
+      { key: 'stalls', to: '/stalls', icon: 'grid' },
+      { key: 'calendar', to: '/calendar', icon: 'calendar' },
+      { key: 'tasks', to: '/tasks', icon: 'checkSquare' },
+    ],
+  },
+  {
+    labelKey: 'nav.groupBusiness',
+    items: [
+      { key: 'contracts', to: '/contracts', icon: 'fileText' },
+      { key: 'payments', to: '/payments', icon: 'dollar' },
+      { key: 'priceList', to: '/price-list', icon: 'priceList' },
+      { key: 'inventory', to: '/inventory', icon: 'box' },
+      { key: 'reports', to: '/reports', icon: 'chart' },
+    ],
+  },
 ]
+
+const settingsItem: NavItem = { key: 'settings', to: '/settings', icon: 'settings' }
+
+function SidebarLink({ item, onClick }: { item: NavItem; onClick: () => void }) {
+  const { t } = usePreferences()
+  return (
+    <NavLink
+      to={item.to}
+      onClick={onClick}
+      className={({ isActive }) =>
+        `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-ink/70 hover:bg-white hover:text-forest ${
+          isActive ? 'bg-white text-forest shadow-soft' : ''
+        }`
+      }
+    >
+      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/70 text-forest">
+        <Icon name={item.icon} className="h-5 w-5" />
+      </span>
+      <span>{t(`nav.${item.key}`)}</span>
+    </NavLink>
+  )
+}
 
 export default function AppLayout() {
   const { session } = useAuth()
@@ -53,27 +88,34 @@ export default function AppLayout() {
             <Icon name="x" className="h-5 w-5" />
           </button>
         </div>
-        <nav className="flex flex-1 flex-col gap-1">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
+        <nav className="flex flex-1 flex-col gap-4 overflow-y-auto">
+          <div className="flex flex-col gap-1">
+            <SidebarLink
+              item={dashboardItem}
               onClick={() => setSidebarOpen(false)}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-ink/70 hover:bg-white hover:text-forest ${
-                  isActive ? 'bg-white text-forest shadow-soft' : ''
-                }`
-              }
-            >
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/70 text-forest">
-                <Icon name={item.icon} className="h-5 w-5" />
-              </span>
-              <span>{t(`nav.${item.key}`)}</span>
-            </NavLink>
+            />
+          </div>
+          {navGroups.map((group) => (
+            <div key={group.labelKey} className="flex flex-col gap-1">
+              <p className="px-4 text-xs font-semibold tracking-wide text-ink/40 uppercase">
+                {t(group.labelKey)}
+              </p>
+              {group.items.map((item) => (
+                <SidebarLink
+                  key={item.to}
+                  item={item}
+                  onClick={() => setSidebarOpen(false)}
+                />
+              ))}
+            </div>
           ))}
         </nav>
         <div className="border-t border-white/70 pt-4">
-          <p className="mb-2 truncate px-1 text-xs text-ink/60">
+          <SidebarLink
+            item={settingsItem}
+            onClick={() => setSidebarOpen(false)}
+          />
+          <p className="mt-3 mb-2 truncate px-1 text-xs text-ink/60">
             {session?.user.email}
           </p>
           <button

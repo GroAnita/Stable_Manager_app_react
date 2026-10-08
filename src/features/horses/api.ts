@@ -221,6 +221,12 @@ export function parseFeedingExtras(raw: string | null): FeedingExtraEntry[] {
   }
 }
 
+export async function listAllFeedingExtras(): Promise<FeedingExtraEntry[]> {
+  const { data, error } = await supabase.from('feeding_plans').select('extras')
+  if (error) throw error
+  return data.flatMap((row) => parseFeedingExtras(row.extras))
+}
+
 type Translate = (key: string, vars?: Record<string, string | number>) => string
 
 export async function logFeedingExtra(params: {
