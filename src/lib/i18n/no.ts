@@ -45,6 +45,8 @@ export const no: typeof en = {
     fullName: 'Fullt navn',
     email: 'E-post',
     password: 'Passord',
+    showPassword: 'Vis passord',
+    hidePassword: 'Skjul passord',
     pleaseWait: 'Vennligst vent…',
     signIn: 'Logg inn',
     signUp: 'Registrer deg',

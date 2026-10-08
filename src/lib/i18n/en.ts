@@ -43,6 +43,8 @@ export const en = {
     fullName: 'Full name',
     email: 'Email',
     password: 'Password',
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
     pleaseWait: 'Please wait…',
     signIn: 'Sign in',
     signUp: 'Sign up',

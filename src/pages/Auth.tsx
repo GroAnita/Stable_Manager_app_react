@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Icon } from '../components/Icon'
 import { signIn, signUp } from '../lib/authService'
 import { useAuth } from '../lib/AuthContext'
 import { usePreferences } from '../lib/PreferencesContext'
@@ -14,6 +15,7 @@ export default function Auth() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [info, setInfo] = useState<string | null>(null)
@@ -90,14 +92,28 @@ export default function Auth() {
           </label>
           <label>
             <span className="field-label">{t('auth.password')}</span>
-            <input
-              required
-              type="password"
-              minLength={6}
-              className="field"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="relative">
+              <input
+                required
+                type={showPassword ? 'text' : 'password'}
+                minLength={6}
+                className="field pr-10"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={
+                  showPassword
+                    ? t('auth.hidePassword')
+                    : t('auth.showPassword')
+                }
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 hover:text-slate-600"
+              >
+                <Icon name={showPassword ? 'eyeOff' : 'eye'} className="h-4 w-4" />
+              </button>
+            </div>
           </label>
           {info && <p className="text-sm text-emerald-700">{info}</p>}
           {error && (
