@@ -10,16 +10,22 @@ import {
   type Owner,
   type OwnerHorse,
 } from '../features/owners/api'
+import { createOwnerInvite, inviteUrl } from '../features/invites/api'
+import { useAuth } from '../lib/AuthContext'
 import { usePreferences } from '../lib/PreferencesContext'
 
 export default function OwnerDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { t } = usePreferences()
+  const { session, profile } = useAuth()
   const [owner, setOwner] = useState<Owner | null>(null)
   const [horses, setHorses] = useState<OwnerHorse[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [invite, setInvite] = useState<string | null>(null)
+  const [inviteSaving, setInviteSaving] = useState(false)
+  const [inviteError, setInviteError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!id) return
@@ -50,6 +56,24 @@ export default function OwnerDetail() {
       return
     await deleteOwner(id)
     navigate('/owners')
+  }
+
+  async function handleGenerateInvite() {
+    if (!owner || !profile?.stable_id || !session) return
+    setInviteSaving(true)
+    setInviteError(null)
+    try {
+      const created = await createOwnerInvite({
+        stableId: profile.stable_id,
+        createdBy: session.user.id,
+        ownerId: owner.id,
+      })
+      setInvite(inviteUrl(created.token))
+    } catch (err) {
+      setInviteError((err as Error).message)
+    } finally {
+      setInviteSaving(false)
+    }
   }
 
   if (loading)
@@ -123,6 +147,48 @@ export default function OwnerDetail() {
               <p className="mt-3 text-sm text-slate-600">{owner.notes}</p>
             </div>
           )}
+
+          <div className="panel p-5">
+            <h2 className="section-title">{t('ownerDetail.portalAccess')}</h2>
+            {owner.user_id ? (
+              <p className="mt-3 text-sm text-slate-500">
+                {t('ownerDetail.portalLinked')}
+              </p>
+            ) : invite ? (
+              <div className="mt-3 space-y-2">
+                <p className="text-sm text-slate-500">
+                  {t('ownerDetail.portalInviteReady')}
+                </p>
+                <input
+                  readOnly
+                  className="field text-xs"
+                  value={invite}
+                  onFocus={(e) => e.target.select()}
+                />
+              </div>
+            ) : (
+              <>
+                <p className="mt-2 text-sm text-slate-500">
+                  {t('ownerDetail.portalInviteHint')}
+                </p>
+                {inviteError && (
+                  <p role="alert" className="mt-2 text-sm text-red-600">
+                    {inviteError}
+                  </p>
+                )}
+                <button
+                  type="button"
+                  disabled={inviteSaving}
+                  onClick={handleGenerateInvite}
+                  className="btn-ghost mt-3"
+                >
+                  {inviteSaving
+                    ? t('common.saving')
+                    : t('ownerDetail.generateInvite')}
+                </button>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="panel p-5">

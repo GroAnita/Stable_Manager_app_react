@@ -53,6 +53,17 @@ export const no: typeof en = {
     confirmEmail:
       'Sjekk e-posten din for å bekrefte kontoen, og logg deretter inn.',
   },
+  onboarding: {
+    title: 'Sett opp stallen din',
+    subtitle:
+      'Opprett stallen din for å komme i gang. Du kan invitere pensjonærer og ansatte etterpå.',
+    createStable: 'Opprett stall',
+  },
+  invite: {
+    title: 'Blir med i stallen',
+    accepting: 'Godtar invitasjonen din…',
+    failed: 'Kunne ikke godta denne invitasjonen: {error}',
+  },
   dashboard: {
     title: 'Oversikt',
     totalHorses: 'Antall hester',
@@ -278,6 +289,12 @@ export const no: typeof en = {
     failedToLoad: 'Kunne ikke laste eier: {error}',
     notFound: 'Fant ikke eieren.',
     confirmDelete: 'Slette {name}? Dette kan ikke angres.',
+    portalAccess: 'Portaltilgang',
+    portalLinked: 'Denne eieren har allerede en pålogging knyttet til kontoen.',
+    portalInviteHint:
+      'Lag en lenke du kan sende til eieren, slik at de kan lage sin egen pålogging og se hestene sine.',
+    portalInviteReady: 'Del denne lenken med eieren:',
+    generateInvite: 'Lag invitasjonslenke',
   },
   ownerForm: {
     newOwner: 'Ny eier',
@@ -492,6 +509,10 @@ export const no: typeof en = {
     account: 'Konto',
     accountEmail: 'E-post:',
     accountRole: 'Rolle:',
+    staffInvite: 'Ansattes tilgang',
+    staffInviteHint:
+      'Lag en lenke du kan sende til en ansatt, slik at de kan lage en pålogging med tilgang til stallen din.',
+    generateStaffInvite: 'Lag invitasjonslenke for ansatt',
     preferences: 'Preferanser',
     language: 'Språk',
     currency: 'Valuta',

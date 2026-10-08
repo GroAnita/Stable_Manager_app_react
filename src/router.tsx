@@ -4,6 +4,8 @@ import AppLayout from './layouts/AppLayout'
 import { RequireAuth } from './lib/RequireAuth'
 
 const Auth = lazy(() => import('./pages/Auth'))
+const CreateStable = lazy(() => import('./pages/CreateStable'))
+const AcceptInvite = lazy(() => import('./pages/AcceptInvite'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const HorseList = lazy(() => import('./pages/HorseList'))
 const HorseDetail = lazy(() => import('./pages/HorseDetail'))
@@ -30,6 +32,24 @@ export const router = createBrowserRouter([
       <Suspense fallback={null}>
         <Auth />
       </Suspense>
+    ),
+  },
+  {
+    path: '/invite/:token',
+    element: (
+      <Suspense fallback={null}>
+        <AcceptInvite />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/onboarding',
+    element: (
+      <RequireAuth requireStable={false}>
+        <Suspense fallback={null}>
+          <CreateStable />
+        </Suspense>
+      </RequireAuth>
     ),
   },
   {

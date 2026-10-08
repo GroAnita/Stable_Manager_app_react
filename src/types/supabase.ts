@@ -943,6 +943,77 @@ export type Database = {
           },
         ]
       }
+      stable_invites: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          kind: string
+          owner_id: string | null
+          role: Database['public']['Enums']['user_role'] | null
+          stable_id: string
+          token: string
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string
+          id?: string
+          kind: string
+          owner_id?: string | null
+          role?: Database['public']['Enums']['user_role'] | null
+          stable_id: string
+          token?: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          kind?: string
+          owner_id?: string | null
+          role?: Database['public']['Enums']['user_role'] | null
+          stable_id?: string
+          token?: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'stable_invites_created_by_fkey'
+            columns: ['created_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'stable_invites_owner_id_fkey'
+            columns: ['owner_id']
+            isOneToOne: false
+            referencedRelation: 'owners'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'stable_invites_stable_id_fkey'
+            columns: ['stable_id']
+            isOneToOne: false
+            referencedRelation: 'stables'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'stable_invites_used_by_fkey'
+            columns: ['used_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       stables: {
         Row: {
           address: string | null
@@ -1326,6 +1397,10 @@ export type Database = {
       }
     }
     Functions: {
+      accept_stable_invite: {
+        Args: { p_token: string }
+        Returns: undefined
+      }
       assign_staff_role: {
         Args: {
           p_role: Database['public']['Enums']['user_role']

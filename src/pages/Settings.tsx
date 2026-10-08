@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { createStaffInvite, inviteUrl } from '../features/invites/api'
 import {
   getMyProfile,
   getStable,
@@ -45,6 +46,11 @@ export default function Settings() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
+  const [staffInvite, setStaffInvite] = useState<string | null>(null)
+  const [staffInviteSaving, setStaffInviteSaving] = useState(false)
+  const [staffInviteError, setStaffInviteError] = useState<string | null>(
+    null,
+  )
 
   useEffect(() => {
     let cancelled = false
@@ -70,6 +76,23 @@ export default function Settings() {
   }, [])
 
   const canEdit = profile?.role === 'stable_owner'
+
+  async function handleGenerateStaffInvite() {
+    if (!profile?.stable_id || !session) return
+    setStaffInviteSaving(true)
+    setStaffInviteError(null)
+    try {
+      const created = await createStaffInvite({
+        stableId: profile.stable_id,
+        createdBy: session.user.id,
+      })
+      setStaffInvite(inviteUrl(created.token))
+    } catch (err) {
+      setStaffInviteError((err as Error).message)
+    } finally {
+      setStaffInviteSaving(false)
+    }
+  }
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => (prev ? { ...prev, [key]: value } : prev))
@@ -253,6 +276,39 @@ export default function Settings() {
               </p>
             </div>
           </div>
+
+          {canEdit && (
+            <div className="panel p-6">
+              <h2 className="section-title">{t('settings.staffInvite')}</h2>
+              <p className="mt-2 text-sm text-slate-500">
+                {t('settings.staffInviteHint')}
+              </p>
+              {staffInviteError && (
+                <p role="alert" className="mt-2 text-sm text-red-600">
+                  {staffInviteError}
+                </p>
+              )}
+              {staffInvite ? (
+                <input
+                  readOnly
+                  className="field mt-3 text-xs"
+                  value={staffInvite}
+                  onFocus={(e) => e.target.select()}
+                />
+              ) : (
+                <button
+                  type="button"
+                  disabled={staffInviteSaving}
+                  onClick={handleGenerateStaffInvite}
+                  className="btn-ghost mt-3"
+                >
+                  {staffInviteSaving
+                    ? t('common.saving')
+                    : t('settings.generateStaffInvite')}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

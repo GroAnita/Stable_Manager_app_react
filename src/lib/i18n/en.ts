@@ -50,6 +50,17 @@ export const en = {
     haveAccount: 'Already have an account? ',
     confirmEmail: 'Check your email to confirm your account, then sign in.',
   },
+  onboarding: {
+    title: 'Set up your stable',
+    subtitle:
+      "Create your stable to get started. You'll be able to invite boarders and staff afterwards.",
+    createStable: 'Create stable',
+  },
+  invite: {
+    title: 'Joining your stable',
+    accepting: 'Accepting your invite…',
+    failed: 'Could not accept this invite: {error}',
+  },
   dashboard: {
     title: 'Dashboard',
     totalHorses: 'Total horses',
@@ -275,6 +286,12 @@ export const en = {
     failedToLoad: 'Failed to load owner: {error}',
     notFound: 'Owner not found.',
     confirmDelete: 'Delete {name}? This cannot be undone.',
+    portalAccess: 'Portal access',
+    portalLinked: 'This owner already has a login linked to their account.',
+    portalInviteHint:
+      'Generate a link to send this owner so they can create their own login and see their horses.',
+    portalInviteReady: 'Share this link with the owner:',
+    generateInvite: 'Generate invite link',
   },
   ownerForm: {
     newOwner: 'New owner',
@@ -489,6 +506,10 @@ export const en = {
     account: 'Account',
     accountEmail: 'Email:',
     accountRole: 'Role:',
+    staffInvite: 'Staff access',
+    staffInviteHint:
+      'Generate a link to send a staff member so they can create a login with access to your stable.',
+    generateStaffInvite: 'Generate staff invite link',
     preferences: 'Preferences',
     language: 'Language',
     currency: 'Currency',

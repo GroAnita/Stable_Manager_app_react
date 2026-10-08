@@ -19,6 +19,26 @@ export async function getMyProfile(): Promise<Profile> {
   return data
 }
 
+export async function createStable(input: {
+  name: string
+  address?: string | null
+  city?: string | null
+  postal_code?: string | null
+  phone?: string | null
+  email?: string | null
+}): Promise<Stable> {
+  const { data, error } = await supabase.rpc('create_stable', {
+    p_name: input.name,
+    p_address: input.address ?? undefined,
+    p_city: input.city ?? undefined,
+    p_postal_code: input.postal_code ?? undefined,
+    p_phone: input.phone ?? undefined,
+    p_email: input.email ?? undefined,
+  })
+  if (error) throw error
+  return data
+}
+
 export async function getStable(id: string): Promise<Stable> {
   const { data, error } = await supabase
     .from('stables')
