@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Badge } from '../components/Badge'
+import { ContractCard } from '../components/ContractCard'
+import { ContractView } from '../components/ContractView'
 import { EmptyState } from '../components/EmptyState'
 import { Icon } from '../components/Icon'
 import {
@@ -51,6 +53,7 @@ export default function ContractList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<Filter>('all')
+  const [viewingId, setViewingId] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -136,7 +139,21 @@ export default function ContractList() {
       )}
 
       {!loading && !error && filtered.length > 0 && (
-        <div className="table-wrap">
+        <div className="grid gap-4 md:hidden">
+          {filtered.map((contract) => (
+            <ContractCard
+              key={contract.id}
+              contract={contract}
+              monthlyTotal={totalMonthlyPrice(contract)}
+              onView={() => setViewingId(contract.id)}
+              onDelete={() => handleDelete(contract)}
+            />
+          ))}
+        </div>
+      )}
+
+      {!loading && !error && filtered.length > 0 && (
+        <div className="table-wrap hidden md:block">
           <table className="data-table">
             <thead>
               <tr>
@@ -160,6 +177,13 @@ export default function ContractList() {
                   </td>
                   <td>
                     <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setViewingId(contract.id)}
+                        className="btn-ghost px-3 py-2"
+                      >
+                        {t('contractList.view')}
+                      </button>
                       <Link
                         to={`/contracts/${contract.id}/edit`}
                         className="btn-ghost px-3 py-2"
@@ -181,6 +205,11 @@ export default function ContractList() {
           </table>
         </div>
       )}
+
+      <ContractView
+        contractId={viewingId}
+        onClose={() => setViewingId(null)}
+      />
     </div>
   )
 }

@@ -7,11 +7,13 @@ export function Modal({
   onClose,
   title,
   children,
+  size = 'md',
 }: {
   open: boolean
   onClose: () => void
   title: string
   children: ReactNode
+  size?: 'md' | 'lg'
 }) {
   useEffect(() => {
     if (!open) return
@@ -34,7 +36,9 @@ export function Modal({
         aria-modal="true"
         aria-label={title}
         onClick={(e) => e.stopPropagation()}
-        className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-card"
+        className={`max-h-[85vh] w-full overflow-y-auto rounded-2xl bg-white p-6 shadow-card print:hidden ${
+          size === 'lg' ? 'max-w-3xl' : 'max-w-md'
+        }`}
       >
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-slate-900">{title}</h2>

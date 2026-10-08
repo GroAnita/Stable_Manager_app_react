@@ -112,3 +112,19 @@
   background: rgba(58, 107, 82, 0.28);
   border-radius: 999px;
 }
+
+@media print {
+  body:has(.print-area) * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible !important;
+  }
+  .print-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+}

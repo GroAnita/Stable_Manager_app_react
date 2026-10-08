@@ -76,6 +76,45 @@ export async function getContract(id: string): Promise<Contract> {
   return data
 }
 
+export type ContractDetail = Contract & {
+  horse: Pick<
+    Database['public']['Tables']['horses']['Row'],
+    'id' | 'name'
+  > | null
+  owner: Pick<
+    Database['public']['Tables']['owners']['Row'],
+    'id' | 'full_name' | 'phone'
+  > | null
+  stall: Pick<
+    Database['public']['Tables']['stalls']['Row'],
+    'id' | 'stall_number'
+  > | null
+  hay_item: PriceListItemOption | null
+  bedding_item: PriceListItemOption | null
+  stable: Pick<
+    Database['public']['Tables']['stables']['Row'],
+    'name' | 'address' | 'city' | 'postal_code' | 'phone' | 'email'
+  > | null
+}
+
+export async function getContractDetail(id: string): Promise<ContractDetail> {
+  const { data, error } = await supabase
+    .from('contracts')
+    .select(
+      `*,
+       horse:horses(id, name),
+       owner:owners(id, full_name, phone),
+       stall:stalls(id, stall_number),
+       hay_item:price_list_items!contracts_hay_price_list_item_id_fkey(id, item, unit, price),
+       bedding_item:price_list_items!contracts_bedding_price_list_item_id_fkey(id, item, unit, price),
+       stable:stables(name, address, city, postal_code, phone, email)`,
+    )
+    .eq('id', id)
+    .single()
+  if (error) throw error
+  return data
+}
+
 export async function createContract(input: ContractInsert): Promise<Contract> {
   const { data, error } = await supabase
     .from('contracts')
