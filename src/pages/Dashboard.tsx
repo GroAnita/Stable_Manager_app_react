@@ -64,46 +64,55 @@ export default function Dashboard() {
     label: string
     value: number
     icon: IconName | 'horse'
+    to: string
   }[] = [
     {
       label: t('dashboard.totalHorses'),
       value: stats.total_horses ?? 0,
       icon: 'horse',
+      to: '/horses',
     },
     {
       label: t('dashboard.occupiedStalls'),
       value: stats.occupied_stalls ?? 0,
       icon: 'grid',
+      to: '/stalls',
     },
     {
       label: t('dashboard.availableStalls'),
       value: stats.available_stalls ?? 0,
       icon: 'home',
+      to: '/stalls',
     },
     {
       label: t('dashboard.paymentsDue7'),
       value: stats.upcoming_payments ?? 0,
       icon: 'dollar',
+      to: '/payments',
     },
     {
       label: t('dashboard.overduePayments'),
       value: stats.overdue_payments ?? 0,
       icon: 'alert',
+      to: '/payments',
     },
     {
       label: t('dashboard.tasksToday'),
       value: stats.today_tasks ?? 0,
       icon: 'checkSquare',
+      to: '/tasks',
     },
     {
       label: t('dashboard.upcomingVetVisits'),
       value: stats.upcoming_vet_visits ?? 0,
       icon: 'calendar',
+      to: '/calendar',
     },
     {
       label: t('dashboard.upcomingFarrierVisits'),
       value: stats.upcoming_farrier_visits ?? 0,
       icon: 'horse',
+      to: '/calendar',
     },
   ]
 
@@ -129,6 +138,7 @@ export default function Dashboard() {
             label={card.label}
             value={card.value}
             icon={<Icon name={card.icon} className="h-5 w-5" />}
+            to={card.to}
           />
         ))}
       </section>
