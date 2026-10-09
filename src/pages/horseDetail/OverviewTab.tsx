@@ -1,25 +1,20 @@
 import { Badge } from '../../components/Badge'
 import type { HorseDetail } from '../../features/horses/api'
+import { calculateAge } from '../../lib/age'
 import { usePreferences } from '../../lib/PreferencesContext'
 
 export function OverviewTab({ horse }: { horse: HorseDetail }) {
   const { t, formatDate } = usePreferences()
+  const age = horse.birthday ? calculateAge(horse.birthday) : horse.age
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <p className="text-slate-400">{t('horseDetail.age')}</p>
-            <p className="font-medium text-slate-800">
-              {horse.age != null
-                ? `${horse.age} ${t('horseDetail.years')}`
-                : '—'}
-            </p>
-          </div>
-          <div>
             <p className="text-slate-400">{t('horseDetail.birthday')}</p>
             <p className="font-medium text-slate-800">
-              {formatDate(horse.birthday)}
+              {horse.birthday ? formatDate(horse.birthday) : '—'}
+              {age != null && ` (${age} ${t('horseDetail.years')})`}
             </p>
           </div>
           <div>

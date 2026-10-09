@@ -6,6 +6,7 @@ import {
   updateHorse,
   type HorseInsert,
 } from '../features/horses/api'
+import { calculateAge } from '../lib/age'
 import {
   listOwnerOptions,
   listStallOptions,
@@ -18,7 +19,7 @@ import { getCurrentStableId } from '../lib/stableContext'
 type FormState = {
   name: string
   breed: string
-  age: string
+  birthday: string
   gender: string
   color: string
   passport_number: string
@@ -39,7 +40,7 @@ type FormState = {
 const emptyForm: FormState = {
   name: '',
   breed: '',
-  age: '',
+  birthday: '',
   gender: '',
   color: '',
   passport_number: '',
@@ -88,7 +89,7 @@ export default function HorseForm() {
         setForm({
           name: horse.name,
           breed: horse.breed ?? '',
-          age: horse.age?.toString() ?? '',
+          birthday: horse.birthday ?? '',
           gender: horse.gender ?? '',
           color: horse.color ?? '',
           passport_number: horse.passport_number ?? '',
@@ -127,7 +128,8 @@ export default function HorseForm() {
       const payload = {
         name: form.name,
         breed: form.breed || null,
-        age: form.age ? Number(form.age) : null,
+        birthday: form.birthday || null,
+        age: calculateAge(form.birthday),
         gender: form.gender || null,
         color: form.color || null,
         passport_number: form.passport_number || null,
@@ -197,12 +199,20 @@ export default function HorseForm() {
           />
         </label>
         <label>
-          <span className="field-label">{t('horseForm.age')}</span>
+          <span className="field-label">
+            {t('horseForm.birthday')}
+            {form.birthday && calculateAge(form.birthday) !== null && (
+              <span className="text-slate-400">
+                {' '}
+                ({t('horseForm.yearsOld', { count: calculateAge(form.birthday)! })})
+              </span>
+            )}
+          </span>
           <input
-            type="number"
+            type="date"
             className="field"
-            value={form.age}
-            onChange={(e) => updateField('age', e.target.value)}
+            value={form.birthday}
+            onChange={(e) => updateField('birthday', e.target.value)}
           />
         </label>
         <label>
