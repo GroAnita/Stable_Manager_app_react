@@ -35,6 +35,7 @@ const navGroups: { labelKey: string; items: NavItem[] }[] = [
 const settingsItem: NavItem = { key: 'settings', to: '/settings', icon: 'settings' }
 
 const ownerNavItems: NavItem[] = [
+  { key: 'dashboard', to: '/owner-dashboard', icon: 'home' },
   { key: 'myHorse', to: '/my-horse', icon: 'horse' },
   { key: 'myContract', to: '/my-contract', icon: 'fileText' },
   { key: 'calendar', to: '/calendar', icon: 'calendar' },
@@ -47,6 +48,7 @@ const ownerProfileItem: NavItem = {
 }
 
 const OWNER_ALLOWED_PATHS = [
+  '/owner-dashboard',
   '/my-horse',
   '/my-contract',
   '/my-profile',
@@ -87,7 +89,7 @@ export default function AppLayout() {
   }
 
   if (isOwner && !OWNER_ALLOWED_PATHS.includes(location.pathname)) {
-    return <Navigate to="/my-horse" replace />
+    return <Navigate to="/owner-dashboard" replace />
   }
 
   return (

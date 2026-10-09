@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { AnnouncementBoard } from '../components/AnnouncementBoard'
 import { Badge } from '../components/Badge'
 import { Card } from '../components/Card'
 import { EmptyState } from '../components/EmptyState'
@@ -118,6 +119,8 @@ export default function Dashboard() {
           </h1>
         </div>
       </section>
+
+      <AnnouncementBoard canManage />
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {statCards.map((card) => (

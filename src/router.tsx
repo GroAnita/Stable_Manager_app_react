@@ -26,6 +26,7 @@ const Settings = lazy(() => import('./pages/Settings'))
 const MyHorse = lazy(() => import('./pages/MyHorse'))
 const MyContract = lazy(() => import('./pages/MyContract'))
 const MyProfile = lazy(() => import('./pages/MyProfile'))
+const OwnerDashboard = lazy(() => import('./pages/OwnerDashboard'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 export const router = createBrowserRouter([
@@ -87,6 +88,7 @@ export const router = createBrowserRouter([
       { path: 'my-horse', element: <MyHorse /> },
       { path: 'my-contract', element: <MyContract /> },
       { path: 'my-profile', element: <MyProfile /> },
+      { path: 'owner-dashboard', element: <OwnerDashboard /> },
       { path: '*', element: <NotFound /> },
     ],
   },
