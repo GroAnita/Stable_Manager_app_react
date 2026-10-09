@@ -156,7 +156,9 @@ export default function HorseDetail() {
       </div>
 
       <div className="panel p-6">
-        {tab === 'overview' && <OverviewTab horse={horse} />}
+        {tab === 'overview' && (
+          <OverviewTab horse={horse} vaccinations={vaccinations} />
+        )}
         {tab === 'medical' && (
           <MedicalTab
             horseId={horse.id}

@@ -5,11 +5,13 @@ import {
   getHorseFeedingPlan,
   getHorseFeedingTimes,
   getHorseMedicalRecords,
+  getHorseVaccinations,
   listMyHorses,
   type FeedingPlan,
   type FeedingTime,
   type HorseDetail,
   type MedicalRecord,
+  type Vaccination,
 } from '../features/horses/api'
 import { usePreferences } from '../lib/PreferencesContext'
 import { OverviewTab } from './horseDetail/OverviewTab'
@@ -17,6 +19,7 @@ import { OverviewTab } from './horseDetail/OverviewTab'
 type HorseBundle = {
   horse: HorseDetail
   medical: MedicalRecord[]
+  vaccinations: Vaccination[]
   feedingPlan: FeedingPlan | null
   feedingTimes: FeedingTime[]
 }
@@ -33,12 +36,14 @@ export default function MyHorse() {
       .then(async (horses) => {
         const data = await Promise.all(
           horses.map(async (horse) => {
-            const [medical, feedingPlan, feedingTimes] = await Promise.all([
-              getHorseMedicalRecords(horse.id),
-              getHorseFeedingPlan(horse.id),
-              getHorseFeedingTimes(horse.id),
-            ])
-            return { horse, medical, feedingPlan, feedingTimes }
+            const [medical, vaccinations, feedingPlan, feedingTimes] =
+              await Promise.all([
+                getHorseMedicalRecords(horse.id),
+                getHorseVaccinations(horse.id),
+                getHorseFeedingPlan(horse.id),
+                getHorseFeedingTimes(horse.id),
+              ])
+            return { horse, medical, vaccinations, feedingPlan, feedingTimes }
           }),
         )
         if (!cancelled) setBundles(data)
@@ -78,7 +83,7 @@ export default function MyHorse() {
         />
       )}
 
-      {bundles.map(({ horse, medical, feedingPlan, feedingTimes }) => (
+      {bundles.map(({ horse, medical, vaccinations, feedingPlan, feedingTimes }) => (
         <div key={horse.id} className="panel space-y-6 p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-2xl font-semibold text-slate-900">
@@ -87,7 +92,7 @@ export default function MyHorse() {
             <Badge status={horse.status} />
           </div>
 
-          <OverviewTab horse={horse} />
+          <OverviewTab horse={horse} vaccinations={vaccinations} />
 
           <div>
             <h3 className="section-title">{t('myHorse.medicalRecords')}</h3>

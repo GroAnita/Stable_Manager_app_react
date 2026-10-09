@@ -1,11 +1,19 @@
-import { Badge } from '../../components/Badge'
-import type { HorseDetail } from '../../features/horses/api'
+import { StatusDot } from '../../components/StatusDot'
+import type { HorseDetail, Vaccination } from '../../features/horses/api'
 import { calculateAge } from '../../lib/age'
 import { usePreferences } from '../../lib/PreferencesContext'
+import { getVaccinationOverviewStatus } from '../../lib/vaccinations'
 
-export function OverviewTab({ horse }: { horse: HorseDetail }) {
+export function OverviewTab({
+  horse,
+  vaccinations,
+}: {
+  horse: HorseDetail
+  vaccinations: Vaccination[]
+}) {
   const { t, formatDate } = usePreferences()
   const age = horse.birthday ? calculateAge(horse.birthday) : horse.age
+  const vaccinationStatus = getVaccinationOverviewStatus(vaccinations)
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <div className="space-y-4">
@@ -55,12 +63,13 @@ export function OverviewTab({ horse }: { horse: HorseDetail }) {
           <p className="text-sm text-slate-400">
             {t('horseDetail.vaccinationStatus')}
           </p>
-          <div className="mt-2">
-            {horse.vaccination_status ? (
-              <Badge status={horse.vaccination_status} />
-            ) : (
-              <p className="text-slate-700">—</p>
-            )}
+          <div className="mt-2 flex items-center gap-2">
+            <StatusDot color={vaccinationStatus.color} />
+            <p className="font-medium text-slate-800">
+              {vaccinationStatus.dueDate
+                ? formatDate(vaccinationStatus.dueDate)
+                : '—'}
+            </p>
           </div>
         </div>
         <div>

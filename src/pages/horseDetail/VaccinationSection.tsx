@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { ConfirmDialog } from '../../components/ConfirmDialog'
 import { Icon } from '../../components/Icon'
 import { Modal } from '../../components/Modal'
+import { StatusDot } from '../../components/StatusDot'
 import {
   createVaccination,
   deleteVaccination,
@@ -31,18 +32,6 @@ function toForm(record: Vaccination): FormState {
     dose: record.dose as VaccinationDose,
     notes: record.notes ?? '',
   }
-}
-
-function StatusDot({ color }: { color: 'green' | 'yellow' | 'red' | 'grey' }) {
-  const classes = {
-    green: 'bg-emerald-500',
-    yellow: 'bg-amber-500',
-    red: 'bg-red-500',
-    grey: 'bg-slate-300',
-  }
-  return (
-    <span className={`inline-block h-2.5 w-2.5 rounded-full ${classes[color]}`} />
-  )
 }
 
 function VaccinationFields({

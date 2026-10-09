@@ -345,7 +345,6 @@ export const en = {
     microchipNumber: 'Microchip number',
     insuranceCompany: 'Insurance company',
     insuranceNumber: 'Insurance number',
-    vaccinationStatus: 'Vaccination status',
     allergies: 'Allergies',
     feedingNotes: 'Feeding notes',
     medicalNotes: 'Medical notes',

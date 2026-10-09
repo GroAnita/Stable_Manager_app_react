@@ -348,7 +348,6 @@ export const no: typeof en = {
     microchipNumber: 'Mikrochip-nummer',
     insuranceCompany: 'Forsikringsselskap',
     insuranceNumber: 'Forsikringsnummer',
-    vaccinationStatus: 'Vaksinasjonsstatus',
     allergies: 'Allergier',
     feedingNotes: 'Fôringsnotater',
     medicalNotes: 'Medisinske notater',

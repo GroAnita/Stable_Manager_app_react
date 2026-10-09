@@ -26,7 +26,6 @@ type FormState = {
   microchip_number: string
   insurance_company: string
   insurance_number: string
-  vaccination_status: string
   allergies: string
   feeding_notes: string
   medical_notes: string
@@ -47,7 +46,6 @@ const emptyForm: FormState = {
   microchip_number: '',
   insurance_company: '',
   insurance_number: '',
-  vaccination_status: '',
   allergies: '',
   feeding_notes: '',
   medical_notes: '',
@@ -96,7 +94,6 @@ export default function HorseForm() {
           microchip_number: horse.microchip_number ?? '',
           insurance_company: horse.insurance_company ?? '',
           insurance_number: horse.insurance_number ?? '',
-          vaccination_status: horse.vaccination_status ?? '',
           allergies: horse.allergies ?? '',
           feeding_notes: horse.feeding_notes ?? '',
           medical_notes: horse.medical_notes ?? '',
@@ -136,7 +133,6 @@ export default function HorseForm() {
         microchip_number: form.microchip_number || null,
         insurance_company: form.insurance_company || null,
         insurance_number: form.insurance_number || null,
-        vaccination_status: form.vaccination_status || null,
         allergies: form.allergies || null,
         feeding_notes: form.feeding_notes || null,
         medical_notes: form.medical_notes || null,
@@ -320,16 +316,6 @@ export default function HorseForm() {
             className="field"
             value={form.insurance_number}
             onChange={(e) => updateField('insurance_number', e.target.value)}
-          />
-        </label>
-        <label>
-          <span className="field-label">
-            {t('horseForm.vaccinationStatus')}
-          </span>
-          <input
-            className="field"
-            value={form.vaccination_status}
-            onChange={(e) => updateField('vaccination_status', e.target.value)}
           />
         </label>
         <label className="sm:col-span-2">

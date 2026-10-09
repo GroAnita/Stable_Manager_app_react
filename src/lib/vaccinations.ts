@@ -152,3 +152,38 @@ export function getAnnualBoosterStatus(
     dueDate: dueDate.toISOString().slice(0, 10),
   }
 }
+
+export type VaccinationStatusColor = 'green' | 'yellow' | 'red' | 'grey'
+
+export type VaccinationOverviewStatus = {
+  color: VaccinationStatusColor
+  dueDate: string | null
+}
+
+/**
+ * Single summary for the horse overview: while the basic series is still
+ * in progress, "next due" is its own deadline (green if on track, red if
+ * missed); once it's complete, it hands off to the yearly booster.
+ */
+export function getVaccinationOverviewStatus(
+  vaccinations: VaccinationRecord[],
+  now: Date = new Date(),
+): VaccinationOverviewStatus {
+  const grunnvaksine = getGrunnvaksineStatus(vaccinations, now)
+
+  if (grunnvaksine.status === 'not_started') {
+    return { color: 'grey', dueDate: null }
+  }
+  if (grunnvaksine.status === 'pending') {
+    return { color: 'green', dueDate: grunnvaksine.deadline }
+  }
+  if (grunnvaksine.status === 'invalid') {
+    return { color: 'red', dueDate: grunnvaksine.deadline }
+  }
+
+  const annual = getAnnualBoosterStatus(vaccinations, grunnvaksine, now)
+  return {
+    color: annual.status === 'not_applicable' ? 'grey' : annual.status,
+    dueDate: annual.dueDate,
+  }
+}
