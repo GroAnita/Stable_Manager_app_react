@@ -19,7 +19,7 @@ const SERVICE_LABEL_KEYS: Record<string, string> = {
   normal: 'contractForm.serviceNormal',
 }
 
-function ContractFields({ contract }: { contract: ContractDetail }) {
+export function ContractFields({ contract }: { contract: ContractDetail }) {
   const { t, formatCurrency, formatDate } = usePreferences()
   const cycleDays = currentBillingCycleDays()
   const hayValue =

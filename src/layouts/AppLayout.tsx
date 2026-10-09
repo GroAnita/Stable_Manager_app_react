@@ -1,5 +1,5 @@
 import { Suspense, useState } from 'react'
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { Navigate, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Icon, type IconName } from '../components/Icon'
 import { signOut } from '../lib/authService'
 import { useAuth } from '../lib/AuthContext'
@@ -34,6 +34,25 @@ const navGroups: { labelKey: string; items: NavItem[] }[] = [
 
 const settingsItem: NavItem = { key: 'settings', to: '/settings', icon: 'settings' }
 
+const ownerNavItems: NavItem[] = [
+  { key: 'myHorse', to: '/my-horse', icon: 'horse' },
+  { key: 'myContract', to: '/my-contract', icon: 'fileText' },
+  { key: 'calendar', to: '/calendar', icon: 'calendar' },
+]
+
+const ownerProfileItem: NavItem = {
+  key: 'myProfile',
+  to: '/my-profile',
+  icon: 'settings',
+}
+
+const OWNER_ALLOWED_PATHS = [
+  '/my-horse',
+  '/my-contract',
+  '/my-profile',
+  '/calendar',
+]
+
 function SidebarLink({ item, onClick }: { item: NavItem; onClick: () => void }) {
   const { t } = usePreferences()
   return (
@@ -55,14 +74,20 @@ function SidebarLink({ item, onClick }: { item: NavItem; onClick: () => void }) 
 }
 
 export default function AppLayout() {
-  const { session } = useAuth()
+  const { session, profile } = useAuth()
   const { t } = usePreferences()
   const navigate = useNavigate()
+  const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const isOwner = profile?.role === 'horse_owner'
 
   async function handleSignOut() {
     await signOut()
     navigate('/auth', { replace: true })
+  }
+
+  if (isOwner && !OWNER_ALLOWED_PATHS.includes(location.pathname)) {
+    return <Navigate to="/my-horse" replace />
   }
 
   return (
@@ -89,18 +114,9 @@ export default function AppLayout() {
           </button>
         </div>
         <nav className="flex flex-1 flex-col gap-4 overflow-y-auto">
-          <div className="flex flex-col gap-1">
-            <SidebarLink
-              item={dashboardItem}
-              onClick={() => setSidebarOpen(false)}
-            />
-          </div>
-          {navGroups.map((group) => (
-            <div key={group.labelKey} className="flex flex-col gap-1">
-              <p className="px-4 text-xs font-semibold tracking-wide text-ink/40 uppercase">
-                {t(group.labelKey)}
-              </p>
-              {group.items.map((item) => (
+          {isOwner ? (
+            <div className="flex flex-col gap-1">
+              {ownerNavItems.map((item) => (
                 <SidebarLink
                   key={item.to}
                   item={item}
@@ -108,11 +124,34 @@ export default function AppLayout() {
                 />
               ))}
             </div>
-          ))}
+          ) : (
+            <>
+              <div className="flex flex-col gap-1">
+                <SidebarLink
+                  item={dashboardItem}
+                  onClick={() => setSidebarOpen(false)}
+                />
+              </div>
+              {navGroups.map((group) => (
+                <div key={group.labelKey} className="flex flex-col gap-1">
+                  <p className="px-4 text-xs font-semibold tracking-wide text-ink/40 uppercase">
+                    {t(group.labelKey)}
+                  </p>
+                  {group.items.map((item) => (
+                    <SidebarLink
+                      key={item.to}
+                      item={item}
+                      onClick={() => setSidebarOpen(false)}
+                    />
+                  ))}
+                </div>
+              ))}
+            </>
+          )}
         </nav>
         <div className="border-t border-white/70 pt-4">
           <SidebarLink
-            item={settingsItem}
+            item={isOwner ? ownerProfileItem : settingsItem}
             onClick={() => setSidebarOpen(false)}
           />
           <p className="mt-3 mb-2 truncate px-1 text-xs text-ink/60">

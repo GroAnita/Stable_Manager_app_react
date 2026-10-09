@@ -9,6 +9,7 @@ import {
   updateHorseEvent,
   type CalendarEvent,
 } from '../features/horses/api'
+import { useAuth } from '../lib/AuthContext'
 import { listHorseOptions, type HorseOption } from '../lib/options'
 import { usePreferences } from '../lib/PreferencesContext'
 import { getCurrentStableId } from '../lib/stableContext'
@@ -190,6 +191,8 @@ function EventFields({
 
 export default function CalendarView() {
   const { t, formatDate } = usePreferences()
+  const { profile } = useAuth()
+  const canManage = profile?.role !== 'horse_owner'
   const [events, setEvents] = useState<CalendarEvent[]>([])
   const [horses, setHorses] = useState<HorseOption[]>([])
   const [loading, setLoading] = useState(true)
@@ -258,6 +261,7 @@ export default function CalendarView() {
   }
 
   function openAdd(defaultDate?: Date) {
+    if (!canManage) return
     setAddForm(emptyForm(toDatetimeLocal((defaultDate ?? new Date()).toISOString())))
     setAddError(null)
     setAddOpen(true)
@@ -303,6 +307,7 @@ export default function CalendarView() {
   }
 
   function openEdit(event: CalendarEvent) {
+    if (!canManage) return
     setEditing(event)
     setEditForm(toForm(event))
     setEditError(null)
@@ -455,11 +460,14 @@ export default function CalendarView() {
     return (
       <div className="space-y-3">
         {visibleEvents.map((event) => (
-          <button
+          <div
             key={event.id}
-            type="button"
-            onClick={() => openEdit(event)}
-            className="panel flex w-full items-start justify-between gap-4 p-4 text-left"
+            role={canManage ? 'button' : undefined}
+            tabIndex={canManage ? 0 : undefined}
+            onClick={canManage ? () => openEdit(event) : undefined}
+            className={`panel flex w-full items-start justify-between gap-4 p-4 text-left ${
+              canManage ? 'cursor-pointer' : ''
+            }`}
           >
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
@@ -479,7 +487,7 @@ export default function CalendarView() {
             <p className="shrink-0 whitespace-nowrap text-sm text-slate-500">
               {formatDate(event.start_time)}
             </p>
-          </button>
+          </div>
         ))}
       </div>
     )
@@ -496,10 +504,16 @@ export default function CalendarView() {
             {t('calendarView.subtitle')}
           </p>
         </div>
-        <button type="button" className="btn-primary" onClick={() => openAdd(currentDate)}>
-          <Icon name="plus" className="h-4 w-4" />
-          {t('calendarView.addEvent')}
-        </button>
+        {canManage && (
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={() => openAdd(currentDate)}
+          >
+            <Icon name="plus" className="h-4 w-4" />
+            {t('calendarView.addEvent')}
+          </button>
+        )}
       </div>
 
       {loading && (
@@ -589,14 +603,21 @@ export default function CalendarView() {
         ) : (
           <div className="space-y-3">
             {dayEventsForModal.map((event) => (
-              <button
+              <div
                 key={event.id}
-                type="button"
-                onClick={() => {
-                  setDayModalDate(null)
-                  openEdit(event)
-                }}
-                className="flex w-full items-start gap-3 rounded-2xl border border-slate-100 p-3 text-left hover:bg-slate-50"
+                role={canManage ? 'button' : undefined}
+                tabIndex={canManage ? 0 : undefined}
+                onClick={
+                  canManage
+                    ? () => {
+                        setDayModalDate(null)
+                        openEdit(event)
+                      }
+                    : undefined
+                }
+                className={`flex w-full items-start gap-3 rounded-2xl border border-slate-100 p-3 text-left ${
+                  canManage ? 'cursor-pointer hover:bg-slate-50' : ''
+                }`}
               >
                 <span
                   className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full"
@@ -615,7 +636,7 @@ export default function CalendarView() {
                     {event.horse?.name ? ` · ${event.horse.name}` : ''}
                   </p>
                 </div>
-              </button>
+              </div>
             ))}
           </div>
         )}

@@ -103,6 +103,17 @@ export async function listHorses(): Promise<HorseListItem[]> {
   return data
 }
 
+export async function listMyHorses(): Promise<HorseDetail[]> {
+  const { data, error } = await supabase
+    .from('horses')
+    .select(
+      '*, owner:owners(id, full_name, phone), stall:stalls(id, stall_number, size, notes)',
+    )
+    .order('name')
+  if (error) throw error
+  return data
+}
+
 export async function getHorse(id: string): Promise<HorseDetail> {
   const { data, error } = await supabase
     .from('horses')

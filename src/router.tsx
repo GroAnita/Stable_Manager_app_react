@@ -23,6 +23,9 @@ const CalendarView = lazy(() => import('./pages/CalendarView'))
 const TaskList = lazy(() => import('./pages/TaskList'))
 const Reports = lazy(() => import('./pages/Reports'))
 const Settings = lazy(() => import('./pages/Settings'))
+const MyHorse = lazy(() => import('./pages/MyHorse'))
+const MyContract = lazy(() => import('./pages/MyContract'))
+const MyProfile = lazy(() => import('./pages/MyProfile'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 export const router = createBrowserRouter([
@@ -81,6 +84,9 @@ export const router = createBrowserRouter([
       { path: 'tasks', element: <TaskList /> },
       { path: 'reports', element: <Reports /> },
       { path: 'settings', element: <Settings /> },
+      { path: 'my-horse', element: <MyHorse /> },
+      { path: 'my-contract', element: <MyContract /> },
+      { path: 'my-profile', element: <MyProfile /> },
       { path: '*', element: <NotFound /> },
     ],
   },
