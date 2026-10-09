@@ -698,6 +698,7 @@ export const en = {
     arena_booking: 'Arena booking',
   },
   category: {
+    boarding: 'Boarding',
     hay: 'Hay',
     grain: 'Grain',
     supplements: 'Supplements',

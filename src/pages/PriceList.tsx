@@ -26,6 +26,7 @@ const UNIT_OPTIONS = [
 ]
 
 const CATEGORY_OPTIONS = [
+  'Boarding',
   'Hay',
   'Grain',
   'Supplements',

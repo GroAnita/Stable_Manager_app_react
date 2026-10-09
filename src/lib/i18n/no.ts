@@ -701,6 +701,7 @@ export const no: typeof en = {
     arena_booking: 'Ridebane-booking',
   },
   category: {
+    boarding: 'Oppstalling',
     hay: 'Høy',
     grain: 'Kraftfôr',
     supplements: 'Tilskudd',
