@@ -59,8 +59,14 @@ export const en = {
     createStable: 'Create stable',
   },
   invite: {
-    title: 'Joining your stable',
+    title: 'Joining a stable',
+    loading: 'Loading…',
+    signedInAs: "You're signed in as {email}.",
+    alreadyInStableWarning:
+      'This account is already part of a stable. Accepting will move it to the new stable and role instead.',
+    acceptAs: 'Accept as {email}',
     accepting: 'Accepting your invite…',
+    useDifferentAccount: 'Sign out and use a different account',
     failed: 'Could not accept this invite: {error}',
   },
   dashboard: {

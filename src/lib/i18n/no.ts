@@ -62,8 +62,14 @@ export const no: typeof en = {
     createStable: 'Opprett stall',
   },
   invite: {
-    title: 'Blir med i stallen',
+    title: 'Blir med i en stall',
+    loading: 'Laster…',
+    signedInAs: 'Du er logget inn som {email}.',
+    alreadyInStableWarning:
+      'Denne kontoen er allerede del av en stall. Hvis du godtar, flyttes den til den nye stallen og rollen i stedet.',
+    acceptAs: 'Godta som {email}',
     accepting: 'Godtar invitasjonen din…',
+    useDifferentAccount: 'Logg ut og bruk en annen konto',
     failed: 'Kunne ikke godta denne invitasjonen: {error}',
   },
   dashboard: {

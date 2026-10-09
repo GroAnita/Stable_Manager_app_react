@@ -21,7 +21,11 @@ export default function Auth() {
   const [info, setInfo] = useState<string | null>(null)
 
   useEffect(() => {
-    if (session) navigate('/dashboard', { replace: true })
+    if (!session) return
+    const pendingToken = sessionStorage.getItem('pendingInviteToken')
+    navigate(pendingToken ? `/invite/${pendingToken}` : '/dashboard', {
+      replace: true,
+    })
   }, [session, navigate])
 
   function toggleMode() {
