@@ -217,19 +217,39 @@ export default function HorseForm() {
         </label>
         <label>
           <span className="field-label">{t('horseForm.gender')}</span>
-          <input
+          <select
             className="field"
             value={form.gender}
             onChange={(e) => updateField('gender', e.target.value)}
-          />
+          >
+            <option value="">—</option>
+            <option value="mare">{t('horseForm.genderMare')}</option>
+            <option value="gelding">{t('horseForm.genderGelding')}</option>
+            <option value="stallion">{t('horseForm.genderStallion')}</option>
+          </select>
         </label>
         <label>
           <span className="field-label">{t('horseForm.color')}</span>
-          <input
+          <select
             className="field"
             value={form.color}
             onChange={(e) => updateField('color', e.target.value)}
-          />
+          >
+            <option value="">—</option>
+            <option value="bay">{t('horseForm.colorBay')}</option>
+            <option value="black">{t('horseForm.colorBlack')}</option>
+            <option value="brown">{t('horseForm.colorBrown')}</option>
+            <option value="chestnut">{t('horseForm.colorChestnut')}</option>
+            <option value="grey">{t('horseForm.colorGrey')}</option>
+            <option value="palomino">{t('horseForm.colorPalomino')}</option>
+            <option value="buckskin">{t('horseForm.colorBuckskin')}</option>
+            <option value="dun">{t('horseForm.colorDun')}</option>
+            <option value="roan">{t('horseForm.colorRoan')}</option>
+            <option value="pinto">{t('horseForm.colorPinto')}</option>
+            <option value="appaloosa">{t('horseForm.colorAppaloosa')}</option>
+            <option value="cremello">{t('horseForm.colorCremello')}</option>
+            <option value="white">{t('horseForm.colorWhite')}</option>
+          </select>
         </label>
         <label>
           <span className="field-label">{t('horseForm.owner')}</span>
