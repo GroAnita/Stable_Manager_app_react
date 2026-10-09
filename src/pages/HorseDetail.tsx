@@ -9,11 +9,13 @@ import {
   getHorseFeedingTimes,
   getHorseMedicalRecords,
   getHorseSchedule,
+  getHorseVaccinations,
   type FeedingPlan,
   type FeedingTime,
   type HorseDetail as HorseDetailData,
   type HorseEvent,
   type MedicalRecord,
+  type Vaccination,
 } from '../features/horses/api'
 import { usePreferences } from '../lib/PreferencesContext'
 import { DocumentsTab } from './horseDetail/DocumentsTab'
@@ -41,6 +43,7 @@ export default function HorseDetail() {
   const { t } = usePreferences()
   const [horse, setHorse] = useState<HorseDetailData | null>(null)
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([])
+  const [vaccinations, setVaccinations] = useState<Vaccination[]>([])
   const [feedingPlan, setFeedingPlan] = useState<FeedingPlan | null>(null)
   const [feedingTimes, setFeedingTimes] = useState<FeedingTime[]>([])
   const [schedule, setSchedule] = useState<HorseEvent[]>([])
@@ -54,14 +57,16 @@ export default function HorseDetail() {
     Promise.all([
       getHorse(id),
       getHorseMedicalRecords(id),
+      getHorseVaccinations(id),
       getHorseFeedingPlan(id),
       getHorseFeedingTimes(id),
       getHorseSchedule(id),
     ])
-      .then(([horseData, medical, feeding, times, events]) => {
+      .then(([horseData, medical, vaccinationRecords, feeding, times, events]) => {
         if (cancelled) return
         setHorse(horseData)
         setMedicalRecords(medical)
+        setVaccinations(vaccinationRecords)
         setFeedingPlan(feeding)
         setFeedingTimes(times)
         setSchedule(events)
@@ -158,6 +163,8 @@ export default function HorseDetail() {
             stableId={horse.stable_id}
             records={medicalRecords}
             onChange={setMedicalRecords}
+            vaccinations={vaccinations}
+            onVaccinationsChange={setVaccinations}
           />
         )}
         {tab === 'feeding' && (

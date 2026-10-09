@@ -55,6 +55,55 @@ export type HorseDetail = Horse & {
   > | null
 }
 
+export type Vaccination = Database['public']['Tables']['vaccinations']['Row']
+export type VaccinationInsert =
+  Database['public']['Tables']['vaccinations']['Insert']
+export type VaccinationUpdate =
+  Database['public']['Tables']['vaccinations']['Update']
+
+export async function getHorseVaccinations(
+  horseId: string,
+): Promise<Vaccination[]> {
+  const { data, error } = await supabase
+    .from('vaccinations')
+    .select('*')
+    .eq('horse_id', horseId)
+    .order('date', { ascending: false })
+  if (error) throw error
+  return data
+}
+
+export async function createVaccination(
+  input: VaccinationInsert,
+): Promise<Vaccination> {
+  const { data, error } = await supabase
+    .from('vaccinations')
+    .insert(input)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function updateVaccination(
+  id: string,
+  input: VaccinationUpdate,
+): Promise<Vaccination> {
+  const { data, error } = await supabase
+    .from('vaccinations')
+    .update(input)
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function deleteVaccination(id: string): Promise<void> {
+  const { error } = await supabase.from('vaccinations').delete().eq('id', id)
+  if (error) throw error
+}
+
 export type MedicalRecord =
   Database['public']['Tables']['medical_records']['Row']
 export type MedicalRecordInsert =

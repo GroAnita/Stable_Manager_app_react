@@ -1187,6 +1187,61 @@ export type Database = {
           },
         ];
       };
+      vaccinations: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          date: string;
+          dose: string;
+          horse_id: string;
+          id: string;
+          notes: string | null;
+          stable_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          date: string;
+          dose: string;
+          horse_id: string;
+          id?: string;
+          notes?: string | null;
+          stable_id: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          date?: string;
+          dose?: string;
+          horse_id?: string;
+          id?: string;
+          notes?: string | null;
+          stable_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "vaccinations_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "vaccinations_horse_id_fkey";
+            columns: ["horse_id"];
+            isOneToOne: false;
+            referencedRelation: "horses";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "vaccinations_stable_id_fkey";
+            columns: ["stable_id"];
+            isOneToOne: false;
+            referencedRelation: "stables";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       dashboard_stats: {

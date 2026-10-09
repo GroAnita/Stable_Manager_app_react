@@ -7,8 +7,10 @@ import {
   deleteMedicalRecord,
   updateMedicalRecord,
   type MedicalRecord,
+  type Vaccination,
 } from '../../features/horses/api'
 import { usePreferences } from '../../lib/PreferencesContext'
+import { VaccinationSection } from './VaccinationSection'
 
 type MedicalFormState = {
   type: string
@@ -115,11 +117,15 @@ export function MedicalTab({
   stableId,
   records,
   onChange,
+  vaccinations,
+  onVaccinationsChange,
 }: {
   horseId: string
   stableId: string
   records: MedicalRecord[]
   onChange: (records: MedicalRecord[]) => void
+  vaccinations: Vaccination[]
+  onVaccinationsChange: (vaccinations: Vaccination[]) => void
 }) {
   const { t, formatDate } = usePreferences()
   const [addOpen, setAddOpen] = useState(false)
@@ -215,7 +221,14 @@ export function MedicalTab({
 
   return (
     <div>
-      <div className="mb-4 flex justify-end">
+      <VaccinationSection
+        horseId={horseId}
+        stableId={stableId}
+        vaccinations={vaccinations}
+        onChange={onVaccinationsChange}
+      />
+
+      <div className="mt-6 mb-4 flex justify-end">
         <button type="button" className="btn-primary" onClick={openAdd}>
           <Icon name="plus" className="h-4 w-4" />
           {t('horseDetail.addRecord')}
