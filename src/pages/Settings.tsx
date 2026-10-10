@@ -4,6 +4,7 @@ import {
   getMyProfile,
   getStable,
   updateStable,
+  uploadStableLogo,
   type Profile,
   type Stable,
 } from '../features/settings/api'
@@ -48,9 +49,9 @@ export default function Settings() {
   const [saved, setSaved] = useState(false)
   const [staffInvite, setStaffInvite] = useState<string | null>(null)
   const [staffInviteSaving, setStaffInviteSaving] = useState(false)
-  const [staffInviteError, setStaffInviteError] = useState<string | null>(
-    null,
-  )
+  const [staffInviteError, setStaffInviteError] = useState<string | null>(null)
+  const [logoUploading, setLogoUploading] = useState(false)
+  const [logoError, setLogoError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -91,6 +92,21 @@ export default function Settings() {
       setStaffInviteError((err as Error).message)
     } finally {
       setStaffInviteSaving(false)
+    }
+  }
+
+  async function handleLogoChange(file: File | undefined) {
+    if (!file || !stable) return
+    setLogoUploading(true)
+    setLogoError(null)
+    try {
+      const logoUrl = await uploadStableLogo({ stableId: stable.id, file })
+      const updated = await updateStable(stable.id, { logo_url: logoUrl })
+      setStable(updated)
+    } catch (err) {
+      setLogoError((err as Error).message)
+    } finally {
+      setLogoUploading(false)
     }
   }
 
@@ -149,6 +165,45 @@ export default function Settings() {
                 {t('settings.onlyOwnerCanEdit')}
               </p>
             )}
+
+            <div className="mt-5 flex items-center gap-4">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-forest/10 text-xl font-semibold text-forest">
+                {stable.logo_url ? (
+                  <img
+                    src={stable.logo_url}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  stable.name.charAt(0).toUpperCase()
+                )}
+              </div>
+              {canEdit && (
+                <label>
+                  <span className="field-label">
+                    {t('settings.stableLogo')}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    disabled={logoUploading}
+                    className="field"
+                    onChange={(e) => handleLogoChange(e.target.files?.[0])}
+                  />
+                  {logoUploading && (
+                    <span className="mt-1 block text-xs text-slate-400">
+                      {t('settings.uploadingLogo')}
+                    </span>
+                  )}
+                  {logoError && (
+                    <span className="mt-1 block text-xs text-red-600">
+                      {logoError}
+                    </span>
+                  )}
+                </label>
+              )}
+            </div>
+
             <div className="mt-5 grid gap-5 md:grid-cols-2">
               <label>
                 <span className="field-label">{t('settings.stableName')}</span>

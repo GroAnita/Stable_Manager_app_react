@@ -1060,6 +1060,7 @@ export type Database = {
           created_at: string;
           email: string | null;
           id: string;
+          logo_url: string | null;
           name: string;
           owner_user_id: string;
           phone: string | null;
@@ -1072,6 +1073,7 @@ export type Database = {
           created_at?: string;
           email?: string | null;
           id?: string;
+          logo_url?: string | null;
           name: string;
           owner_user_id: string;
           phone?: string | null;
@@ -1084,6 +1086,7 @@ export type Database = {
           created_at?: string;
           email?: string | null;
           id?: string;
+          logo_url?: string | null;
           name?: string;
           owner_user_id?: string;
           phone?: string | null;
@@ -1535,6 +1538,7 @@ export type Database = {
           created_at: string;
           email: string | null;
           id: string;
+          logo_url: string | null;
           name: string;
           owner_user_id: string;
           phone: string | null;

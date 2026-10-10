@@ -1,5 +1,11 @@
 import { Suspense, useState } from 'react'
-import { Navigate, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import {
+  Navigate,
+  NavLink,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom'
 import { Icon, type IconName } from '../components/Icon'
 import { signOut } from '../lib/authService'
 import { useAuth } from '../lib/AuthContext'
@@ -8,7 +14,11 @@ import 'flag-icons/css/flag-icons.min.css'
 
 type NavItem = { key: string; to: string; icon: IconName | 'horse' }
 
-const dashboardItem: NavItem = { key: 'dashboard', to: '/dashboard', icon: 'home' }
+const dashboardItem: NavItem = {
+  key: 'dashboard',
+  to: '/dashboard',
+  icon: 'home',
+}
 
 const navGroups: { labelKey: string; items: NavItem[] }[] = [
   {
@@ -33,7 +43,11 @@ const navGroups: { labelKey: string; items: NavItem[] }[] = [
   },
 ]
 
-const settingsItem: NavItem = { key: 'settings', to: '/settings', icon: 'settings' }
+const settingsItem: NavItem = {
+  key: 'settings',
+  to: '/settings',
+  icon: 'settings',
+}
 
 const ownerNavItems: NavItem[] = [
   { key: 'dashboard', to: '/owner-dashboard', icon: 'home' },
@@ -56,7 +70,13 @@ const OWNER_ALLOWED_PATHS = [
   '/calendar',
 ]
 
-function SidebarLink({ item, onClick }: { item: NavItem; onClick: () => void }) {
+function SidebarLink({
+  item,
+  onClick,
+}: {
+  item: NavItem
+  onClick: () => void
+}) {
   const { t } = usePreferences()
   return (
     <NavLink
@@ -188,15 +208,39 @@ export default function AppLayout() {
           >
             <Icon name="menu" className="h-5 w-5" />
           </button>
-          <p className="text-xs font-medium tracking-[0.25em] text-ink/40 uppercase">
-            {profile?.role ? t(`role.${profile.role}`) : t('nav.overview')}
-          </p>
+          <div>
+            <p className="text-xs font-medium tracking-[0.25em] text-ink/40 uppercase">
+              {profile?.role ? t(`role.${profile.role}`) : t('nav.overview')}
+            </p>
+          </div>
+          <div className="ml-4 flex flex-1 items-center justify-center gap-3">
+            {profile?.stable?.name && (
+              <>
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-forest/10 text-sm font-semibold text-forest">
+                  {profile.stable.logo_url ? (
+                    <img
+                      src={profile.stable.logo_url}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    profile.stable.name.charAt(0).toUpperCase()
+                  )}
+                </div>
+                <p className="text-4xl font-semibold text-forest">
+                  {profile.stable.name}
+                </p>
+              </>
+            )}
+          </div>
           <div className="ml-auto flex gap-2">
             <button
               type="button"
               aria-label="English"
               onClick={selectEnglish}
-              className={language === 'en' ? '' : 'opacity-50 hover:opacity-100'}
+              className={
+                language === 'en' ? '' : 'opacity-50 hover:opacity-100'
+              }
             >
               <span className="fi fi-gb"></span>
             </button>
@@ -204,12 +248,13 @@ export default function AppLayout() {
               type="button"
               aria-label="Norsk"
               onClick={selectNorwegian}
-              className={language === 'no' ? '' : 'opacity-50 hover:opacity-100'}
+              className={
+                language === 'no' ? '' : 'opacity-50 hover:opacity-100'
+              }
             >
               <span className="fi fi-no"></span>
             </button>
           </div>
-
         </header>
         <main className="flex-1 overflow-x-hidden px-4 py-6 md:px-6">
           <Suspense

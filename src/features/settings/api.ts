@@ -3,7 +3,9 @@ import type { Database } from '../../types/supabase'
 
 export type Stable = Database['public']['Tables']['stables']['Row']
 export type StableUpdate = Database['public']['Tables']['stables']['Update']
-export type Profile = Database['public']['Tables']['profiles']['Row']
+export type Profile = Database['public']['Tables']['profiles']['Row'] & {
+  stable: Pick<Stable, 'name' | 'logo_url'> | null
+}
 
 export async function getMyProfile(): Promise<Profile> {
   const {
@@ -12,11 +14,28 @@ export async function getMyProfile(): Promise<Profile> {
   if (!user) throw new Error('Not signed in.')
   const { data, error } = await supabase
     .from('profiles')
-    .select('*')
+    .select('*, stable:stables(name, logo_url)')
     .eq('id', user.id)
     .single()
   if (error) throw error
   return data
+}
+
+export async function uploadStableLogo({
+  stableId,
+  file,
+}: {
+  stableId: string
+  file: File
+}): Promise<string> {
+  const extension = file.name.split('.').pop() ?? 'png'
+  const path = `${stableId}/logo-${Date.now()}.${extension}`
+  const { error: uploadError } = await supabase.storage
+    .from('stable-logos')
+    .upload(path, file, { upsert: true })
+  if (uploadError) throw uploadError
+  const { data } = supabase.storage.from('stable-logos').getPublicUrl(path)
+  return data.publicUrl
 }
 
 export async function createStable(input: {
