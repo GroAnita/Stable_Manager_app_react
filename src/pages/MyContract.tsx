@@ -106,19 +106,22 @@ export default function MyContract() {
                       <Badge status={payment.status} />
                     </td>
                     <td>
-                      {payment.status !== 'paid' && (
-                        <div className="flex flex-wrap gap-2">
-                          <button type="button" className="btn-secondary">
-                            {t('myContract.payWithCard')}
-                          </button>
-                          <button
-                            type="button"
-                            className="rounded-xl bg-[#ff5b24] px-3 py-2 text-sm font-semibold text-white hover:bg-[#e54f1d]"
-                          >
-                            {t('myContract.payWithVipps')}
-                          </button>
-                        </div>
-                      )}
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          disabled={payment.status === 'paid'}
+                          className="btn-secondary disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          {t('myContract.payWithCard')}
+                        </button>
+                        <button
+                          type="button"
+                          disabled={payment.status === 'paid'}
+                          className="rounded-xl bg-[#ff5b24] px-3 py-2 text-sm font-semibold text-white hover:bg-[#e54f1d] disabled:cursor-not-allowed disabled:bg-[#ff5b24] disabled:opacity-40 disabled:hover:bg-[#ff5b24]"
+                        >
+                          {t('myContract.payWithVipps')}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
