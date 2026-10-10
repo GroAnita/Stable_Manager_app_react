@@ -17,6 +17,7 @@ export type Database = {
       announcements: {
         Row: {
           body: string;
+          category: string;
           created_at: string;
           created_by: string;
           id: string;
@@ -26,6 +27,7 @@ export type Database = {
         };
         Insert: {
           body: string;
+          category?: string;
           created_at?: string;
           created_by: string;
           id?: string;
@@ -35,6 +37,7 @@ export type Database = {
         };
         Update: {
           body?: string;
+          category?: string;
           created_at?: string;
           created_by?: string;
           id?: string;

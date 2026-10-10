@@ -17,7 +17,7 @@ export async function listAnnouncements(): Promise<Announcement[]> {
 }
 
 export async function createAnnouncement(
-  input: Pick<AnnouncementInsert, 'title' | 'body'>,
+  input: Pick<AnnouncementInsert, 'title' | 'body' | 'category'>,
 ): Promise<Announcement> {
   const {
     data: { user },
