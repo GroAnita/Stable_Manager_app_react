@@ -78,11 +78,21 @@ function SidebarLink({ item, onClick }: { item: NavItem; onClick: () => void }) 
 
 export default function AppLayout() {
   const { session, profile } = useAuth()
-  const { t, language, setLanguage } = usePreferences()
+  const { t, language, setLanguage, setCurrency } = usePreferences()
   const navigate = useNavigate()
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const isOwner = profile?.role === 'horse_owner'
+
+  function selectEnglish() {
+    setLanguage('en')
+    setCurrency('EUR')
+  }
+
+  function selectNorwegian() {
+    setLanguage('no')
+    setCurrency('NOK')
+  }
 
   async function handleSignOut() {
     await signOut()
@@ -185,7 +195,7 @@ export default function AppLayout() {
             <button
               type="button"
               aria-label="English"
-              onClick={() => setLanguage('en')}
+              onClick={selectEnglish}
               className={language === 'en' ? '' : 'opacity-50 hover:opacity-100'}
             >
               <span className="fi fi-gb"></span>
@@ -193,7 +203,7 @@ export default function AppLayout() {
             <button
               type="button"
               aria-label="Norsk"
-              onClick={() => setLanguage('no')}
+              onClick={selectNorwegian}
               className={language === 'no' ? '' : 'opacity-50 hover:opacity-100'}
             >
               <span className="fi fi-no"></span>
