@@ -2,6 +2,8 @@
 
 A web application built with **React**, **TypeScript**, and **Vite**, designed to help larger boarding stables manage their day-to-day operations in one place. Running a boarding stable means juggling a lot of moving parts — who's boarding where, what each horse eats and when, who's coming by for a lesson or a vet visit — and this project aims to bring that all into a single, easy-to-use interface.
 
+**Live Demo:** [https://stable-manager-app-react-groanita.vercel.app/auth]
+
 ## Features
 
 - **Boarder management** — keep track of boarders and their horses in one organized system, instead of scattered spreadsheets or paper records.
