@@ -4,6 +4,7 @@ import AppLayout from './layouts/AppLayout'
 import { RequireAuth } from './lib/RequireAuth'
 
 const Auth = lazy(() => import('./pages/Auth'))
+const ResetPassword = lazy(() => import('./pages/ResetPassword'))
 const CreateStable = lazy(() => import('./pages/CreateStable'))
 const AcceptInvite = lazy(() => import('./pages/AcceptInvite'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
@@ -35,6 +36,14 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={null}>
         <Auth />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/reset-password',
+    element: (
+      <Suspense fallback={null}>
+        <ResetPassword />
       </Suspense>
     ),
   },

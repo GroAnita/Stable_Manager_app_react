@@ -62,6 +62,23 @@ export const no: typeof en = {
     haveAccount: 'Har du allerede en konto? ',
     confirmEmail:
       'Sjekk e-posten din for å bekrefte kontoen, og logg deretter inn.',
+    forgotPassword: 'Glemt passord?',
+    resetPasswordTitle: 'Tilbakestill passordet ditt',
+    resetPasswordSubtitle:
+      'Skriv inn e-posten din, og vi sender deg en lenke for å tilbakestille passordet.',
+    sendResetLink: 'Send tilbakestillingslenke',
+    resetLinkSent:
+      'Hvis det finnes en konto for denne e-posten, har vi sendt en lenke for å tilbakestille passordet.',
+    backToSignIn: 'Tilbake til innlogging',
+    newPassword: 'Nytt passord',
+    confirmPassword: 'Bekreft passord',
+    passwordsDontMatch: 'Passordene er ikke like.',
+    setNewPasswordTitle: 'Sett et nytt passord',
+    setNewPasswordSubtitle: 'Velg et nytt passord for kontoen din.',
+    savePassword: 'Lagre passord',
+    passwordUpdated: 'Passordet er oppdatert. Du kan nå logge inn.',
+    invalidResetLink:
+      'Denne lenken er ugyldig eller har utløpt. Be om en ny nedenfor.',
   },
   onboarding: {
     title: 'Sett opp stallen din',

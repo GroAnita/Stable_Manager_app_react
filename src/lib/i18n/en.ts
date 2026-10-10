@@ -59,6 +59,23 @@ export const en = {
     noAccount: "Don't have an account? ",
     haveAccount: 'Already have an account? ',
     confirmEmail: 'Check your email to confirm your account, then sign in.',
+    forgotPassword: 'Forgot password?',
+    resetPasswordTitle: 'Reset your password',
+    resetPasswordSubtitle:
+      "Enter your email and we'll send you a link to reset your password.",
+    sendResetLink: 'Send reset link',
+    resetLinkSent:
+      "If an account exists for that email, we've sent a link to reset your password.",
+    backToSignIn: 'Back to sign in',
+    newPassword: 'New password',
+    confirmPassword: 'Confirm password',
+    passwordsDontMatch: 'Passwords do not match.',
+    setNewPasswordTitle: 'Set a new password',
+    setNewPasswordSubtitle: 'Choose a new password for your account.',
+    savePassword: 'Save password',
+    passwordUpdated: 'Password updated. You can now sign in.',
+    invalidResetLink:
+      'This reset link is invalid or has expired. Request a new one below.',
   },
   onboarding: {
     title: 'Set up your stable',
