@@ -22,7 +22,7 @@ export type ContractListItem = Pick<
 > & {
   horse: Pick<
     Database['public']['Tables']['horses']['Row'],
-    'id' | 'name'
+    'id' | 'name' | 'away'
   > | null
   owner: Pick<
     Database['public']['Tables']['owners']['Row'],
@@ -64,7 +64,7 @@ export async function listContracts(): Promise<ContractListItem[]> {
     .from('contracts')
     .select(
       `id, monthly_rent, included_hay_kg, bedding_quantity, start_date, end_date, status,
-       horse:horses(id, name),
+       horse:horses(id, name, away),
        owner:owners(id, full_name),
        hay_item:price_list_items!contracts_hay_price_list_item_id_fkey(price),
        bedding_item:price_list_items!contracts_bedding_price_list_item_id_fkey(price)`,
@@ -100,7 +100,7 @@ export async function getContract(id: string): Promise<Contract> {
 export type ContractDetail = Contract & {
   horse: Pick<
     Database['public']['Tables']['horses']['Row'],
-    'id' | 'name'
+    'id' | 'name' | 'away'
   > | null
   owner: Pick<
     Database['public']['Tables']['owners']['Row'],
@@ -123,7 +123,7 @@ export async function getContractDetail(id: string): Promise<ContractDetail> {
     .from('contracts')
     .select(
       `*,
-       horse:horses(id, name),
+       horse:horses(id, name, away),
        owner:owners(id, full_name, phone),
        stall:stalls(id, stall_number),
        hay_item:price_list_items!contracts_hay_price_list_item_id_fkey(id, item, unit, price),
@@ -173,6 +173,21 @@ export async function listBoardingItems(): Promise<PriceListItemOption[]> {
     .order('item')
   if (error) throw error
   return data
+}
+
+export async function getEmptyBoxRate(
+  stableId: string,
+): Promise<number | null> {
+  const { data, error } = await supabase
+    .from('price_list_items')
+    .select('price')
+    .eq('stable_id', stableId)
+    .eq('category', 'EmptyBox')
+    .order('created_at')
+    .limit(1)
+    .maybeSingle()
+  if (error) throw error
+  return data?.price ?? null
 }
 
 export async function listHayItems(): Promise<PriceListItemOption[]> {

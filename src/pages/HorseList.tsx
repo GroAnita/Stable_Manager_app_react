@@ -219,7 +219,10 @@ export default function HorseList() {
                   <td>{horse.owner?.full_name ?? '—'}</td>
                   <td>{horse.stall?.stall_number ?? '—'}</td>
                   <td>
-                    <Badge status={horse.status} />
+                    <div className="flex flex-wrap gap-2">
+                      <Badge status={horse.status} />
+                      {horse.away && <Badge status="away" />}
+                    </div>
                   </td>
                 </tr>
               ))}

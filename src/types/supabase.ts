@@ -445,6 +445,7 @@ export type Database = {
           age: number | null;
           allergies: string | null;
           arrival_date: string | null;
+          away: boolean;
           back_hoof_size: string | null;
           birthday: string | null;
           breed: string | null;
@@ -475,6 +476,7 @@ export type Database = {
           age?: number | null;
           allergies?: string | null;
           arrival_date?: string | null;
+          away?: boolean;
           back_hoof_size?: string | null;
           birthday?: string | null;
           breed?: string | null;
@@ -505,6 +507,7 @@ export type Database = {
           age?: number | null;
           allergies?: string | null;
           arrival_date?: string | null;
+          away?: boolean;
           back_hoof_size?: string | null;
           birthday?: string | null;
           breed?: string | null;

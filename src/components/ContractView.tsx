@@ -4,6 +4,7 @@ import { Icon } from './Icon'
 import { Modal } from './Modal'
 import {
   getContractDetail,
+  getEmptyBoxRate,
   type ContractDetail,
 } from '../features/contracts/api'
 import {
@@ -21,8 +22,26 @@ const SERVICE_LABEL_KEYS: Record<string, string> = {
 
 export function ContractFields({ contract }: { contract: ContractDetail }) {
   const { t, formatCurrency, formatDate } = usePreferences()
+  const [emptyBoxRate, setEmptyBoxRate] = useState<number | null>(null)
+  const horseIsAway = contract.horse?.away ?? false
+
+  useEffect(() => {
+    if (!horseIsAway) return
+    let cancelled = false
+    getEmptyBoxRate(contract.stable_id)
+      .then((rate) => {
+        if (!cancelled) setEmptyBoxRate(rate)
+      })
+      .catch(() => {
+        if (!cancelled) setEmptyBoxRate(null)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [horseIsAway, contract.stable_id])
+
   const cycleDays = currentBillingCycleDays()
-  const hayValue =
+  const rawHayValue =
     contract.hay_item && contract.included_hay_kg
       ? hayValueIncVat(
           contract.hay_item.price,
@@ -30,15 +49,17 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
           cycleDays,
         )
       : 0
-  const beddingValue =
+  const rawBeddingValue =
     contract.bedding_item && contract.bedding_quantity
       ? beddingAmountIncVat(
           contract.bedding_item.price,
           contract.bedding_quantity,
         )
       : 0
-  const total =
-    Math.round((contract.monthly_rent + hayValue + beddingValue) * 100) / 100
+  const hayValue = horseIsAway ? 0 : rawHayValue
+  const beddingValue = horseIsAway ? 0 : rawBeddingValue
+  const rent = horseIsAway ? (emptyBoxRate ?? 0) : contract.monthly_rent
+  const total = Math.round((rent + hayValue + beddingValue) * 100) / 100
   const serviceKey = contract.included_services
     ? SERVICE_LABEL_KEYS[contract.included_services]
     : null
@@ -51,7 +72,11 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
             {contract.stable.name}
           </h2>
           <p className="text-sm text-slate-500">
-            {[contract.stable.address, contract.stable.postal_code, contract.stable.city]
+            {[
+              contract.stable.address,
+              contract.stable.postal_code,
+              contract.stable.city,
+            ]
               .filter(Boolean)
               .join(', ')}
           </p>
@@ -118,8 +143,13 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
         <div className="mt-2 space-y-1 text-sm text-slate-600">
           <div className="flex justify-between">
             <span>{t('contractForm.summaryRent')}</span>
-            <span>{formatCurrency(contract.monthly_rent)}</span>
+            <span>{formatCurrency(rent)}</span>
           </div>
+          {horseIsAway && (
+            <p className="text-xs text-orange-600">
+              {t('contractForm.emptyBoxSummaryNote')}
+            </p>
+          )}
           {hayValue > 0 && (
             <div className="flex justify-between">
               <span>

@@ -14,7 +14,10 @@ export function HorseCard({ horse }: { horse: HorseListItem }) {
     >
       <div className="flex items-start justify-between gap-4">
         <HorseAvatar name={horse.name} photoUrl={horse.photo_url} />
-        <Badge status={horse.status} />
+        <div className="flex flex-wrap justify-end gap-2">
+          <Badge status={horse.status} />
+          {horse.away && <Badge status="away" />}
+        </div>
       </div>
       <div>
         <h3 className="text-xl font-semibold text-slate-900">{horse.name}</h3>

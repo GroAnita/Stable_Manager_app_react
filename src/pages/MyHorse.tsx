@@ -89,7 +89,10 @@ export default function MyHorse() {
             <h2 className="text-2xl font-semibold text-slate-900">
               {horse.name}
             </h2>
-            <Badge status={horse.status} />
+            <div className="flex flex-wrap gap-2">
+              <Badge status={horse.status} />
+              {horse.away && <Badge status="away" />}
+            </div>
           </div>
 
           <OverviewTab horse={horse} vaccinations={vaccinations} />

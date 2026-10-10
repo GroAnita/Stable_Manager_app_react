@@ -11,7 +11,7 @@ export type StallOption = Pick<
 >
 export type HorseOption = Pick<
   Database['public']['Tables']['horses']['Row'],
-  'id' | 'name'
+  'id' | 'name' | 'away'
 >
 export type StaffOption = Pick<
   Database['public']['Tables']['profiles']['Row'],
@@ -39,7 +39,7 @@ export async function listStallOptions(): Promise<StallOption[]> {
 export async function listHorseOptions(): Promise<HorseOption[]> {
   const { data, error } = await supabase
     .from('horses')
-    .select('id, name')
+    .select('id, name, away')
     .eq('active', true)
     .order('name')
   if (error) throw error

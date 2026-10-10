@@ -393,6 +393,7 @@ export const no: typeof en = {
     medicalNotes: 'Medisinske notater',
     generalNotes: 'Generelle notater',
     active: 'Aktiv',
+    away: 'Bortreist (midlertidig ute av stallen, f.eks. på sommerbeite)',
     loading: 'Laster hest…',
     noStableFound: 'Fant ingen stall for denne brukeren. Vennligst logg inn.',
   },
@@ -485,6 +486,13 @@ export const no: typeof en = {
     boardingItem: 'Oppstallingsplan',
     selectBoardingItem: 'Velg oppstallingsplan',
     noBoardingItems: 'Ingen oppstallingsvarer i prislisten.',
+    emptyBoxToggle: 'Denne hesten er merket som bortreist',
+    emptyBoxHint:
+      'Høy, flis og oppstallingsplan er frosset mens hesten er bortreist — denne kontrakten fakturerer den faste tom boks leien på {amount} i stedet.',
+    noEmptyBoxItems:
+      'Ingen «Tom boks leie»-vare satt i prislisten ennå — legg til en slik at denne kontrakten faktureres riktig mens hesten er bortreist.',
+    emptyBoxSummaryNote:
+      'Hest bortreist: høy og flis er frosset og utelatt fra denne summen.',
     monthlyRent: 'Månedsleie',
     deposit: 'Depositum',
     status: 'Status',
@@ -724,6 +732,7 @@ export const no: typeof en = {
   },
   status: {
     active: 'Aktiv',
+    away: 'Bortreist',
     ending_soon: 'Avslutter snart',
     expired: 'Utløpt',
     cancelled: 'Kansellert',
@@ -747,6 +756,7 @@ export const no: typeof en = {
   },
   category: {
     boarding: 'Oppstalling',
+    emptybox: 'Tom boks leie',
     hay: 'Høy',
     grain: 'Kraftfôr',
     supplements: 'Tilskudd',

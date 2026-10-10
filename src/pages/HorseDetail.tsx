@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Badge } from '../components/Badge'
 import { HorseAvatar } from '../components/HorseAvatar'
 import { Icon } from '../components/Icon'
 import {
@@ -112,9 +113,13 @@ export default function HorseDetail() {
             <p className="text-sm tracking-[0.25em] text-slate-400 uppercase">
               {t('horseDetail.profile')}
             </p>
-            <h1 className="mt-2 text-3xl font-semibold text-slate-900">
-              {horse.name}
-            </h1>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <h1 className="text-3xl font-semibold text-slate-900">
+                {horse.name}
+              </h1>
+              <Badge status={horse.status} />
+              {horse.away && <Badge status="away" />}
+            </div>
             <p className="mt-2 text-sm text-slate-500">
               {[horse.breed, horse.gender, horse.color]
                 .filter(Boolean)

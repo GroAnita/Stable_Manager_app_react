@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { Toggle } from '../components/Toggle'
 import {
   createHorse,
   getHorse,
@@ -34,6 +35,7 @@ type FormState = {
   owner_id: string
   stall_id: string
   active: boolean
+  away: boolean
 }
 
 const emptyForm: FormState = {
@@ -54,6 +56,7 @@ const emptyForm: FormState = {
   owner_id: '',
   stall_id: '',
   active: true,
+  away: false,
 }
 
 export default function HorseForm() {
@@ -102,6 +105,7 @@ export default function HorseForm() {
           owner_id: horse.owner_id ?? '',
           stall_id: horse.stall_id ?? '',
           active: horse.active,
+          away: horse.away,
         })
       })
       .catch((err: Error) => setError(err.message))
@@ -141,6 +145,7 @@ export default function HorseForm() {
         owner_id: form.owner_id || null,
         stall_id: form.stall_id || null,
         active: form.active,
+        away: form.away,
       }
 
       if (isEdit && id) {
@@ -200,7 +205,11 @@ export default function HorseForm() {
             {form.birthday && calculateAge(form.birthday) !== null && (
               <span className="text-slate-400">
                 {' '}
-                ({t('horseForm.yearsOld', { count: calculateAge(form.birthday)! })})
+                (
+                {t('horseForm.yearsOld', {
+                  count: calculateAge(form.birthday)!,
+                })}
+                )
               </span>
             )}
           </span>
@@ -350,14 +359,16 @@ export default function HorseForm() {
             onChange={(e) => updateField('notes', e.target.value)}
           />
         </label>
-        <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-          <input
-            type="checkbox"
-            checked={form.active}
-            onChange={(e) => updateField('active', e.target.checked)}
-          />
-          {t('horseForm.active')}
-        </label>
+        <Toggle
+          checked={form.active}
+          onChange={(checked) => updateField('active', checked)}
+          label={t('horseForm.active')}
+        />
+        <Toggle
+          checked={form.away}
+          onChange={(checked) => updateField('away', checked)}
+          label={t('horseForm.away')}
+        />
 
         <div className="sm:col-span-2">
           <button type="submit" disabled={saving} className="btn-primary">

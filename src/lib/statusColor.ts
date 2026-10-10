@@ -47,5 +47,7 @@ export function getStatusColor(status: string): string {
     ].includes(normalized)
   )
     return 'bg-sky-100 text-sky-800 border border-sky-200'
+  if (['away'].includes(normalized))
+    return 'bg-orange-100 text-orange-800 border border-orange-200'
   return 'bg-slate-100 text-slate-700 border border-slate-200'
 }

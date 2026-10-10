@@ -212,7 +212,10 @@ export default function OwnerDetail() {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <p className="font-medium text-slate-900">{horse.name}</p>
-                    <Badge status={horse.status} />
+                    <div className="flex flex-wrap gap-2">
+                      <Badge status={horse.status} />
+                      {horse.away && <Badge status="away" />}
+                    </div>
                   </div>
                   <p className="mt-1 text-sm text-slate-500">
                     {horse.breed ?? '—'} · {t('horseList.stall')}{' '}

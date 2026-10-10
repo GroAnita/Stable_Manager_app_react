@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import {
   createContract,
   getContract,
+  getEmptyBoxRate,
   listBeddingItems,
   listBoardingItems,
   listHayItems,
@@ -84,6 +85,7 @@ export default function ContractForm() {
   const [boardingItems, setBoardingItems] = useState<PriceListItemOption[]>([])
   const [hayItems, setHayItems] = useState<PriceListItemOption[]>([])
   const [beddingItems, setBeddingItems] = useState<PriceListItemOption[]>([])
+  const [emptyBoxRate, setEmptyBoxRate] = useState<number | null>(null)
   const [loading, setLoading] = useState(isEdit)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -101,6 +103,10 @@ export default function ContractForm() {
       .catch((err: Error) => setError(err.message))
     listBoardingItems()
       .then(setBoardingItems)
+      .catch((err: Error) => setError(err.message))
+    getCurrentStableId()
+      .then((stableId) => (stableId ? getEmptyBoxRate(stableId) : null))
+      .then(setEmptyBoxRate)
       .catch((err: Error) => setError(err.message))
     listHayItems()
       .then(setHayItems)
@@ -162,6 +168,8 @@ export default function ContractForm() {
     }))
   }
 
+  const horseIsAway = horses.find((h) => h.id === form.horse_id)?.away ?? false
+
   const cycleDays = currentBillingCycleDays()
   const selectedHayItem = hayItems.find(
     (item) => item.id === form.hay_price_list_item_id,
@@ -181,8 +189,13 @@ export default function ContractForm() {
       ? beddingAmountIncVat(selectedBeddingItem.price, qty)
       : 0
   }, [selectedBeddingItem, form.bedding_quantity])
-  const rent = Number(form.monthly_rent) || 0
-  const total = Math.round((rent + hayValue + beddingAmount) * 100) / 100
+  const effectiveHayValue = horseIsAway ? 0 : hayValue
+  const effectiveBeddingAmount = horseIsAway ? 0 : beddingAmount
+  const rent = horseIsAway
+    ? (emptyBoxRate ?? 0)
+    : Number(form.monthly_rent) || 0
+  const total =
+    Math.round((rent + effectiveHayValue + effectiveBeddingAmount) * 100) / 100
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
@@ -266,6 +279,7 @@ export default function ContractForm() {
             {horses.map((horse) => (
               <option key={horse.id} value={horse.id}>
                 {horse.name}
+                {horse.away ? ` (${t('status.away')})` : ''}
               </option>
             ))}
           </select>
@@ -301,11 +315,28 @@ export default function ContractForm() {
             ))}
           </select>
         </label>
+
+        {horseIsAway && (
+          <div className="rounded-2xl border border-orange-200 bg-orange-50 p-4 md:col-span-2 xl:col-span-3">
+            <p className="text-sm font-medium text-orange-900">
+              {t('contractForm.emptyBoxToggle')}
+            </p>
+            <p className="mt-1 text-xs text-orange-700">
+              {emptyBoxRate !== null
+                ? t('contractForm.emptyBoxHint', {
+                    amount: formatCurrency(emptyBoxRate),
+                  })
+                : t('contractForm.noEmptyBoxItems')}
+            </p>
+          </div>
+        )}
+
         <div>
           <span className="field-label">{t('contractForm.boardingItem')}</span>
           {boardingItems.length ? (
             <select
               className="field"
+              disabled={horseIsAway}
               value={form.boarding_price_list_item_id}
               onChange={(e) => selectBoardingItem(e.target.value)}
             >
@@ -330,6 +361,7 @@ export default function ContractForm() {
             type="number"
             step="0.01"
             min="0"
+            disabled={horseIsAway}
             className="field"
             value={form.monthly_rent}
             onChange={(e) => updateField('monthly_rent', e.target.value)}
@@ -392,6 +424,7 @@ export default function ContractForm() {
           {hayItems.length ? (
             <select
               className="field"
+              disabled={horseIsAway}
               value={form.hay_price_list_item_id}
               onChange={(e) =>
                 updateField('hay_price_list_item_id', e.target.value)
@@ -425,6 +458,7 @@ export default function ContractForm() {
             type="number"
             step="0.01"
             min="0"
+            disabled={horseIsAway}
             className="field"
             value={form.included_hay_kg}
             onChange={(e) => updateField('included_hay_kg', e.target.value)}
@@ -437,6 +471,7 @@ export default function ContractForm() {
           {beddingItems.length ? (
             <select
               className="field"
+              disabled={horseIsAway}
               value={form.bedding_price_list_item_id}
               onChange={(e) =>
                 updateField('bedding_price_list_item_id', e.target.value)
@@ -471,6 +506,7 @@ export default function ContractForm() {
             type="number"
             step="0.01"
             min="0"
+            disabled={horseIsAway}
             className="field"
             value={form.bedding_quantity}
             onChange={(e) => updateField('bedding_quantity', e.target.value)}
@@ -536,7 +572,12 @@ export default function ContractForm() {
               <span>{t('contractForm.summaryRent')}</span>
               <span>{formatCurrency(rent)}</span>
             </div>
-            {hayValue > 0 && (
+            {horseIsAway && (
+              <p className="text-xs text-orange-600">
+                {t('contractForm.emptyBoxSummaryNote')}
+              </p>
+            )}
+            {effectiveHayValue > 0 && (
               <div className="flex justify-between">
                 <span>
                   {t('contractForm.summaryHay', {
@@ -544,17 +585,17 @@ export default function ContractForm() {
                     days: cycleDays,
                   })}
                 </span>
-                <span>{formatCurrency(hayValue)}</span>
+                <span>{formatCurrency(effectiveHayValue)}</span>
               </div>
             )}
-            {beddingAmount > 0 && (
+            {effectiveBeddingAmount > 0 && (
               <div className="flex justify-between">
                 <span>
                   {t('contractForm.summaryBedding', {
                     qty: form.bedding_quantity || 0,
                   })}
                 </span>
-                <span>{formatCurrency(beddingAmount)}</span>
+                <span>{formatCurrency(effectiveBeddingAmount)}</span>
               </div>
             )}
             <div className="mt-2 flex justify-between border-t border-slate-200 pt-2 font-semibold text-slate-900">

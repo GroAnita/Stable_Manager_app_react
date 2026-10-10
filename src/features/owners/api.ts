@@ -7,7 +7,7 @@ export type OwnerUpdate = Database['public']['Tables']['owners']['Update']
 
 export type OwnerHorse = Pick<
   Database['public']['Tables']['horses']['Row'],
-  'id' | 'name' | 'breed' | 'status'
+  'id' | 'name' | 'breed' | 'status' | 'away'
 > & {
   stall: Pick<
     Database['public']['Tables']['stalls']['Row'],
@@ -51,7 +51,7 @@ export async function getOwner(id: string): Promise<Owner> {
 export async function getOwnerHorses(ownerId: string): Promise<OwnerHorse[]> {
   const { data, error } = await supabase
     .from('horses')
-    .select('id, name, breed, status, stall:stalls(stall_number)')
+    .select('id, name, breed, status, away, stall:stalls(stall_number)')
     .eq('owner_id', ownerId)
     .order('name')
   if (error) throw error

@@ -391,6 +391,7 @@ export const en = {
     medicalNotes: 'Medical notes',
     generalNotes: 'General notes',
     active: 'Active',
+    away: 'Away (temporarily out of the stable, e.g. on summer grass)',
     loading: 'Loading horse…',
     noStableFound: 'No stable found for the current user. Please sign in.',
   },
@@ -483,6 +484,13 @@ export const en = {
     boardingItem: 'Boarding plan',
     selectBoardingItem: 'Select boarding plan',
     noBoardingItems: 'No boarding items in the price list.',
+    emptyBoxToggle: 'This horse is marked away',
+    emptyBoxHint:
+      'Hay, bedding and the boarding plan are frozen while away — this contract bills the fixed empty box fee of {amount} instead.',
+    noEmptyBoxItems:
+      'No "Empty box fee" item set in the price list yet — add one so this contract bills correctly while the horse is away.',
+    emptyBoxSummaryNote:
+      'Horse away: hay and bedding are frozen and excluded from this total.',
     monthlyRent: 'Monthly rent',
     deposit: 'Deposit',
     status: 'Status',
@@ -723,6 +731,7 @@ export const en = {
   },
   status: {
     active: 'Active',
+    away: 'Away',
     ending_soon: 'Ending soon',
     expired: 'Expired',
     cancelled: 'Cancelled',
@@ -746,6 +755,7 @@ export const en = {
   },
   category: {
     boarding: 'Boarding',
+    emptybox: 'Empty box fee',
     hay: 'Hay',
     grain: 'Grain',
     supplements: 'Supplements',

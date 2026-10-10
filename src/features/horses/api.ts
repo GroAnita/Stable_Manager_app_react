@@ -33,6 +33,7 @@ export type HorseListItem = Pick<
   | 'photo_url'
   | 'status'
   | 'active'
+  | 'away'
 > & {
   owner: Pick<
     Database['public']['Tables']['owners']['Row'],
@@ -145,7 +146,7 @@ export async function listHorses(): Promise<HorseListItem[]> {
   const { data, error } = await supabase
     .from('horses')
     .select(
-      'id, name, breed, age, color, passport_number, photo_url, status, active, owner:owners(id, full_name), stall:stalls(id, stall_number)',
+      'id, name, breed, age, color, passport_number, photo_url, status, active, away, owner:owners(id, full_name), stall:stalls(id, stall_number)',
     )
     .order('name')
   if (error) throw error
