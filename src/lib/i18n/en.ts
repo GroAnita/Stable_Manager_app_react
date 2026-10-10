@@ -1,5 +1,6 @@
 export const en = {
   common: {
+    appName: 'Stable Manager',
     save: 'Save',
     saving: 'Saving…',
     cancel: 'Cancel',
@@ -76,6 +77,16 @@ export const en = {
     passwordUpdated: 'Password updated. You can now sign in.',
     invalidResetLink:
       'This reset link is invalid or has expired. Request a new one below.',
+    marketingHeadline: 'Everything your stable needs, in one place',
+    marketingSubtitle:
+      'Horses, contracts, invoicing and the whole team on one simple dashboard — in English or Norwegian.',
+    marketingFeatureHorses:
+      'Horse profiles, feeding plans and vaccination tracking',
+    marketingFeatureBilling:
+      'Contracts, invoices and payments, generated automatically',
+    marketingFeatureBoard: 'A shared notice board so nothing gets missed',
+    marketingFeatureRoles:
+      'Separate views for staff and boarders — everyone sees just what they need',
   },
   onboarding: {
     title: 'Set up your stable',
@@ -147,7 +158,8 @@ export const en = {
     categoryInfo: 'General',
     noAnnouncements: 'No announcements yet.',
     deleteTitle: 'Delete announcement',
-    deleteMessage: 'This announcement will be removed for everyone. This cannot be undone.',
+    deleteMessage:
+      'This announcement will be removed for everyone. This cannot be undone.',
   },
   dashboard: {
     title: 'Dashboard',
@@ -592,7 +604,8 @@ export const en = {
     addItem: 'Add item',
     editItem: 'Edit item',
     deleteItem: 'Delete item',
-    confirmDeleteItem: 'Stop tracking "{name}" and delete its delivery history?',
+    confirmDeleteItem:
+      'Stop tracking "{name}" and delete its delivery history?',
     selectItem: 'Price list item',
     chooseItem: 'Select an item to track',
     noAvailableItems:
@@ -677,7 +690,8 @@ export const en = {
   },
   taskList: {
     title: 'Tasks',
-    subtitle: 'Manage day-to-day care, admin and medical follow-ups across the stable.',
+    subtitle:
+      'Manage day-to-day care, admin and medical follow-ups across the stable.',
     addTask: 'Add task',
     allPriorities: 'All priorities',
     allTasks: 'All tasks',

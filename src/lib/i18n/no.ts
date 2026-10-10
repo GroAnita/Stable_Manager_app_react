@@ -2,6 +2,7 @@ import type { en } from './en'
 
 export const no: typeof en = {
   common: {
+    appName: 'StallDrift',
     save: 'Lagre',
     saving: 'Lagrer…',
     cancel: 'Avbryt',
@@ -79,6 +80,16 @@ export const no: typeof en = {
     passwordUpdated: 'Passordet er oppdatert. Du kan nå logge inn.',
     invalidResetLink:
       'Denne lenken er ugyldig eller har utløpt. Be om en ny nedenfor.',
+    marketingHeadline: 'Alt stallen din trenger, på ett sted',
+    marketingSubtitle:
+      'Hester, kontrakter, fakturering og hele teamet i ett enkelt dashbord — på norsk eller engelsk.',
+    marketingFeatureHorses:
+      'Hesteprofiler, fôringsplaner og vaksinasjonsoversikt',
+    marketingFeatureBilling:
+      'Kontrakter, fakturaer og betalinger, generert automatisk',
+    marketingFeatureBoard: 'En delt oppslagstavle så ingenting går glipp av',
+    marketingFeatureRoles:
+      'Egne visninger for ansatte og hesteeiere — alle ser bare det de trenger',
   },
   onboarding: {
     title: 'Sett opp stallen din',
@@ -595,7 +606,8 @@ export const no: typeof en = {
     addItem: 'Legg til vare',
     editItem: 'Rediger vare',
     deleteItem: 'Slett vare',
-    confirmDeleteItem: 'Stoppe sporing av «{name}» og slette leveringshistorikken?',
+    confirmDeleteItem:
+      'Stoppe sporing av «{name}» og slette leveringshistorikken?',
     selectItem: 'Vare fra prisliste',
     chooseItem: 'Velg en vare å spore',
     noAvailableItems:

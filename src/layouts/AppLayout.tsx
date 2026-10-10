@@ -137,7 +137,9 @@ export default function AppLayout() {
         }`}
       >
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-forest">Stable Manager</h1>
+          <h1 className="text-2xl font-semibold text-forest">
+            {t('common.appName')}
+          </h1>
           <button
             type="button"
             className="rounded-full p-2 text-ink/60 hover:bg-white lg:hidden"
@@ -200,20 +202,8 @@ export default function AppLayout() {
         </div>
       </aside>
       <div className="flex min-h-screen flex-1 flex-col lg:min-w-0">
-        <header className="flex items-center gap-3 border-b border-white/70 bg-cream/90 px-4 py-5 backdrop-blur md:px-6">
-          <button
-            type="button"
-            className="rounded-2xl border border-slate-200 bg-white p-2.5 text-ink/70 lg:hidden"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Icon name="menu" className="h-5 w-5" />
-          </button>
-          <div>
-            <p className="text-xs font-medium tracking-[0.25em] text-ink/40 uppercase">
-              {profile?.role ? t(`role.${profile.role}`) : t('nav.overview')}
-            </p>
-          </div>
-          <div className="ml-4 flex flex-1 items-center justify-center gap-3">
+        <header className="flex flex-col gap-3 border-b border-white/70 bg-cream/90 px-4 py-4 backdrop-blur lg:flex-row lg:items-center lg:py-5 lg:px-6">
+          <div className="order-1 flex items-center justify-center gap-3 lg:order-2 lg:flex-1">
             {profile?.stable?.name && (
               <>
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-forest/10 text-sm font-semibold text-forest">
@@ -227,33 +217,47 @@ export default function AppLayout() {
                     profile.stable.name.charAt(0).toUpperCase()
                   )}
                 </div>
-                <p className="text-4xl font-semibold text-forest">
+                <p className="text-2xl font-semibold text-forest lg:text-4xl">
                   {profile.stable.name}
                 </p>
               </>
             )}
           </div>
-          <div className="ml-auto flex gap-2">
-            <button
-              type="button"
-              aria-label="English"
-              onClick={selectEnglish}
-              className={
-                language === 'en' ? '' : 'opacity-50 hover:opacity-100'
-              }
-            >
-              <span className="fi fi-gb"></span>
-            </button>
-            <button
-              type="button"
-              aria-label="Norsk"
-              onClick={selectNorwegian}
-              className={
-                language === 'no' ? '' : 'opacity-50 hover:opacity-100'
-              }
-            >
-              <span className="fi fi-no"></span>
-            </button>
+          <div className="order-2 flex items-center justify-between gap-3 lg:contents">
+            <div className="order-1 flex items-center gap-3">
+              <button
+                type="button"
+                className="rounded-2xl border border-slate-200 bg-white p-2.5 text-ink/70 lg:hidden"
+                onClick={() => setSidebarOpen(true)}
+              >
+                <Icon name="menu" className="h-5 w-5" />
+              </button>
+              <p className="text-xs font-medium tracking-[0.25em] text-ink/40 uppercase">
+                {profile?.role ? t(`role.${profile.role}`) : t('nav.overview')}
+              </p>
+            </div>
+            <div className="order-3 flex gap-2 lg:ml-auto">
+              <button
+                type="button"
+                aria-label="English"
+                onClick={selectEnglish}
+                className={
+                  language === 'en' ? '' : 'opacity-50 hover:opacity-100'
+                }
+              >
+                <span className="fi fi-gb"></span>
+              </button>
+              <button
+                type="button"
+                aria-label="Norsk"
+                onClick={selectNorwegian}
+                className={
+                  language === 'no' ? '' : 'opacity-50 hover:opacity-100'
+                }
+              >
+                <span className="fi fi-no"></span>
+              </button>
+            </div>
           </div>
         </header>
         <main className="flex-1 overflow-x-hidden px-4 py-6 md:px-6">
