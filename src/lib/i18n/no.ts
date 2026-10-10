@@ -40,6 +40,11 @@ export const no: typeof en = {
     groupStableOperations: 'Stalldrift',
     groupBusiness: 'Forretning',
   },
+  role: {
+    stable_owner: 'Admin',
+    stable_employee: 'Ansatt',
+    horse_owner: 'Eier',
+  },
   auth: {
     welcomeBack: 'Velkommen tilbake',
     createAccount: 'Opprett konto',

@@ -38,6 +38,11 @@ export const en = {
     groupStableOperations: 'Stable operations',
     groupBusiness: 'Business',
   },
+  role: {
+    stable_owner: 'Admin',
+    stable_employee: 'Staff',
+    horse_owner: 'Owner',
+  },
   auth: {
     welcomeBack: 'Welcome back',
     createAccount: 'Create an account',

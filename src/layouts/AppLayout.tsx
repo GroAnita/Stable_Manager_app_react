@@ -179,7 +179,7 @@ export default function AppLayout() {
             <Icon name="menu" className="h-5 w-5" />
           </button>
           <p className="text-xs font-medium tracking-[0.25em] text-ink/40 uppercase">
-            {t('nav.overview')}
+            {profile?.role ? t(`role.${profile.role}`) : t('nav.overview')}
           </p>
           <div className="ml-auto flex gap-2">
             <button
