@@ -4,6 +4,7 @@ import { Icon, type IconName } from '../components/Icon'
 import { signOut } from '../lib/authService'
 import { useAuth } from '../lib/AuthContext'
 import { usePreferences } from '../lib/PreferencesContext'
+import 'flag-icons/css/flag-icons.min.css'
 
 type NavItem = { key: string; to: string; icon: IconName | 'horse' }
 
@@ -77,7 +78,7 @@ function SidebarLink({ item, onClick }: { item: NavItem; onClick: () => void }) 
 
 export default function AppLayout() {
   const { session, profile } = useAuth()
-  const { t } = usePreferences()
+  const { t, language, setLanguage } = usePreferences()
   const navigate = useNavigate()
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -180,6 +181,25 @@ export default function AppLayout() {
           <p className="text-xs font-medium tracking-[0.25em] text-ink/40 uppercase">
             {t('nav.overview')}
           </p>
+          <div className="ml-auto flex gap-2">
+            <button
+              type="button"
+              aria-label="English"
+              onClick={() => setLanguage('en')}
+              className={language === 'en' ? '' : 'opacity-50 hover:opacity-100'}
+            >
+              <span className="fi fi-gb"></span>
+            </button>
+            <button
+              type="button"
+              aria-label="Norsk"
+              onClick={() => setLanguage('no')}
+              className={language === 'no' ? '' : 'opacity-50 hover:opacity-100'}
+            >
+              <span className="fi fi-no"></span>
+            </button>
+          </div>
+
         </header>
         <main className="flex-1 overflow-x-hidden px-4 py-6 md:px-6">
           <Suspense
