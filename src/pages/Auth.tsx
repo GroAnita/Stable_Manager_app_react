@@ -93,7 +93,7 @@ export default function Auth() {
   }
 
   return (
-    <div className="relative flex min-h-screen bg-cream">
+    <div className="relative flex min-h-screen flex-col bg-cream lg:flex-row">
       <div className="absolute top-4 right-4 z-10 flex gap-2">
         <button
           type="button"
@@ -112,6 +112,20 @@ export default function Auth() {
           <span className="fi fi-no"></span>
         </button>
       </div>
+
+      <div className="relative flex flex-col items-center overflow-hidden bg-forest px-6 py-10 text-center lg:hidden">
+        <Icon
+          name="horse"
+          className="pointer-events-none absolute -right-10 -bottom-10 h-40 w-40 text-white/10"
+        />
+        <p className="relative text-xs font-semibold tracking-[0.25em] text-cream/70 uppercase">
+          {t('common.appName')}
+        </p>
+        <h1 className="relative mt-3 max-w-xs text-xl font-semibold text-white">
+          {t('auth.marketingHeadline')}
+        </h1>
+      </div>
+
       <div className="relative hidden w-1/2 shrink-0 overflow-hidden bg-forest px-12 py-16 lg:flex lg:flex-col lg:justify-center">
         <Icon
           name="horse"

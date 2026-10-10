@@ -42,10 +42,10 @@ const PreferencesContext = createContext<PreferencesContextValue | undefined>(
 
 export function PreferencesProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(
-    () => (localStorage.getItem(LANG_KEY) as Language | null) || 'en',
+    () => (localStorage.getItem(LANG_KEY) as Language | null) || 'no',
   )
   const [currency, setCurrencyState] = useState<Currency>(
-    () => (localStorage.getItem(CURRENCY_KEY) as Currency | null) || 'EUR',
+    () => (localStorage.getItem(CURRENCY_KEY) as Currency | null) || 'NOK',
   )
 
   function setLanguage(lang: Language) {
