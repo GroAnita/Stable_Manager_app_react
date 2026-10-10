@@ -98,7 +98,6 @@ export default function OwnerDetail() {
     ],
     [t('ownerDetail.emergencyContact'), owner.emergency_contact ?? '—'],
     [t('ownerDetail.emergencyPhone'), owner.emergency_phone ?? '—'],
-    [t('ownerDetail.billing'), owner.payment_method ?? '—'],
   ]
 
   return (

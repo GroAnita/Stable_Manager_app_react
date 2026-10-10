@@ -18,7 +18,6 @@ type FormState = {
   postal_code: string
   emergency_contact: string
   emergency_phone: string
-  payment_method: string
   notes: string
 }
 
@@ -31,7 +30,6 @@ const emptyForm: FormState = {
   postal_code: '',
   emergency_contact: '',
   emergency_phone: '',
-  payment_method: '',
   notes: '',
 }
 
@@ -61,7 +59,6 @@ export default function OwnerForm() {
           postal_code: owner.postal_code ?? '',
           emergency_contact: owner.emergency_contact ?? '',
           emergency_phone: owner.emergency_phone ?? '',
-          payment_method: owner.payment_method ?? '',
           notes: owner.notes ?? '',
         })
       })
@@ -92,7 +89,6 @@ export default function OwnerForm() {
         postal_code: form.postal_code || null,
         emergency_contact: form.emergency_contact || null,
         emergency_phone: form.emergency_phone || null,
-        payment_method: form.payment_method || null,
         notes: form.notes || null,
       }
 
@@ -155,14 +151,6 @@ export default function OwnerForm() {
             className="field"
             value={form.email}
             onChange={(e) => updateField('email', e.target.value)}
-          />
-        </label>
-        <label>
-          <span className="field-label">{t('ownerForm.billing')}</span>
-          <input
-            className="field"
-            value={form.payment_method}
-            onChange={(e) => updateField('payment_method', e.target.value)}
           />
         </label>
         <label className="sm:col-span-2">
