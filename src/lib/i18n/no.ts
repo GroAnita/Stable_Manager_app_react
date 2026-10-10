@@ -120,6 +120,9 @@ export const no: typeof en = {
     dueDate: 'Forfallsdato',
     amount: 'Beløp',
     status: 'Status',
+    actions: 'Betal',
+    payWithCard: 'Betal med kort',
+    payWithVipps: 'Vipps',
   },
   myProfile: {
     title: 'Min profil',

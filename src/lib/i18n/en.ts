@@ -117,6 +117,9 @@ export const en = {
     dueDate: 'Due date',
     amount: 'Amount',
     status: 'Status',
+    actions: 'Pay',
+    payWithCard: 'Pay with card',
+    payWithVipps: 'Vipps',
   },
   myProfile: {
     title: 'My Profile',

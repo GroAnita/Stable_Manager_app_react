@@ -93,6 +93,7 @@ export default function MyContract() {
                   <th>{t('myContract.dueDate')}</th>
                   <th>{t('myContract.amount')}</th>
                   <th>{t('myContract.status')}</th>
+                  <th>{t('myContract.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -103,6 +104,21 @@ export default function MyContract() {
                     <td>{formatCurrency(payment.amount)}</td>
                     <td>
                       <Badge status={payment.status} />
+                    </td>
+                    <td>
+                      {payment.status !== 'paid' && (
+                        <div className="flex flex-wrap gap-2">
+                          <button type="button" className="btn-secondary">
+                            {t('myContract.payWithCard')}
+                          </button>
+                          <button
+                            type="button"
+                            className="rounded-xl bg-[#ff5b24] px-3 py-2 text-sm font-semibold text-white hover:bg-[#e54f1d]"
+                          >
+                            {t('myContract.payWithVipps')}
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
