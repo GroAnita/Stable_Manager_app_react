@@ -165,6 +165,16 @@ export async function deleteContract(id: string): Promise<void> {
   if (error) throw error
 }
 
+export async function listBoardingItems(): Promise<PriceListItemOption[]> {
+  const { data, error } = await supabase
+    .from('price_list_items')
+    .select('id, item, unit, price')
+    .eq('category', 'Boarding')
+    .order('item')
+  if (error) throw error
+  return data
+}
+
 export async function listHayItems(): Promise<PriceListItemOption[]> {
   const { data, error } = await supabase
     .from('price_list_items')

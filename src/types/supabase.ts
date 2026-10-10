@@ -131,6 +131,7 @@ export type Database = {
           additional_services: string | null;
           bedding_price_list_item_id: string | null;
           bedding_quantity: number;
+          boarding_price_list_item_id: string | null;
           created_at: string;
           deposit: number | null;
           end_date: string | null;
@@ -152,6 +153,7 @@ export type Database = {
           additional_services?: string | null;
           bedding_price_list_item_id?: string | null;
           bedding_quantity?: number;
+          boarding_price_list_item_id?: string | null;
           created_at?: string;
           deposit?: number | null;
           end_date?: string | null;
@@ -173,6 +175,7 @@ export type Database = {
           additional_services?: string | null;
           bedding_price_list_item_id?: string | null;
           bedding_quantity?: number;
+          boarding_price_list_item_id?: string | null;
           created_at?: string;
           deposit?: number | null;
           end_date?: string | null;
@@ -194,6 +197,13 @@ export type Database = {
           {
             foreignKeyName: "contracts_bedding_price_list_item_id_fkey";
             columns: ["bedding_price_list_item_id"];
+            isOneToOne: false;
+            referencedRelation: "price_list_items";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "contracts_boarding_price_list_item_id_fkey";
+            columns: ["boarding_price_list_item_id"];
             isOneToOne: false;
             referencedRelation: "price_list_items";
             referencedColumns: ["id"];

@@ -4,6 +4,7 @@ import {
   createContract,
   getContract,
   listBeddingItems,
+  listBoardingItems,
   listHayItems,
   updateContract,
   type ContractInsert,
@@ -36,6 +37,7 @@ type FormState = {
   horse_id: string
   owner_id: string
   stall_id: string
+  boarding_price_list_item_id: string
   monthly_rent: string
   deposit: string
   start_date: string
@@ -54,6 +56,7 @@ const emptyForm: FormState = {
   horse_id: '',
   owner_id: '',
   stall_id: '',
+  boarding_price_list_item_id: '',
   monthly_rent: '',
   deposit: '',
   start_date: '',
@@ -78,6 +81,7 @@ export default function ContractForm() {
   const [horses, setHorses] = useState<HorseOption[]>([])
   const [owners, setOwners] = useState<OwnerOption[]>([])
   const [stalls, setStalls] = useState<StallOption[]>([])
+  const [boardingItems, setBoardingItems] = useState<PriceListItemOption[]>([])
   const [hayItems, setHayItems] = useState<PriceListItemOption[]>([])
   const [beddingItems, setBeddingItems] = useState<PriceListItemOption[]>([])
   const [loading, setLoading] = useState(isEdit)
@@ -94,6 +98,9 @@ export default function ContractForm() {
       .catch((err: Error) => setError(err.message))
     listStallOptions()
       .then(setStalls)
+      .catch((err: Error) => setError(err.message))
+    listBoardingItems()
+      .then(setBoardingItems)
       .catch((err: Error) => setError(err.message))
     listHayItems()
       .then(setHayItems)
@@ -113,6 +120,8 @@ export default function ContractForm() {
           horse_id: contract.horse_id,
           owner_id: contract.owner_id,
           stall_id: contract.stall_id ?? '',
+          boarding_price_list_item_id:
+            contract.boarding_price_list_item_id ?? '',
           monthly_rent: contract.monthly_rent.toString(),
           deposit: contract.deposit?.toString() ?? '',
           start_date: contract.start_date,
@@ -142,6 +151,15 @@ export default function ContractForm() {
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
     if (key === 'included_services') setServiceError(false)
+  }
+
+  function selectBoardingItem(itemId: string) {
+    const item = boardingItems.find((option) => option.id === itemId)
+    setForm((prev) => ({
+      ...prev,
+      boarding_price_list_item_id: itemId,
+      monthly_rent: item ? item.price.toString() : prev.monthly_rent,
+    }))
   }
 
   const cycleDays = currentBillingCycleDays()
@@ -179,6 +197,7 @@ export default function ContractForm() {
         horse_id: form.horse_id,
         owner_id: form.owner_id,
         stall_id: form.stall_id || null,
+        boarding_price_list_item_id: form.boarding_price_list_item_id || null,
         monthly_rent: Number(form.monthly_rent) || 0,
         deposit: form.deposit ? Number(form.deposit) : null,
         start_date: form.start_date,
@@ -282,6 +301,28 @@ export default function ContractForm() {
             ))}
           </select>
         </label>
+        <div>
+          <span className="field-label">{t('contractForm.boardingItem')}</span>
+          {boardingItems.length ? (
+            <select
+              className="field"
+              value={form.boarding_price_list_item_id}
+              onChange={(e) => selectBoardingItem(e.target.value)}
+            >
+              <option value="">{t('contractForm.selectBoardingItem')}</option>
+              {boardingItems.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.item}
+                  {item.unit ? ` (${item.unit})` : ''}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <p className="field flex items-center text-sm text-slate-400">
+              {t('contractForm.noBoardingItems')}
+            </p>
+          )}
+        </div>
         <label>
           <span className="field-label">{t('contractForm.monthlyRent')}</span>
           <input
