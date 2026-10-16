@@ -385,6 +385,268 @@ export type Database = {
           },
         ];
       };
+      feeding_rota_participants: {
+        Row: {
+          active: boolean;
+          created_at: string;
+          id: string;
+          owner_id: string;
+          stable_id: string;
+        };
+        Insert: {
+          active?: boolean;
+          created_at?: string;
+          id?: string;
+          owner_id: string;
+          stable_id: string;
+        };
+        Update: {
+          active?: boolean;
+          created_at?: string;
+          id?: string;
+          owner_id?: string;
+          stable_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "feeding_rota_participants_owner_id_fkey";
+            columns: ["owner_id"];
+            isOneToOne: false;
+            referencedRelation: "owners";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "feeding_rota_participants_stable_id_fkey";
+            columns: ["stable_id"];
+            isOneToOne: false;
+            referencedRelation: "stables";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      feeding_shift_swap_requests: {
+        Row: {
+          created_at: string;
+          id: string;
+          requested_by_owner_id: string;
+          requested_to_owner_id: string;
+          responded_at: string | null;
+          shift_id: string;
+          stable_id: string;
+          status: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          requested_by_owner_id: string;
+          requested_to_owner_id: string;
+          responded_at?: string | null;
+          shift_id: string;
+          stable_id: string;
+          status?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          requested_by_owner_id?: string;
+          requested_to_owner_id?: string;
+          responded_at?: string | null;
+          shift_id?: string;
+          stable_id?: string;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "feeding_shift_swap_requests_requested_by_owner_id_fkey";
+            columns: ["requested_by_owner_id"];
+            isOneToOne: false;
+            referencedRelation: "owners";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "feeding_shift_swap_requests_requested_to_owner_id_fkey";
+            columns: ["requested_to_owner_id"];
+            isOneToOne: false;
+            referencedRelation: "owners";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "feeding_shift_swap_requests_shift_id_fkey";
+            columns: ["shift_id"];
+            isOneToOne: false;
+            referencedRelation: "feeding_shifts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "feeding_shift_swap_requests_stable_id_fkey";
+            columns: ["stable_id"];
+            isOneToOne: false;
+            referencedRelation: "stables";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      feeding_shift_type_horses: {
+        Row: {
+          horse_id: string;
+          shift_type_id: string;
+        };
+        Insert: {
+          horse_id: string;
+          shift_type_id: string;
+        };
+        Update: {
+          horse_id?: string;
+          shift_type_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "feeding_shift_type_horses_horse_id_fkey";
+            columns: ["horse_id"];
+            isOneToOne: false;
+            referencedRelation: "horses";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "feeding_shift_type_horses_shift_type_id_fkey";
+            columns: ["shift_type_id"];
+            isOneToOne: false;
+            referencedRelation: "feeding_shift_types";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      feeding_shift_types: {
+        Row: {
+          active: boolean;
+          created_at: string;
+          id: string;
+          label: string;
+          scope: string;
+          sort_order: number;
+          stable_id: string;
+          time_of_day: string;
+          updated_at: string;
+        };
+        Insert: {
+          active?: boolean;
+          created_at?: string;
+          id?: string;
+          label: string;
+          scope?: string;
+          sort_order?: number;
+          stable_id: string;
+          time_of_day: string;
+          updated_at?: string;
+        };
+        Update: {
+          active?: boolean;
+          created_at?: string;
+          id?: string;
+          label?: string;
+          scope?: string;
+          sort_order?: number;
+          stable_id?: string;
+          time_of_day?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "feeding_shift_types_stable_id_fkey";
+            columns: ["stable_id"];
+            isOneToOne: false;
+            referencedRelation: "stables";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      feeding_shifts: {
+        Row: {
+          assigned_owner_id: string | null;
+          completed_at: string | null;
+          completed_by: string | null;
+          created_at: string;
+          created_by: string | null;
+          date: string;
+          id: string;
+          reminder_day_before_sent_at: string | null;
+          reminder_hour_before_sent_at: string | null;
+          shift_type_id: string;
+          stable_id: string;
+          status: string;
+          unassignable: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          assigned_owner_id?: string | null;
+          completed_at?: string | null;
+          completed_by?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          date: string;
+          id?: string;
+          reminder_day_before_sent_at?: string | null;
+          reminder_hour_before_sent_at?: string | null;
+          shift_type_id: string;
+          stable_id: string;
+          status?: string;
+          unassignable?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          assigned_owner_id?: string | null;
+          completed_at?: string | null;
+          completed_by?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          date?: string;
+          id?: string;
+          reminder_day_before_sent_at?: string | null;
+          reminder_hour_before_sent_at?: string | null;
+          shift_type_id?: string;
+          stable_id?: string;
+          status?: string;
+          unassignable?: boolean;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "feeding_shifts_assigned_owner_id_fkey";
+            columns: ["assigned_owner_id"];
+            isOneToOne: false;
+            referencedRelation: "owners";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "feeding_shifts_completed_by_fkey";
+            columns: ["completed_by"];
+            isOneToOne: false;
+            referencedRelation: "owners";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "feeding_shifts_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "feeding_shifts_shift_type_id_fkey";
+            columns: ["shift_type_id"];
+            isOneToOne: false;
+            referencedRelation: "feeding_shift_types";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "feeding_shifts_stable_id_fkey";
+            columns: ["stable_id"];
+            isOneToOne: false;
+            referencedRelation: "stables";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       feeding_times: {
         Row: {
           created_at: string;
@@ -758,6 +1020,51 @@ export type Database = {
           },
           {
             foreignKeyName: "notifications_stable_id_fkey";
+            columns: ["stable_id"];
+            isOneToOne: false;
+            referencedRelation: "stables";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      owner_unavailability: {
+        Row: {
+          created_at: string;
+          end_date: string;
+          id: string;
+          owner_id: string;
+          reason: string | null;
+          stable_id: string;
+          start_date: string;
+        };
+        Insert: {
+          created_at?: string;
+          end_date: string;
+          id?: string;
+          owner_id: string;
+          reason?: string | null;
+          stable_id: string;
+          start_date: string;
+        };
+        Update: {
+          created_at?: string;
+          end_date?: string;
+          id?: string;
+          owner_id?: string;
+          reason?: string | null;
+          stable_id?: string;
+          start_date?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "owner_unavailability_owner_id_fkey";
+            columns: ["owner_id"];
+            isOneToOne: false;
+            referencedRelation: "owners";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "owner_unavailability_stable_id_fkey";
             columns: ["stable_id"];
             isOneToOne: false;
             referencedRelation: "stables";
@@ -1590,6 +1897,45 @@ export type Database = {
         };
       };
       refresh_overdue_payments: { Args: never; Returns: undefined };
+      request_feeding_shift_swap: {
+        Args: { p_shift_id: string; p_to_owner_id: string };
+        Returns: {
+          created_at: string;
+          id: string;
+          requested_by_owner_id: string;
+          requested_to_owner_id: string;
+          responded_at: string | null;
+          shift_id: string;
+          stable_id: string;
+          status: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "feeding_shift_swap_requests";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      respond_feeding_shift_swap: {
+        Args: { p_accept: boolean; p_swap_id: string };
+        Returns: {
+          created_at: string;
+          id: string;
+          requested_by_owner_id: string;
+          requested_to_owner_id: string;
+          responded_at: string | null;
+          shift_id: string;
+          stable_id: string;
+          status: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "feeding_shift_swap_requests";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      send_feeding_shift_reminders: { Args: never; Returns: undefined };
     };
     Enums: {
       calendar_event_type:
@@ -1613,7 +1959,13 @@ export type Database = {
         | "vaccination_due"
         | "contract_ending"
         | "farrier_reminder"
-        | "medication_reminder";
+        | "medication_reminder"
+        | "feeding_shift_assigned"
+        | "feeding_shift_changed"
+        | "feeding_shift_swap_requested"
+        | "feeding_shift_swap_accepted"
+        | "feeding_shift_swap_declined"
+        | "feeding_shift_reminder";
       payment_status: "paid" | "due" | "overdue";
       stall_status: "available" | "occupied" | "reserved" | "maintenance";
       task_priority: "low" | "medium" | "high";
@@ -1769,6 +2121,12 @@ export const Constants = {
         "contract_ending",
         "farrier_reminder",
         "medication_reminder",
+        "feeding_shift_assigned",
+        "feeding_shift_changed",
+        "feeding_shift_swap_requested",
+        "feeding_shift_swap_accepted",
+        "feeding_shift_swap_declined",
+        "feeding_shift_reminder",
       ],
       payment_status: ["paid", "due", "overdue"],
       stall_status: ["available", "occupied", "reserved", "maintenance"],

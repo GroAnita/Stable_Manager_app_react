@@ -7,6 +7,7 @@ import {
   useNavigate,
 } from 'react-router-dom'
 import { Icon, type IconName } from '../components/Icon'
+import { NotificationBell } from '../components/NotificationBell'
 import { signOut } from '../lib/authService'
 import { useAuth } from '../lib/AuthContext'
 import { usePreferences } from '../lib/PreferencesContext'
@@ -29,6 +30,7 @@ const navGroups: { labelKey: string; items: NavItem[] }[] = [
       { key: 'stalls', to: '/stalls', icon: 'grid' },
       { key: 'calendar', to: '/calendar', icon: 'calendar' },
       { key: 'tasks', to: '/tasks', icon: 'checkSquare' },
+      { key: 'feedingRota', to: '/feeding-rota', icon: 'checkSquare' },
     ],
   },
   {
@@ -54,6 +56,7 @@ const ownerNavItems: NavItem[] = [
   { key: 'myHorse', to: '/my-horse', icon: 'horse' },
   { key: 'myContract', to: '/my-contract', icon: 'fileText' },
   { key: 'calendar', to: '/calendar', icon: 'calendar' },
+  { key: 'myFeedingRota', to: '/my-feeding-rota', icon: 'checkSquare' },
 ]
 
 const ownerProfileItem: NavItem = {
@@ -68,6 +71,7 @@ const OWNER_ALLOWED_PATHS = [
   '/my-contract',
   '/my-profile',
   '/calendar',
+  '/my-feeding-rota',
 ]
 
 function SidebarLink({
@@ -236,7 +240,8 @@ export default function AppLayout() {
                 {profile?.role ? t(`role.${profile.role}`) : t('nav.overview')}
               </p>
             </div>
-            <div className="order-3 flex gap-2 lg:ml-auto">
+            <div className="order-3 flex items-center gap-2 lg:ml-auto">
+              <NotificationBell />
               <button
                 type="button"
                 aria-label="English"

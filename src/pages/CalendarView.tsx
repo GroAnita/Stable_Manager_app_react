@@ -3,17 +3,35 @@ import { Badge } from '../components/Badge'
 import { Icon } from '../components/Icon'
 import { Modal } from '../components/Modal'
 import {
+  listAllPublishedShifts,
+  reassignShift,
+  type FeedingShift,
+} from '../features/feedingRota/api'
+import {
   createHorseEvent,
   deleteHorseEvent,
   listAllEvents,
   updateHorseEvent,
   type CalendarEvent,
 } from '../features/horses/api'
+import { getMyOwnerRecord } from '../features/owners/api'
 import { useAuth } from '../lib/AuthContext'
-import { listHorseOptions, type HorseOption } from '../lib/options'
+import {
+  listHorseOptions,
+  listOwnerOptions,
+  type HorseOption,
+  type OwnerOption,
+} from '../lib/options'
 import { usePreferences } from '../lib/PreferencesContext'
 import { getCurrentStableId } from '../lib/stableContext'
 import type { Database } from '../types/supabase'
+
+const FEEDING_SHIFT_COLOR = '#0284C7'
+
+function feedingShiftMoment(shift: FeedingShift): Date {
+  const time = shift.shift_type?.time_of_day?.slice(0, 5) ?? '00:00'
+  return new Date(`${shift.date}T${time}:00`)
+}
 
 type EventType = Database['public']['Enums']['calendar_event_type']
 type ViewMode = 'month' | 'week' | 'day'
@@ -195,6 +213,11 @@ export default function CalendarView() {
   const canManage = profile?.role !== 'horse_owner'
   const [events, setEvents] = useState<CalendarEvent[]>([])
   const [horses, setHorses] = useState<HorseOption[]>([])
+  const [owners, setOwners] = useState<OwnerOption[]>([])
+  const [feedingShifts, setFeedingShifts] = useState<FeedingShift[]>([])
+  const [myOwnerId, setMyOwnerId] = useState<string | null>(null)
+  const [myDutiesOnly, setMyDutiesOnly] = useState(false)
+  const [feedingDetail, setFeedingDetail] = useState<FeedingShift | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -211,19 +234,26 @@ export default function CalendarView() {
   const [addError, setAddError] = useState<string | null>(null)
 
   const [editing, setEditing] = useState<CalendarEvent | null>(null)
-  const [editForm, setEditForm] = useState<EventFormState>(() =>
-    emptyForm(''),
-  )
+  const [editForm, setEditForm] = useState<EventFormState>(() => emptyForm(''))
   const [editSaving, setEditSaving] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
-    Promise.all([listAllEvents(), listHorseOptions()])
-      .then(([eventsData, horsesData]) => {
+    Promise.all([
+      listAllEvents(),
+      listHorseOptions(),
+      listAllPublishedShifts(),
+      canManage ? listOwnerOptions() : Promise.resolve([]),
+      canManage ? Promise.resolve(null) : getMyOwnerRecord(),
+    ])
+      .then(([eventsData, horsesData, shiftsData, ownerOpts, myOwner]) => {
         if (!cancelled) {
           setEvents(eventsData)
           setHorses(horsesData)
+          setFeedingShifts(shiftsData)
+          setOwners(ownerOpts)
+          setMyOwnerId(myOwner?.id ?? null)
         }
       })
       .catch((err: Error) => {
@@ -235,6 +265,7 @@ export default function CalendarView() {
     return () => {
       cancelled = true
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const range = useMemo(() => {
@@ -247,14 +278,41 @@ export default function CalendarView() {
 
   const visibleEvents = useMemo(
     () =>
-      events
-        .filter((event) => {
-          const date = new Date(event.start_time)
-          return date >= range.start && date <= range.end
-        })
-        .sort((a, b) => a.start_time.localeCompare(b.start_time)),
-    [events, range],
+      myDutiesOnly
+        ? []
+        : events
+            .filter((event) => {
+              const date = new Date(event.start_time)
+              return date >= range.start && date <= range.end
+            })
+            .sort((a, b) => a.start_time.localeCompare(b.start_time)),
+    [events, range, myDutiesOnly],
   )
+
+  const visibleFeedingShifts = useMemo(
+    () =>
+      feedingShifts
+        .filter((shift) => {
+          const moment = feedingShiftMoment(shift)
+          if (moment < range.start || moment > range.end) return false
+          if (myDutiesOnly && shift.assigned_owner_id !== myOwnerId)
+            return false
+          return true
+        })
+        .sort(
+          (a, b) =>
+            feedingShiftMoment(a).getTime() - feedingShiftMoment(b).getTime(),
+        ),
+    [feedingShifts, range, myDutiesOnly, myOwnerId],
+  )
+
+  function feedingShiftsOn(iso: string): FeedingShift[] {
+    return feedingShifts.filter((shift) => {
+      if (shift.date !== iso) return false
+      if (myDutiesOnly && shift.assigned_owner_id !== myOwnerId) return false
+      return true
+    })
+  }
 
   function findHorseFor(form: EventFormState): HorseOption | null {
     return horses.find((h) => h.id === form.horse_id) ?? null
@@ -262,7 +320,9 @@ export default function CalendarView() {
 
   function openAdd(defaultDate?: Date) {
     if (!canManage) return
-    setAddForm(emptyForm(toDatetimeLocal((defaultDate ?? new Date()).toISOString())))
+    setAddForm(
+      emptyForm(toDatetimeLocal((defaultDate ?? new Date()).toISOString())),
+    )
     setAddError(null)
     setAddOpen(true)
   }
@@ -370,10 +430,16 @@ export default function CalendarView() {
   })
 
   const dayEventsForModal = dayModalDate
-    ? events
-        .filter((event) => toIsoDate(new Date(event.start_time)) === dayModalDate)
-        .sort((a, b) => a.start_time.localeCompare(b.start_time))
+    ? myDutiesOnly
+      ? []
+      : events
+          .filter(
+            (event) => toIsoDate(new Date(event.start_time)) === dayModalDate,
+          )
+          .sort((a, b) => a.start_time.localeCompare(b.start_time))
     : []
+
+  const dayShiftsForModal = dayModalDate ? feedingShiftsOn(dayModalDate) : []
 
   function renderMonthGrid() {
     const start = startOfMonth(currentDate)
@@ -382,7 +448,9 @@ export default function CalendarView() {
     const days: (Date | null)[] = []
     for (let i = 0; i < leading; i += 1) days.push(null)
     for (let day = 1; day <= end.getDate(); day += 1)
-      days.push(new Date(currentDate.getFullYear(), currentDate.getMonth(), day))
+      days.push(
+        new Date(currentDate.getFullYear(), currentDate.getMonth(), day),
+      )
     while (days.length % 7 !== 0) days.push(null)
 
     const weekdayLabels = [
@@ -407,11 +475,19 @@ export default function CalendarView() {
         ))}
         {days.map((day, index) => {
           if (!day)
-            return <div key={index} className="min-h-24 rounded-2xl bg-white/50" />
+            return (
+              <div key={index} className="min-h-24 rounded-2xl bg-white/50" />
+            )
           const iso = toIsoDate(day)
-          const dayEvents = events
-            .filter((event) => toIsoDate(new Date(event.start_time)) === iso)
-            .sort((a, b) => a.start_time.localeCompare(b.start_time))
+          const dayEvents = myDutiesOnly
+            ? []
+            : events
+                .filter(
+                  (event) => toIsoDate(new Date(event.start_time)) === iso,
+                )
+                .sort((a, b) => a.start_time.localeCompare(b.start_time))
+          const dayShifts = feedingShiftsOn(iso)
+          const totalCount = dayEvents.length + dayShifts.length
           return (
             <button
               key={iso}
@@ -423,14 +499,26 @@ export default function CalendarView() {
                 <p className="text-sm font-medium text-slate-900">
                   {day.getDate()}
                 </p>
-                {dayEvents.length > 0 && (
-                  <span className="text-xs text-slate-400">
-                    {dayEvents.length}
-                  </span>
+                {totalCount > 0 && (
+                  <span className="text-xs text-slate-400">{totalCount}</span>
                 )}
               </div>
               <div className="mt-1 space-y-1">
-                {dayEvents.slice(0, 3).map((event) => (
+                {dayShifts.slice(0, 3).map((shift) => (
+                  <div
+                    key={shift.id}
+                    className="flex items-center gap-1 truncate text-xs text-slate-600"
+                  >
+                    <span
+                      className="h-1.5 w-1.5 shrink-0 rounded-full"
+                      style={{ background: FEEDING_SHIFT_COLOR }}
+                    />
+                    <span className="truncate">
+                      {shift.shift_type?.label ?? '—'}
+                    </span>
+                  </div>
+                ))}
+                {dayEvents.slice(0, 3 - dayShifts.length).map((event) => (
                   <div
                     key={event.id}
                     className="flex items-center gap-1 truncate text-xs text-slate-600"
@@ -451,7 +539,7 @@ export default function CalendarView() {
   }
 
   function renderAgenda() {
-    if (visibleEvents.length === 0)
+    if (visibleEvents.length === 0 && visibleFeedingShifts.length === 0)
       return (
         <div className="panel p-10 text-center text-sm text-slate-500">
           {t('calendarView.noEventsRange')}
@@ -459,6 +547,45 @@ export default function CalendarView() {
       )
     return (
       <div className="space-y-3">
+        {visibleFeedingShifts.map((shift) => (
+          <div
+            key={shift.id}
+            role="button"
+            tabIndex={0}
+            onClick={() => setFeedingDetail(shift)}
+            className="panel flex w-full cursor-pointer items-start justify-between gap-4 p-4 text-left"
+          >
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span
+                  className="h-3 w-3 shrink-0 rounded-full"
+                  style={{ background: FEEDING_SHIFT_COLOR }}
+                />
+                <p className="min-w-0 font-medium wrap-break-word text-slate-900">
+                  {shift.shift_type?.label ?? '—'}
+                </p>
+                {shift.completed_at ? (
+                  <Badge
+                    status="active"
+                    label={t('feedingRota.markCompleted')}
+                  />
+                ) : (
+                  <Badge
+                    status="pending"
+                    label={t('feedingRota.notConfirmed')}
+                  />
+                )}
+              </div>
+              <p className="mt-1 text-sm text-slate-500">
+                {shift.assigned_owner?.full_name ??
+                  t('feedingRota.unassignedOption')}
+              </p>
+            </div>
+            <p className="shrink-0 whitespace-nowrap text-sm text-slate-500">
+              {formatDate(shift.date)}
+            </p>
+          </div>
+        ))}
         {visibleEvents.map((event) => (
           <div
             key={event.id}
@@ -504,7 +631,7 @@ export default function CalendarView() {
             {t('calendarView.subtitle')}
           </p>
         </div>
-        {canManage && (
+        {canManage ? (
           <button
             type="button"
             className="btn-primary"
@@ -513,6 +640,15 @@ export default function CalendarView() {
             <Icon name="plus" className="h-4 w-4" />
             {t('calendarView.addEvent')}
           </button>
+        ) : (
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+            <input
+              type="checkbox"
+              checked={myDutiesOnly}
+              onChange={(e) => setMyDutiesOnly(e.target.checked)}
+            />
+            {t('feedingRota.myFilterOnly')}
+          </label>
         )}
       </div>
 
@@ -569,7 +705,9 @@ export default function CalendarView() {
                         : 'bg-white text-slate-600'
                     }`}
                   >
-                    {t(`calendarView.mode${item.charAt(0).toUpperCase()}${item.slice(1)}`)}
+                    {t(
+                      `calendarView.mode${item.charAt(0).toUpperCase()}${item.slice(1)}`,
+                    )}
                   </button>
                 ))}
               </div>
@@ -598,10 +736,42 @@ export default function CalendarView() {
         onClose={() => setDayModalDate(null)}
         title={dayModalDate ? formatDate(dayModalDate) : ''}
       >
-        {dayEventsForModal.length === 0 ? (
-          <p className="text-sm text-slate-500">{t('calendarView.noEventsDay')}</p>
+        {dayEventsForModal.length === 0 && dayShiftsForModal.length === 0 ? (
+          <p className="text-sm text-slate-500">
+            {t('calendarView.noEventsDay')}
+          </p>
         ) : (
           <div className="space-y-3">
+            {dayShiftsForModal.map((shift) => (
+              <div
+                key={shift.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  setDayModalDate(null)
+                  setFeedingDetail(shift)
+                }}
+                className="flex w-full cursor-pointer items-start gap-3 rounded-2xl border border-slate-100 p-3 text-left hover:bg-slate-50"
+              >
+                <span
+                  className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full"
+                  style={{ background: FEEDING_SHIFT_COLOR }}
+                />
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-medium text-slate-900">
+                      {shift.shift_type?.label ?? '—'}
+                    </p>
+                  </div>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {shift.shift_type?.time_of_day?.slice(0, 5)}
+                    {shift.assigned_owner?.full_name
+                      ? ` · ${shift.assigned_owner.full_name}`
+                      : ''}
+                  </p>
+                </div>
+              </div>
+            ))}
             {dayEventsForModal.map((event) => (
               <div
                 key={event.id}
@@ -653,7 +823,11 @@ export default function CalendarView() {
               {addError}
             </p>
           )}
-          <EventFields form={addForm} horses={horses} onChange={updateAddField} />
+          <EventFields
+            form={addForm}
+            horses={horses}
+            onChange={updateAddField}
+          />
           <button type="submit" disabled={addSaving} className="btn-primary">
             {addSaving ? t('common.saving') : t('calendarView.save')}
           </button>
@@ -671,7 +845,11 @@ export default function CalendarView() {
               {editError}
             </p>
           )}
-          <EventFields form={editForm} horses={horses} onChange={updateEditField} />
+          <EventFields
+            form={editForm}
+            horses={horses}
+            onChange={updateEditField}
+          />
           <button type="submit" disabled={editSaving} className="btn-primary">
             {editSaving ? t('common.saving') : t('common.save')}
           </button>
@@ -679,6 +857,58 @@ export default function CalendarView() {
         <button type="button" className="btn-ghost mt-4" onClick={handleDelete}>
           {t('common.delete')}
         </button>
+      </Modal>
+
+      <Modal
+        open={feedingDetail !== null}
+        onClose={() => setFeedingDetail(null)}
+        title={feedingDetail?.shift_type?.label ?? ''}
+      >
+        {feedingDetail && (
+          <div className="space-y-3 text-sm">
+            <p className="text-slate-700">
+              {formatDate(feedingDetail.date)} ·{' '}
+              {feedingDetail.shift_type?.time_of_day?.slice(0, 5)}
+            </p>
+            <p className="text-slate-700">
+              {feedingDetail.assigned_owner?.full_name ??
+                t('feedingRota.unassignedOption')}
+            </p>
+            <p className="text-slate-500">
+              {feedingDetail.completed_at
+                ? t('feedingRota.completedBy', {
+                    name: feedingDetail.assigned_owner?.full_name ?? '—',
+                  })
+                : t('feedingRota.notConfirmed')}
+            </p>
+            {canManage && (
+              <label>
+                <span className="field-label">{t('feedingRota.reassign')}</span>
+                <select
+                  className="field"
+                  value={feedingDetail.assigned_owner_id ?? ''}
+                  onChange={async (e) => {
+                    const updated = await reassignShift(
+                      feedingDetail.id,
+                      e.target.value || null,
+                    )
+                    setFeedingShifts((prev) =>
+                      prev.map((s) => (s.id === updated.id ? updated : s)),
+                    )
+                    setFeedingDetail(updated)
+                  }}
+                >
+                  <option value="">{t('feedingRota.unassignedOption')}</option>
+                  {owners.map((owner) => (
+                    <option key={owner.id} value={owner.id}>
+                      {owner.full_name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+          </div>
+        )}
       </Modal>
     </div>
   )

@@ -1,17 +1,56 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AnnouncementBoard } from '../components/AnnouncementBoard'
 import { Icon, type IconName } from '../components/Icon'
+import {
+  listMyUpcomingShifts,
+  type FeedingShift,
+} from '../features/feedingRota/api'
+import { getMyOwnerRecord } from '../features/owners/api'
 import { usePreferences } from '../lib/PreferencesContext'
 
-const quickLinks: { labelKey: string; to: string; icon: IconName | 'horse' }[] = [
-  { labelKey: 'ownerDashboard.myHorse', to: '/my-horse', icon: 'horse' },
-  { labelKey: 'ownerDashboard.myContract', to: '/my-contract', icon: 'fileText' },
-  { labelKey: 'ownerDashboard.calendar', to: '/calendar', icon: 'calendar' },
-  { labelKey: 'ownerDashboard.myProfile', to: '/my-profile', icon: 'settings' },
-]
+const quickLinks: { labelKey: string; to: string; icon: IconName | 'horse' }[] =
+  [
+    { labelKey: 'ownerDashboard.myHorse', to: '/my-horse', icon: 'horse' },
+    {
+      labelKey: 'ownerDashboard.myContract',
+      to: '/my-contract',
+      icon: 'fileText',
+    },
+    { labelKey: 'ownerDashboard.calendar', to: '/calendar', icon: 'calendar' },
+    {
+      labelKey: 'ownerDashboard.myFeedingRota',
+      to: '/my-feeding-rota',
+      icon: 'checkSquare',
+    },
+    {
+      labelKey: 'ownerDashboard.myProfile',
+      to: '/my-profile',
+      icon: 'settings',
+    },
+  ]
 
 export default function OwnerDashboard() {
-  const { t } = usePreferences()
+  const { t, formatDate } = usePreferences()
+  const [nextDuty, setNextDuty] = useState<FeedingShift | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    Promise.all([getMyOwnerRecord(), listMyUpcomingShifts()])
+      .then(([owner, shifts]) => {
+        if (cancelled || !owner) return
+        const mine = shifts.filter(
+          (s) => s.assigned_owner_id === owner.id && !s.completed_at,
+        )
+        setNextDuty(mine[0] ?? null)
+      })
+      .catch(() => {
+        if (!cancelled) setNextDuty(null)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
     <div className="page-shell">
@@ -28,6 +67,20 @@ export default function OwnerDashboard() {
           </p>
         </div>
       </section>
+
+      {nextDuty && (
+        <Link
+          to="/my-feeding-rota"
+          className="panel block p-5 transition hover:shadow-soft"
+        >
+          <p className="text-sm text-slate-400">
+            {t('feedingRota.myNextDuty')}
+          </p>
+          <p className="mt-1 text-lg font-semibold text-forest">
+            {formatDate(nextDuty.date)} · {nextDuty.shift_type?.label ?? '—'}
+          </p>
+        </Link>
+      )}
 
       <AnnouncementBoard canManage={false} />
 
