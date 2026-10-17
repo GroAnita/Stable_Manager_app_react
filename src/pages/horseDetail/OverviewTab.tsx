@@ -1,8 +1,15 @@
-import { StatusDot } from '../../components/StatusDot'
+import { StatusDot, type StatusDotColor } from '../../components/StatusDot'
 import type { HorseDetail, Vaccination } from '../../features/horses/api'
 import { calculateAge } from '../../lib/age'
 import { usePreferences } from '../../lib/PreferencesContext'
 import { getVaccinationOverviewStatus } from '../../lib/vaccinations'
+
+const VACCINATION_STATUS_LABEL_KEY: Record<StatusDotColor, string> = {
+  green: 'horseDetail.vaccinationStatusOk',
+  yellow: 'horseDetail.vaccinationStatusDueSoon',
+  red: 'horseDetail.vaccinationStatusOverdue',
+  grey: 'horseDetail.vaccinationStatusUnknown',
+}
 
 export function OverviewTab({
   horse,
@@ -79,6 +86,9 @@ export function OverviewTab({
           </p>
           <div className="mt-2 flex items-center gap-2">
             <StatusDot color={vaccinationStatus.color} />
+            <span className="sr-only">
+              {t(VACCINATION_STATUS_LABEL_KEY[vaccinationStatus.color])}
+            </span>
             <p className="font-medium text-slate-800">
               {vaccinationStatus.dueDate
                 ? formatDate(vaccinationStatus.dueDate)

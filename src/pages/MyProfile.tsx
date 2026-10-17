@@ -206,7 +206,7 @@ export default function MyProfile() {
               {saving ? t('common.saving') : t('common.save')}
             </button>
             {saved && (
-              <span className="text-sm text-emerald-700">
+              <span role="status" className="text-sm text-emerald-700">
                 {t('common.saved')}
               </span>
             )}

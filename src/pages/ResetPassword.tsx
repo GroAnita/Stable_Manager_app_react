@@ -36,7 +36,7 @@ export default function ResetPassword() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-cream px-4">
+    <main className="flex min-h-screen items-center justify-center bg-cream px-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-semibold text-forest">
@@ -131,6 +131,6 @@ export default function ResetPassword() {
           </form>
         )}
       </div>
-    </div>
+    </main>
   )
 }

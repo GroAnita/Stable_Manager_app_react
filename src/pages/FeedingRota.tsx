@@ -399,6 +399,7 @@ export default function FeedingRota() {
                   <div className="flex shrink-0 gap-2">
                     <button
                       type="button"
+                      aria-label={`${t('common.edit')}: ${shiftType.label}`}
                       className="text-slate-400 hover:text-forest"
                       onClick={() => openEditShiftType(shiftType)}
                     >
@@ -406,6 +407,7 @@ export default function FeedingRota() {
                     </button>
                     <button
                       type="button"
+                      aria-label={`${t('common.delete')}: ${shiftType.label}`}
                       className="text-slate-400 hover:text-red-600"
                       onClick={() => setDeletingShiftTypeId(shiftType.id)}
                     >
@@ -514,6 +516,7 @@ export default function FeedingRota() {
                   </div>
                   <button
                     type="button"
+                    aria-label={`${t('common.delete')}: ${item.owner?.full_name ?? ''}`}
                     className="text-slate-400 hover:text-red-600"
                     onClick={() => setDeletingUnavailabilityId(item.id)}
                   >
@@ -606,6 +609,7 @@ export default function FeedingRota() {
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
                     <select
+                      aria-label={`${t('feedingRota.reassignOwnerLabel')}: ${formatDate(shift.date)} · ${shift.shift_type?.label ?? ''}`}
                       className="field"
                       value={shift.assigned_owner_id ?? ''}
                       onChange={(e) => handleReassign(shift.id, e.target.value)}
@@ -620,6 +624,7 @@ export default function FeedingRota() {
                     {shift.status === 'draft' && (
                       <button
                         type="button"
+                        aria-label={`${t('common.delete')}: ${formatDate(shift.date)} · ${shift.shift_type?.label ?? ''}`}
                         className="text-slate-400 hover:text-red-600"
                         onClick={() => setDeletingShiftId(shift.id)}
                       >

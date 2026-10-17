@@ -381,7 +381,7 @@ export default function Settings() {
                 {canEdit && (
                   <div className="mt-6 flex items-center justify-end gap-3">
                     {saved && (
-                      <span className="text-sm text-emerald-700">
+                      <span role="status" className="text-sm text-emerald-700">
                         {t('common.saved')}
                       </span>
                     )}

@@ -1,5 +1,6 @@
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useId, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
+import { usePreferences } from '../lib/PreferencesContext'
 import { Icon } from './Icon'
 
 export function Modal({
@@ -15,6 +16,9 @@ export function Modal({
   children: ReactNode
   size?: 'md' | 'lg'
 }) {
+  const { t } = usePreferences()
+  const titleId = useId()
+
   useEffect(() => {
     if (!open) return
     function handleKeyDown(event: KeyboardEvent) {
@@ -34,17 +38,20 @@ export function Modal({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label={title}
+        aria-labelledby={titleId}
         onClick={(e) => e.stopPropagation()}
         className={`max-h-[85vh] w-full overflow-y-auto rounded-2xl bg-card p-6 shadow-card print:hidden ${
           size === 'lg' ? 'max-w-3xl' : 'max-w-md'
         }`}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+          <h2 id={titleId} className="text-lg font-semibold text-slate-900">
+            {title}
+          </h2>
           <button
             type="button"
             onClick={onClose}
+            aria-label={t('common.close')}
             className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
           >
             <Icon name="x" className="h-5 w-5" />

@@ -21,6 +21,15 @@ export function NotificationBell() {
 
   useEffect(load, [])
 
+  useEffect(() => {
+    if (!open) return
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [open])
+
   const unread = notifications.filter((n) => !n.is_read)
 
   async function handleOpen() {
@@ -41,13 +50,24 @@ export function NotificationBell() {
     <div className="relative">
       <button
         type="button"
-        aria-label={t('feedingRota.notificationsTitle')}
+        aria-label={
+          unread.length > 0
+            ? t('feedingRota.notificationsTitleWithCount', {
+                count: unread.length,
+              })
+            : t('feedingRota.notificationsTitle')
+        }
+        aria-haspopup="true"
+        aria-expanded={open}
         onClick={handleOpen}
         className="relative rounded-full p-2 text-ink/60 hover:bg-card hover:text-forest"
       >
         <Icon name="bell" className="h-5 w-5" />
         {unread.length > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-semibold text-white">
+          <span
+            aria-hidden="true"
+            className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-semibold text-white"
+          >
             {unread.length > 9 ? '9+' : unread.length}
           </span>
         )}

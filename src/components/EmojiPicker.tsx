@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { usePreferences } from '../lib/PreferencesContext'
 
 const EMOJIS = [
   '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🙂',
@@ -10,13 +11,25 @@ const EMOJIS = [
 ]
 
 export function EmojiPicker({ onSelect }: { onSelect: (emoji: string) => void }) {
+  const { t } = usePreferences()
   const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    if (!open) return
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [open])
 
   return (
     <div className="relative inline-block">
       <button
         type="button"
-        aria-label="Insert emoji"
+        aria-label={t('common.insertEmoji')}
+        aria-haspopup="true"
+        aria-expanded={open}
         className="rounded-md px-1.5 py-0.5 text-base hover:bg-slate-200"
         onClick={() => setOpen((prev) => !prev)}
       >

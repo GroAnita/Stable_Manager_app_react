@@ -669,6 +669,7 @@ export default function CalendarView() {
               <div className="flex gap-2">
                 <button
                   type="button"
+                  aria-label={t('common.previous')}
                   className="btn-ghost px-3 py-2"
                   onClick={() => shiftDate(-1)}
                 >
@@ -676,6 +677,7 @@ export default function CalendarView() {
                 </button>
                 <button
                   type="button"
+                  aria-label={t('common.next')}
                   className="btn-ghost px-3 py-2"
                   onClick={() => shiftDate(1)}
                 >

@@ -8,6 +8,9 @@ export function StatusDot({ color }: { color: StatusDotColor }) {
     grey: 'bg-slate-300',
   }
   return (
-    <span className={`inline-block h-2.5 w-2.5 rounded-full ${classes[color]}`} />
+    <span
+      aria-hidden="true"
+      className={`inline-block h-2.5 w-2.5 rounded-full ${classes[color]}`}
+    />
   )
 }

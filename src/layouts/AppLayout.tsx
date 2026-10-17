@@ -150,13 +150,17 @@ export default function AppLayout() {
           </h1>
           <button
             type="button"
+            aria-label={t('nav.closeMenu')}
             className="rounded-full p-2 text-ink/60 hover:bg-card lg:hidden"
             onClick={() => setSidebarOpen(false)}
           >
             <Icon name="x" className="h-5 w-5" />
           </button>
         </div>
-        <nav className="flex flex-1 flex-col gap-4 overflow-y-auto">
+        <nav
+          aria-label={t('nav.mainNavigation')}
+          className="flex flex-1 flex-col gap-4 overflow-y-auto"
+        >
           {isOwner ? (
             <div className="flex flex-col gap-1">
               {ownerNavItems.map((item) => (
@@ -235,6 +239,7 @@ export default function AppLayout() {
             <div className="order-1 flex items-center gap-3">
               <button
                 type="button"
+                aria-label={t('nav.openMenu')}
                 className="rounded-2xl border border-slate-200 bg-card p-2.5 text-ink/70 lg:hidden"
                 onClick={() => setSidebarOpen(true)}
               >

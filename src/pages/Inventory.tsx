@@ -333,6 +333,7 @@ export default function Inventory() {
                   <div className="flex gap-2">
                     <button
                       type="button"
+                      aria-label={`${t('common.edit')}: ${item.price_list_item.item}`}
                       onClick={() => openEditItem(item)}
                       className="rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                     >
@@ -340,6 +341,7 @@ export default function Inventory() {
                     </button>
                     <button
                       type="button"
+                      aria-label={`${t('common.delete')}: ${item.price_list_item.item}`}
                       onClick={() => handleDeleteItem(item)}
                       className="rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                     >
@@ -421,6 +423,7 @@ export default function Inventory() {
                             </span>
                             <button
                               type="button"
+                              aria-label={`${t('common.delete')}: ${delivery.quantity} ${unit} · ${formatDate(delivery.delivered_on)}`}
                               onClick={() =>
                                 handleDeleteDelivery(item, delivery.id)
                               }

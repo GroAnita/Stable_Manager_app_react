@@ -93,7 +93,7 @@ export default function Auth() {
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-cream lg:flex-row">
+    <main className="relative flex min-h-screen flex-col bg-cream lg:flex-row">
       <div className="absolute top-4 right-4 z-10 flex gap-2">
         <button
           type="button"
@@ -118,7 +118,7 @@ export default function Auth() {
           name="horse"
           className="pointer-events-none absolute -right-10 -bottom-10 h-40 w-40 text-white/10"
         />
-        <p className="relative text-xs font-semibold tracking-[0.25em] text-white/70 uppercase">
+        <p className="relative text-xs font-semibold tracking-[0.25em] text-white/85 uppercase">
           {t('common.appName')}
         </p>
         <h1 className="relative mt-3 max-w-xs text-xl font-semibold text-white">
@@ -132,7 +132,7 @@ export default function Auth() {
           className="pointer-events-none absolute -right-16 -bottom-16 h-96 w-96 text-white/10"
         />
         <div className="relative max-w-md">
-          <p className="text-sm font-semibold tracking-[0.25em] text-white/70 uppercase">
+          <p className="text-sm font-semibold tracking-[0.25em] text-white/85 uppercase">
             {t('common.appName')}
           </p>
           <h1 className="mt-4 text-3xl font-semibold text-white">
@@ -278,6 +278,6 @@ export default function Auth() {
           )}
         </div>
       </div>
-    </div>
+    </main>
   )
 }

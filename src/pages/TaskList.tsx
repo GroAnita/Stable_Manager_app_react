@@ -421,6 +421,7 @@ export default function TaskList() {
                 />
                 <button
                   type="button"
+                  aria-label={`${t('common.delete')}: ${task.title}`}
                   onClick={() => setDeleteTarget(task)}
                   className="rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                 >

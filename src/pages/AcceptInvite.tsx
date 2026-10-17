@@ -49,19 +49,19 @@ export default function AcceptInvite() {
 
   if (loading || !session || profileLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-cream px-4 py-10">
+      <main className="flex min-h-screen items-center justify-center bg-cream px-4 py-10">
         <div className="panel w-full max-w-md p-6 text-center">
           <h1 className="text-xl font-semibold text-slate-900">
             {t('invite.title')}
           </h1>
           <p className="mt-3 text-sm text-slate-500">{t('invite.loading')}</p>
         </div>
-      </div>
+      </main>
     )
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-cream px-4 py-10">
+    <main className="flex min-h-screen items-center justify-center bg-cream px-4 py-10">
       <div className="panel w-full max-w-md p-6 text-center">
         <h1 className="text-xl font-semibold text-slate-900">
           {t('invite.title')}
@@ -100,6 +100,6 @@ export default function AcceptInvite() {
           </button>
         </div>
       </div>
-    </div>
+    </main>
   )
 }

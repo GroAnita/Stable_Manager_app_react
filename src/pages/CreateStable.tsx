@@ -57,7 +57,7 @@ export default function CreateStable() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-cream px-4 py-10">
+    <main className="flex min-h-screen items-center justify-center bg-cream px-4 py-10">
       <div className="panel w-full max-w-lg p-6">
         <h1 className="text-2xl font-semibold text-slate-900">
           {t('onboarding.title')}
@@ -127,6 +127,6 @@ export default function CreateStable() {
           </button>
         </form>
       </div>
-    </div>
+    </main>
   )
 }
