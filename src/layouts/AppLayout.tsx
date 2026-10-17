@@ -32,6 +32,7 @@ const navGroups: { labelKey: string; items: NavItem[] }[] = [
       { key: 'calendar', to: '/calendar', icon: 'calendar' },
       { key: 'tasks', to: '/tasks', icon: 'checkSquare' },
       { key: 'feedingRota', to: '/feeding-rota', icon: 'checkSquare' },
+      { key: 'noticeBoard', to: '/notice-board', icon: 'bell' },
     ],
   },
   {
@@ -58,6 +59,7 @@ const ownerNavItems: NavItem[] = [
   { key: 'myContract', to: '/my-contract', icon: 'fileText' },
   { key: 'calendar', to: '/calendar', icon: 'calendar' },
   { key: 'myFeedingRota', to: '/my-feeding-rota', icon: 'checkSquare' },
+  { key: 'noticeBoard', to: '/notice-board', icon: 'bell' },
 ]
 
 const ownerProfileItem: NavItem = {
@@ -73,6 +75,7 @@ const OWNER_ALLOWED_PATHS = [
   '/my-profile',
   '/calendar',
   '/my-feeding-rota',
+  '/notice-board',
 ]
 
 function SidebarLink({

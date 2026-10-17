@@ -129,7 +129,7 @@ export default function Dashboard() {
         </div>
       </section>
 
-      <AnnouncementBoard canManage />
+      <AnnouncementBoard canManage limit={5} />
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {statCards.map((card) => (

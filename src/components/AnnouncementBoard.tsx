@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 import {
   createAnnouncement,
   deleteAnnouncement,
@@ -39,7 +40,13 @@ function toCategory(value: string): AnnouncementCategory {
   return value === 'warning' || value === 'reminder' ? value : 'info'
 }
 
-export function AnnouncementBoard({ canManage }: { canManage: boolean }) {
+export function AnnouncementBoard({
+  canManage,
+  limit,
+}: {
+  canManage: boolean
+  limit?: number
+}) {
   const { t, formatDate } = usePreferences()
   const [announcements, setAnnouncements] = useState<Announcement[] | null>(
     null,
@@ -190,45 +197,58 @@ export function AnnouncementBoard({ canManage }: { canManage: boolean }) {
         </p>
       ) : (
         <div className="space-y-3">
-          {announcements.map((item) => {
-            const itemCategory = toCategory(item.category)
-            return (
-              <div
-                key={item.id}
-                className={`rounded-2xl px-4 py-3 ${CATEGORY_CARD_CLASSES[itemCategory]}`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex min-w-0 flex-wrap items-center gap-2">
-                    <p className="font-medium text-slate-800">{item.title}</p>
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${CATEGORY_BADGE_CLASSES[itemCategory]}`}
-                    >
-                      {t(categoryLabelKey(itemCategory))}
-                    </span>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <span className="text-xs whitespace-nowrap text-slate-400">
-                      {formatDate(item.created_at)}
-                    </span>
-                    {canManage && (
-                      <button
-                        type="button"
-                        aria-label={t('common.delete')}
-                        className="text-slate-400 hover:text-red-600"
-                        onClick={() => setPendingDeleteId(item.id)}
+          {(limit ? announcements.slice(0, limit) : announcements).map(
+            (item) => {
+              const itemCategory = toCategory(item.category)
+              return (
+                <div
+                  key={item.id}
+                  className={`rounded-2xl px-4 py-3 ${CATEGORY_CARD_CLASSES[itemCategory]}`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex min-w-0 flex-wrap items-center gap-2">
+                      <p className="font-medium text-slate-800">
+                        {item.title}
+                      </p>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${CATEGORY_BADGE_CLASSES[itemCategory]}`}
                       >
-                        <Icon name="trash" className="h-4 w-4" />
-                      </button>
-                    )}
+                        {t(categoryLabelKey(itemCategory))}
+                      </span>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <span className="text-xs whitespace-nowrap text-slate-400">
+                        {formatDate(item.created_at)}
+                      </span>
+                      {canManage && (
+                        <button
+                          type="button"
+                          aria-label={t('common.delete')}
+                          className="text-slate-400 hover:text-red-600"
+                          onClick={() => setPendingDeleteId(item.id)}
+                        >
+                          <Icon name="trash" className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
+                  <p className="mt-1 text-sm whitespace-pre-wrap text-slate-600">
+                    {item.body}
+                  </p>
                 </div>
-                <p className="mt-1 text-sm whitespace-pre-wrap text-slate-600">
-                  {item.body}
-                </p>
-              </div>
-            )
-          })}
+              )
+            },
+          )}
         </div>
+      )}
+
+      {limit != null && (announcements?.length ?? 0) > limit && (
+        <Link
+          to="/notice-board"
+          className="btn-ghost mt-4 w-full justify-center"
+        >
+          {t('announcements.showMore')}
+        </Link>
       )}
 
       <ConfirmDialog

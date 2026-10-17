@@ -31,6 +31,7 @@ const MyProfile = lazy(() => import('./pages/MyProfile'))
 const OwnerDashboard = lazy(() => import('./pages/OwnerDashboard'))
 const FeedingRota = lazy(() => import('./pages/FeedingRota'))
 const MyFeedingRota = lazy(() => import('./pages/MyFeedingRota'))
+const NoticeBoard = lazy(() => import('./pages/NoticeBoard'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 export const router = createBrowserRouter([
@@ -104,6 +105,7 @@ export const router = createBrowserRouter([
       { path: 'owner-dashboard', element: <OwnerDashboard /> },
       { path: 'feeding-rota', element: <FeedingRota /> },
       { path: 'my-feeding-rota', element: <MyFeedingRota /> },
+      { path: 'notice-board', element: <NoticeBoard /> },
       { path: '*', element: <NotFound /> },
     ],
   },

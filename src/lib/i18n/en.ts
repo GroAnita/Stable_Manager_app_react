@@ -30,6 +30,7 @@ export const en = {
     calendar: 'Calendar',
     tasks: 'Tasks',
     feedingRota: 'Feeding Rota',
+    noticeBoard: 'Notice Board',
     reports: 'Reports',
     priceList: 'Price list',
     inventory: 'Inventory',
@@ -258,6 +259,7 @@ export const en = {
     categoryReminder: 'Reminder',
     categoryInfo: 'General',
     noAnnouncements: 'No announcements yet.',
+    showMore: 'Show more',
     deleteTitle: 'Delete announcement',
     deleteMessage:
       'This announcement will be removed for everyone. This cannot be undone.',
