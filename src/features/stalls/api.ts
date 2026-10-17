@@ -20,7 +20,9 @@ export type StallWithHorses = Stall & { horses: StallHorse[] }
 export async function listStalls(): Promise<StallWithHorses[]> {
   const { data, error } = await supabase
     .from('stalls')
-    .select('*, horses(id, name, active, owner:owners(id, full_name))')
+    .select(
+      '*, horses(id, name, active, owner:owners!horses_owner_id_fkey(id, full_name))',
+    )
     .order('stall_number')
   if (error) throw error
   return data

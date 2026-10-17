@@ -316,6 +316,12 @@ export const en = {
     gender: 'Gender',
     color: 'Color',
     owner: 'Owner',
+    additionalOwners: 'Additional owners',
+    additionalOwnersHint:
+      'Give up to two more people view access to this horse’s profile, calendar, and feeding details — a parent and children sharing a horse, for example. To take feeding shifts, they also need to be added as a rota participant.',
+    noAdditionalOwners: 'No additional owners yet.',
+    addAdditionalOwner: 'Add an additional owner',
+    selectOwner: 'Select an owner…',
     stall: 'Stall',
     status: 'Status',
     arrivalDate: 'Arrival date',

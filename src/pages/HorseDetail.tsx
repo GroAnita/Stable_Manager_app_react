@@ -19,6 +19,7 @@ import {
   type Vaccination,
 } from '../features/horses/api'
 import { usePreferences } from '../lib/PreferencesContext'
+import { AdditionalOwnersCard } from './horseDetail/AdditionalOwnersCard'
 import { DocumentsTab } from './horseDetail/DocumentsTab'
 import { FeedingTab } from './horseDetail/FeedingTab'
 import { MedicalTab } from './horseDetail/MedicalTab'
@@ -162,7 +163,13 @@ export default function HorseDetail() {
 
       <div className="panel p-6">
         {tab === 'overview' && (
-          <OverviewTab horse={horse} vaccinations={vaccinations} />
+          <div className="space-y-6">
+            <OverviewTab horse={horse} vaccinations={vaccinations} />
+            <AdditionalOwnersCard
+              horseId={horse.id}
+              primaryOwnerId={horse.owner_id}
+            />
+          </div>
         )}
         {tab === 'medical' && (
           <MedicalTab

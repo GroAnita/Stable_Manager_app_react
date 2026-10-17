@@ -317,6 +317,12 @@ export const no: typeof en = {
     gender: 'Kjønn',
     color: 'Farge',
     owner: 'Eier',
+    additionalOwners: 'Flere eiere',
+    additionalOwnersHint:
+      'Gi opptil to flere personer visningstilgang til denne hestens profil, kalender og fôringsinfo — for eksempel en forelder og barn som deler en hest. For å ta fôringsvakter må de også legges til som deltaker i fôringsturnusen.',
+    noAdditionalOwners: 'Ingen flere eiere lagt til.',
+    addAdditionalOwner: 'Legg til en eier',
+    selectOwner: 'Velg en eier…',
     stall: 'Boks',
     status: 'Status',
     arrivalDate: 'Ankomstdato',

@@ -146,7 +146,7 @@ export async function listHorses(): Promise<HorseListItem[]> {
   const { data, error } = await supabase
     .from('horses')
     .select(
-      'id, name, breed, age, color, passport_number, photo_url, status, active, away, owner:owners(id, full_name), stall:stalls(id, stall_number)',
+      'id, name, breed, age, color, passport_number, photo_url, status, active, away, owner:owners!horses_owner_id_fkey(id, full_name), stall:stalls(id, stall_number)',
     )
     .order('name')
   if (error) throw error
@@ -157,7 +157,7 @@ export async function listMyHorses(): Promise<HorseDetail[]> {
   const { data, error } = await supabase
     .from('horses')
     .select(
-      '*, owner:owners(id, full_name, phone), stall:stalls(id, stall_number, size, notes)',
+      '*, owner:owners!horses_owner_id_fkey(id, full_name, phone), stall:stalls(id, stall_number, size, notes)',
     )
     .order('name')
   if (error) throw error
@@ -168,7 +168,7 @@ export async function getHorse(id: string): Promise<HorseDetail> {
   const { data, error } = await supabase
     .from('horses')
     .select(
-      '*, owner:owners(id, full_name, phone), stall:stalls(id, stall_number, size, notes)',
+      '*, owner:owners!horses_owner_id_fkey(id, full_name, phone), stall:stalls(id, stall_number, size, notes)',
     )
     .eq('id', id)
     .single()
@@ -202,6 +202,51 @@ export async function updateHorse(
 
 export async function deleteHorse(id: string): Promise<void> {
   const { error } = await supabase.from('horses').delete().eq('id', id)
+  if (error) throw error
+}
+
+export type AdditionalOwner = Pick<
+  Database['public']['Tables']['owners']['Row'],
+  'id' | 'full_name'
+>
+
+export async function listAdditionalOwners(
+  horseId: string,
+): Promise<AdditionalOwner[]> {
+  const { data, error } = await supabase
+    .from('horse_additional_owners')
+    .select('owner:owners(id, full_name)')
+    .eq('horse_id', horseId)
+  if (error) throw error
+  return data.map((row) => row.owner).filter((owner) => owner !== null)
+}
+
+export async function addAdditionalOwner(
+  horseId: string,
+  ownerId: string,
+): Promise<AdditionalOwner> {
+  const { error } = await supabase
+    .from('horse_additional_owners')
+    .insert({ horse_id: horseId, owner_id: ownerId })
+  if (error) throw error
+  const { data, error: ownerError } = await supabase
+    .from('owners')
+    .select('id, full_name')
+    .eq('id', ownerId)
+    .single()
+  if (ownerError) throw ownerError
+  return data
+}
+
+export async function removeAdditionalOwner(
+  horseId: string,
+  ownerId: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from('horse_additional_owners')
+    .delete()
+    .eq('horse_id', horseId)
+    .eq('owner_id', ownerId)
   if (error) throw error
 }
 
