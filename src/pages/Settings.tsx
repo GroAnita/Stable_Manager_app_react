@@ -42,7 +42,6 @@ type SettingsSection =
   | 'stableInfo'
   | 'subscription'
   | 'feedingRounds'
-  | 'fieldsTurnout'
   | 'staffAccess'
   | 'billing'
   | 'integrations'
@@ -76,11 +75,6 @@ const SETTINGS_NAV: { groupKey: string; items: SettingsNavItem[] }[] = [
         key: 'feedingRounds',
         labelKey: 'settings.navFeedingRounds',
         icon: 'clock',
-      },
-      {
-        key: 'fieldsTurnout',
-        labelKey: 'settings.navFieldsTurnout',
-        icon: 'map',
       },
     ],
   },
@@ -410,9 +404,6 @@ export default function Settings() {
           )}
           {section === 'feedingRounds' && (
             <ComingSoonPanel labelKey="settings.navFeedingRounds" />
-          )}
-          {section === 'fieldsTurnout' && (
-            <ComingSoonPanel labelKey="settings.navFieldsTurnout" />
           )}
           {section === 'billing' && (
             <ComingSoonPanel labelKey="settings.navBilling" />

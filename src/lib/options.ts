@@ -9,6 +9,10 @@ export type StallOption = Pick<
   Database['public']['Tables']['stalls']['Row'],
   'id' | 'stall_number'
 >
+export type PaddockOption = Pick<
+  Database['public']['Tables']['paddocks']['Row'],
+  'id' | 'name'
+>
 export type HorseOption = Pick<
   Database['public']['Tables']['horses']['Row'],
   'id' | 'name' | 'away'
@@ -32,6 +36,15 @@ export async function listStallOptions(): Promise<StallOption[]> {
     .from('stalls')
     .select('id, stall_number')
     .order('stall_number')
+  if (error) throw error
+  return data
+}
+
+export async function listPaddockOptions(): Promise<PaddockOption[]> {
+  const { data, error } = await supabase
+    .from('paddocks')
+    .select('id, name')
+    .order('name')
   if (error) throw error
   return data
 }

@@ -57,6 +57,20 @@ export function OverviewTab({
             {horse.stall?.notes || t('horseDetail.noStallNotes')}
           </p>
         </div>
+        <div className="rounded-2xl bg-slate-50 p-4">
+          <p className="text-sm text-slate-400">
+            {t('horseDetail.paddockAssignment')}
+          </p>
+          <p className="mt-1 font-medium text-slate-900">
+            {horse.paddock?.name ?? t('horseDetail.noPaddockAssigned')}
+            {horse.paddock?.size && ` · ${horse.paddock.size}`}
+          </p>
+          {horse.paddock && (
+            <p className="text-sm text-slate-500">
+              {horse.paddock.notes || t('horseDetail.noPaddockNotes')}
+            </p>
+          )}
+        </div>
       </div>
       <div className="space-y-4">
         <div>

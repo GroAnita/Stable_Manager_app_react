@@ -28,6 +28,7 @@ const navGroups: { labelKey: string; items: NavItem[] }[] = [
       { key: 'horses', to: '/horses', icon: 'horse' },
       { key: 'owners', to: '/owners', icon: 'users' },
       { key: 'stalls', to: '/stalls', icon: 'grid' },
+      { key: 'paddocks', to: '/paddocks', icon: 'map' },
       { key: 'calendar', to: '/calendar', icon: 'calendar' },
       { key: 'tasks', to: '/tasks', icon: 'checkSquare' },
       { key: 'feedingRota', to: '/feeding-rota', icon: 'checkSquare' },

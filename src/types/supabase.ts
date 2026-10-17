@@ -758,6 +758,7 @@ export type Database = {
           name: string
           notes: string | null
           owner_id: string | null
+          paddock_id: string | null
           passport_number: string | null
           photo_url: string | null
           stable_id: string
@@ -789,6 +790,7 @@ export type Database = {
           name: string
           notes?: string | null
           owner_id?: string | null
+          paddock_id?: string | null
           passport_number?: string | null
           photo_url?: string | null
           stable_id: string
@@ -820,6 +822,7 @@ export type Database = {
           name?: string
           notes?: string | null
           owner_id?: string | null
+          paddock_id?: string | null
           passport_number?: string | null
           photo_url?: string | null
           stable_id?: string
@@ -834,6 +837,13 @@ export type Database = {
             columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "owners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "horses_paddock_id_fkey"
+            columns: ["paddock_id"]
+            isOneToOne: false
+            referencedRelation: "paddocks"
             referencedColumns: ["id"]
           },
           {
@@ -1160,6 +1170,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "owners_stable_id_fkey"
+            columns: ["stable_id"]
+            isOneToOne: false
+            referencedRelation: "stables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      paddocks: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          notes: string | null
+          size: string | null
+          stable_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          notes?: string | null
+          size?: string | null
+          stable_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          size?: string | null
+          stable_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paddocks_stable_id_fkey"
             columns: ["stable_id"]
             isOneToOne: false
             referencedRelation: "stables"

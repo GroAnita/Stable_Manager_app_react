@@ -10,8 +10,10 @@ import {
 import { calculateAge } from '../lib/age'
 import {
   listOwnerOptions,
+  listPaddockOptions,
   listStallOptions,
   type OwnerOption,
+  type PaddockOption,
   type StallOption,
 } from '../lib/options'
 import { usePreferences } from '../lib/PreferencesContext'
@@ -34,6 +36,7 @@ type FormState = {
   arrival_date: string
   owner_id: string
   stall_id: string
+  paddock_id: string
   active: boolean
   away: boolean
 }
@@ -55,6 +58,7 @@ const emptyForm: FormState = {
   arrival_date: '',
   owner_id: '',
   stall_id: '',
+  paddock_id: '',
   active: true,
   away: false,
 }
@@ -68,6 +72,7 @@ export default function HorseForm() {
   const [form, setForm] = useState<FormState>(emptyForm)
   const [owners, setOwners] = useState<OwnerOption[]>([])
   const [stalls, setStalls] = useState<StallOption[]>([])
+  const [paddocks, setPaddocks] = useState<PaddockOption[]>([])
   const [loading, setLoading] = useState(isEdit)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -78,6 +83,9 @@ export default function HorseForm() {
       .catch((err: Error) => setError(err.message))
     listStallOptions()
       .then(setStalls)
+      .catch((err: Error) => setError(err.message))
+    listPaddockOptions()
+      .then(setPaddocks)
       .catch((err: Error) => setError(err.message))
   }, [])
 
@@ -104,6 +112,7 @@ export default function HorseForm() {
           arrival_date: horse.arrival_date ?? '',
           owner_id: horse.owner_id ?? '',
           stall_id: horse.stall_id ?? '',
+          paddock_id: horse.paddock_id ?? '',
           active: horse.active,
           away: horse.away,
         })
@@ -144,6 +153,7 @@ export default function HorseForm() {
         arrival_date: form.arrival_date || null,
         owner_id: form.owner_id || null,
         stall_id: form.stall_id || null,
+        paddock_id: form.paddock_id || null,
         active: form.active,
         away: form.away,
       }
@@ -282,6 +292,21 @@ export default function HorseForm() {
             {stalls.map((stall) => (
               <option key={stall.id} value={stall.id}>
                 {stall.stall_number}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span className="field-label">{t('horseForm.paddock')}</span>
+          <select
+            className="field"
+            value={form.paddock_id}
+            onChange={(e) => updateField('paddock_id', e.target.value)}
+          >
+            <option value="">—</option>
+            {paddocks.map((paddock) => (
+              <option key={paddock.id} value={paddock.id}>
+                {paddock.name}
               </option>
             ))}
           </select>

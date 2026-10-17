@@ -15,6 +15,7 @@ const OwnerList = lazy(() => import('./pages/OwnerList'))
 const OwnerDetail = lazy(() => import('./pages/OwnerDetail'))
 const OwnerForm = lazy(() => import('./pages/OwnerForm'))
 const StallView = lazy(() => import('./pages/StallView'))
+const PaddockView = lazy(() => import('./pages/PaddockView'))
 const ContractList = lazy(() => import('./pages/ContractList'))
 const ContractForm = lazy(() => import('./pages/ContractForm'))
 const PaymentList = lazy(() => import('./pages/PaymentList'))
@@ -86,6 +87,7 @@ export const router = createBrowserRouter([
       { path: 'owners/:id/edit', element: <OwnerForm /> },
       { path: 'owners/:id', element: <OwnerDetail /> },
       { path: 'stalls', element: <StallView /> },
+      { path: 'paddocks', element: <PaddockView /> },
       { path: 'contracts', element: <ContractList /> },
       { path: 'contracts/new', element: <ContractForm /> },
       { path: 'contracts/:id/edit', element: <ContractForm /> },
