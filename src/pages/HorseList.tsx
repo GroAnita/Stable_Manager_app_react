@@ -87,13 +87,13 @@ export default function HorseList() {
           {t('horseList.title')}
         </h1>
         <div className="flex items-center gap-3">
-          <div className="flex rounded-2xl border border-slate-200 bg-white p-1">
+          <div className="flex rounded-2xl border border-slate-200 bg-card p-1">
             <button
               type="button"
               onClick={() => setViewMode('grid')}
               className={`rounded-xl px-4 py-2 text-sm font-medium ${
                 viewMode === 'grid'
-                  ? 'bg-forest text-white'
+                  ? 'bg-primary text-white'
                   : 'text-slate-500'
               }`}
             >
@@ -104,7 +104,7 @@ export default function HorseList() {
               onClick={() => setViewMode('list')}
               className={`rounded-xl px-4 py-2 text-sm font-medium ${
                 viewMode === 'list'
-                  ? 'bg-forest text-white'
+                  ? 'bg-primary text-white'
                   : 'text-slate-500'
               }`}
             >

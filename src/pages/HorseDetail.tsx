@@ -152,8 +152,8 @@ export default function HorseDetail() {
             onClick={() => setTab(item.key)}
             className={`rounded-xl px-4 py-2 text-sm font-medium ${
               tab === item.key
-                ? 'bg-forest text-white'
-                : 'bg-white text-slate-600'
+                ? 'bg-primary text-white'
+                : 'bg-card text-slate-600'
             }`}
           >
             {t(item.labelKey)}

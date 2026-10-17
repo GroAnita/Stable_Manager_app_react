@@ -7,10 +7,96 @@
   --color-cream: #f7f6f2;
   --color-card: #ffffff;
   --color-ink: #333333;
+  /* Solid button/panel fills that always carry white text or icons on
+     top. Kept separate from forest/warmbrown, which lighten in dark
+     mode for readability as text and would otherwise fail contrast
+     against white content once used as a fill. Intentionally NOT
+     overridden under .dark, so these stay the original, already
+     white-text-safe brand colors in both themes. */
+  --color-primary: #3a6b52;
+  --color-secondary: #8b6b4a;
   --radius-xl: 1rem;
   --radius-2xl: 1.25rem;
   --shadow-soft: 0 10px 30px rgba(58, 107, 82, 0.08);
   --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* Dark mode overrides, applied by toggling the "dark" class on html
+   (see PreferencesContext). Unlayered rules take precedence over the
+   theme values above regardless of source order, which is the standard
+   Tailwind v4 pattern for class-based theme overrides. Keeps the same
+   brand hues and radii; every other token is a lightness-inverted
+   pairing so existing utility classes stay correct unchanged. */
+.dark {
+  color-scheme: dark;
+
+  --color-forest: #88b89a;
+  --color-warmbrown: #c5a582;
+  --color-gold: #e2bf70;
+  --color-cream: #171c19;
+  --color-card: #222a25;
+  --color-ink: #edece6;
+
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.2);
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.28);
+
+  --color-slate-50: #1c231e;
+  --color-slate-100: #242c26;
+  --color-slate-200: #333d35;
+  --color-slate-300: #45514a;
+  --color-slate-400: #7c877e;
+  --color-slate-500: #99a399;
+  --color-slate-600: #b3bcb2;
+  --color-slate-700: #c9d0c7;
+  --color-slate-800: #dde2db;
+  --color-slate-900: #f1f3ef;
+
+  --color-red-50: #2a1515;
+  --color-red-100: #3a1c1c;
+  --color-red-200: #4d2626;
+  --color-red-600: #f87171;
+  --color-red-700: #fca5a5;
+  --color-red-800: #fecaca;
+  --color-red-900: #fee2e2;
+
+  --color-amber-50: #2a2010;
+  --color-amber-100: #3a2c15;
+  --color-amber-200: #4d3a1a;
+  --color-amber-700: #fcd34d;
+  --color-amber-800: #fde68a;
+  --color-amber-900: #fef3c7;
+
+  --color-emerald-50: #10231c;
+  --color-emerald-100: #163026;
+  --color-emerald-200: #1d4033;
+  --color-emerald-600: #34d399;
+  --color-emerald-700: #6ee7b7;
+  --color-emerald-800: #a7f3d0;
+  --color-emerald-900: #d1fae5;
+
+  --color-orange-50: #2a1c10;
+  --color-orange-100: #3a2615;
+  --color-orange-200: #4d331a;
+  --color-orange-600: #fb923c;
+  --color-orange-700: #fdba74;
+  --color-orange-800: #fed7aa;
+  --color-orange-900: #ffedd5;
+
+  --color-sky-50: #10202a;
+  --color-sky-100: #162a3a;
+  --color-sky-200: #1e3a4f;
+  --color-sky-800: #7dd3fc;
+  --color-sky-900: #bae6fd;
+
+  --color-rose-500: #fb7185;
+  --color-rose-600: #fda4af;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(136, 184, 154, 0.3);
 }
 
 @layer base {
@@ -66,16 +152,16 @@
     @apply text-lg font-semibold text-slate-900;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-forest px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-forest/90 disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-primary/90 disabled:opacity-60;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-warmbrown px-4 py-2.5 text-sm font-medium text-white hover:bg-warmbrown/90;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-secondary px-4 py-2.5 text-sm font-medium text-white hover:bg-secondary/90;
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:border-forest/20 hover:text-forest;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-card px-4 py-2.5 text-sm font-medium text-slate-700 hover:border-forest/20 hover:text-forest;
   }
   .field {
-    @apply w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 placeholder:text-slate-400;
+    @apply w-full rounded-xl border border-slate-200 bg-card px-3 py-2.5 text-sm text-slate-800 placeholder:text-slate-400;
   }
   .field-label {
     @apply mb-1.5 block text-sm font-medium text-slate-700;
@@ -84,7 +170,7 @@
     @apply panel p-5;
   }
   .table-wrap {
-    @apply overflow-x-auto rounded-2xl border border-slate-200 bg-white;
+    @apply overflow-x-auto rounded-2xl border border-slate-200 bg-card;
   }
   .data-table {
     @apply min-w-full divide-y divide-slate-200 text-left text-sm;

@@ -13,6 +13,7 @@ import {
   usePreferences,
   type Currency,
   type Language,
+  type Theme,
 } from '../lib/PreferencesContext'
 import { StaffAccessPanel } from './settings/StaffAccessPanel'
 
@@ -127,7 +128,8 @@ function ComingSoonPanel({ labelKey }: { labelKey: string }) {
 
 export default function Settings() {
   const { session } = useAuth()
-  const { t, language, setLanguage, currency, setCurrency } = usePreferences()
+  const { t, language, setLanguage, currency, setCurrency, theme, setTheme } =
+    usePreferences()
   const [section, setSection] = useState<SettingsSection>('stableInfo')
   const [profile, setProfile] = useState<Profile | null>(null)
   const [stable, setStable] = useState<Stable | null>(null)
@@ -241,7 +243,7 @@ export default function Settings() {
                     className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-sm font-medium ${
                       section === item.key
                         ? 'bg-forest/10 text-forest'
-                        : 'text-ink/70 hover:bg-white'
+                        : 'text-ink/70 hover:bg-card'
                     }`}
                   >
                     <Icon name={item.icon} className="h-5 w-5 shrink-0" />
@@ -475,6 +477,18 @@ export default function Settings() {
                         {value}
                       </option>
                     ))}
+                  </select>
+                </label>
+                <label>
+                  <span className="field-label">{t('settings.theme')}</span>
+                  <select
+                    className="field"
+                    value={theme}
+                    onChange={(e) => setTheme(e.target.value as Theme)}
+                  >
+                    <option value="system">{t('settings.themeSystem')}</option>
+                    <option value="light">{t('settings.themeLight')}</option>
+                    <option value="dark">{t('settings.themeDark')}</option>
                   </select>
                 </label>
               </div>

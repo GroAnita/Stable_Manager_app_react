@@ -285,19 +285,19 @@ export function FeedingTab({
                 )}
               </div>
               <div className="mt-3 space-y-1.5">
-                <p className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-600">
+                <p className="rounded-xl border border-slate-200 bg-card px-3 py-1.5 text-sm text-slate-600">
                   <span className="font-medium text-slate-800">
                     {t('horseDetail.hay')}:
                   </span>{' '}
                   {entry.hay || '—'}
                 </p>
-                <p className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-600">
+                <p className="rounded-xl border border-slate-200 bg-card px-3 py-1.5 text-sm text-slate-600">
                   <span className="font-medium text-slate-800">
                     {t('horseDetail.grain')}:
                   </span>{' '}
                   {entry.feed || '—'}
                 </p>
-                <p className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-600">
+                <p className="rounded-xl border border-slate-200 bg-card px-3 py-1.5 text-sm text-slate-600">
                   <span className="font-medium text-slate-800">
                     {t('horseDetail.supplements')}:
                   </span>{' '}

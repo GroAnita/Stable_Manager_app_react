@@ -47,7 +47,7 @@ export function ShiftFeedingInfo({ shift }: { shift: FeedingShift }) {
             info.map((item) => (
               <div
                 key={item.horse.id}
-                className="rounded-xl border border-slate-100 bg-white p-3"
+                className="rounded-xl border border-slate-100 bg-card p-3"
               >
                 <p className="font-medium text-slate-800">{item.horse.name}</p>
                 {item.feedingTimes.length === 0 ? (

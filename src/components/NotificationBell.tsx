@@ -43,7 +43,7 @@ export function NotificationBell() {
         type="button"
         aria-label={t('feedingRota.notificationsTitle')}
         onClick={handleOpen}
-        className="relative rounded-full p-2 text-ink/60 hover:bg-white hover:text-forest"
+        className="relative rounded-full p-2 text-ink/60 hover:bg-card hover:text-forest"
       >
         <Icon name="bell" className="h-5 w-5" />
         {unread.length > 0 && (
@@ -55,7 +55,7 @@ export function NotificationBell() {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-50 mt-2 w-80 max-w-[90vw] rounded-2xl border border-slate-200 bg-white p-3 shadow-card">
+          <div className="absolute right-0 z-50 mt-2 w-80 max-w-[90vw] rounded-2xl border border-slate-200 bg-card p-3 shadow-card">
             <div className="flex items-center justify-between gap-2 px-1">
               <p className="text-sm font-semibold text-slate-800">
                 {t('feedingRota.notificationsTitle')}

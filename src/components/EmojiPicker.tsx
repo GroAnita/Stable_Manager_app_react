@@ -28,7 +28,7 @@ export function EmojiPicker({ onSelect }: { onSelect: (emoji: string) => void })
             className="fixed inset-0 z-40"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute z-50 mt-1 grid w-64 grid-cols-8 gap-1 rounded-2xl border border-slate-200 bg-white p-3 shadow-card">
+          <div className="absolute z-50 mt-1 grid w-64 grid-cols-8 gap-1 rounded-2xl border border-slate-200 bg-card p-3 shadow-card">
             {EMOJIS.map((emoji) => (
               <button
                 key={emoji}

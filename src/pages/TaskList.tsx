@@ -375,7 +375,7 @@ export default function TaskList() {
                   onClick={() => toggleCompleted(task)}
                   className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded border text-xs ${
                     task.completed
-                      ? 'border-forest bg-forest text-white'
+                      ? 'border-primary bg-primary text-white'
                       : 'border-slate-300'
                   }`}
                 >

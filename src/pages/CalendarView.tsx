@@ -494,7 +494,7 @@ export default function CalendarView() {
               key={iso}
               type="button"
               onClick={() => setDayModalDate(iso)}
-              className="min-h-24 rounded-2xl border border-slate-200 bg-white p-2 text-left hover:border-forest/30"
+              className="min-h-24 rounded-2xl border border-slate-200 bg-card p-2 text-left hover:border-forest/30"
             >
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium text-slate-900">
@@ -702,8 +702,8 @@ export default function CalendarView() {
                     onClick={() => setMode(item)}
                     className={`rounded-xl px-4 py-2 text-sm font-medium ${
                       mode === item
-                        ? 'bg-forest text-white'
-                        : 'bg-white text-slate-600'
+                        ? 'bg-primary text-white'
+                        : 'bg-card text-slate-600'
                     }`}
                   >
                     {t(

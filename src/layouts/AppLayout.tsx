@@ -91,12 +91,12 @@ function SidebarLink({
       to={item.to}
       onClick={onClick}
       className={({ isActive }) =>
-        `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-ink/70 hover:bg-white hover:text-forest ${
-          isActive ? 'bg-white text-forest shadow-soft' : ''
+        `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-ink/70 hover:bg-card hover:text-forest ${
+          isActive ? 'bg-card text-forest shadow-soft' : ''
         }`
       }
     >
-      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/70 text-forest">
+      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/70 text-primary">
         <Icon name={item.icon} className="h-5 w-5" />
       </span>
       <span>{t(`nav.${item.key}`)}</span>
@@ -135,7 +135,7 @@ export default function AppLayout() {
     <div className="min-h-screen lg:flex">
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-30 bg-slate-900/40 lg:hidden"
+          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -150,7 +150,7 @@ export default function AppLayout() {
           </h1>
           <button
             type="button"
-            className="rounded-full p-2 text-ink/60 hover:bg-white lg:hidden"
+            className="rounded-full p-2 text-ink/60 hover:bg-card lg:hidden"
             onClick={() => setSidebarOpen(false)}
           >
             <Icon name="x" className="h-5 w-5" />
@@ -235,7 +235,7 @@ export default function AppLayout() {
             <div className="order-1 flex items-center gap-3">
               <button
                 type="button"
-                className="rounded-2xl border border-slate-200 bg-white p-2.5 text-ink/70 lg:hidden"
+                className="rounded-2xl border border-slate-200 bg-card p-2.5 text-ink/70 lg:hidden"
                 onClick={() => setSidebarOpen(true)}
               >
                 <Icon name="menu" className="h-5 w-5" />

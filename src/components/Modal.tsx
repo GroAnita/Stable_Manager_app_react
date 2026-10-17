@@ -28,7 +28,7 @@ export function Modal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
       onClick={onClose}
     >
       <div
@@ -36,7 +36,7 @@ export function Modal({
         aria-modal="true"
         aria-label={title}
         onClick={(e) => e.stopPropagation()}
-        className={`max-h-[85vh] w-full overflow-y-auto rounded-2xl bg-white p-6 shadow-card print:hidden ${
+        className={`max-h-[85vh] w-full overflow-y-auto rounded-2xl bg-card p-6 shadow-card print:hidden ${
           size === 'lg' ? 'max-w-3xl' : 'max-w-md'
         }`}
       >

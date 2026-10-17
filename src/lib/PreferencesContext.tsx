@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from 'react'
 import { en } from './i18n/en'
 import { no } from './i18n/no'
 import {
@@ -8,11 +14,20 @@ import {
 
 export type Language = 'en' | 'no'
 export type Currency = 'EUR' | 'NOK' | 'SEK' | 'GBP'
+export type Theme = 'light' | 'dark' | 'system'
 
 const dictionaries = { en, no }
 const LOCALES: Record<Language, string> = { en: 'en-GB', no: 'nb-NO' }
 const LANG_KEY = 'stable-manager:language'
 const CURRENCY_KEY = 'stable-manager:currency'
+const THEME_KEY = 'stable-manager:theme'
+
+function systemPrefersDark(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+  )
+}
 
 type Dict = typeof en
 type Vars = Record<string, string | number>
@@ -31,6 +46,8 @@ type PreferencesContextValue = {
   setLanguage: (lang: Language) => void
   currency: Currency
   setCurrency: (currency: Currency) => void
+  theme: Theme
+  setTheme: (theme: Theme) => void
   t: (key: string, vars?: Vars) => string
   formatCurrency: (amount: number) => string
   formatDate: (dateStr: string | null) => string
@@ -47,6 +64,9 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
   const [currency, setCurrencyState] = useState<Currency>(
     () => (localStorage.getItem(CURRENCY_KEY) as Currency | null) || 'NOK',
   )
+  const [theme, setThemeState] = useState<Theme>(
+    () => (localStorage.getItem(THEME_KEY) as Theme | null) || 'system',
+  )
 
   function setLanguage(lang: Language) {
     setLanguageState(lang)
@@ -57,6 +77,23 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     setCurrencyState(nextCurrency)
     localStorage.setItem(CURRENCY_KEY, nextCurrency)
   }
+
+  function setTheme(nextTheme: Theme) {
+    setThemeState(nextTheme)
+    localStorage.setItem(THEME_KEY, nextTheme)
+  }
+
+  useEffect(() => {
+    function applyTheme() {
+      const isDark = theme === 'dark' || (theme === 'system' && systemPrefersDark())
+      document.documentElement.classList.toggle('dark', isDark)
+    }
+    applyTheme()
+    if (theme !== 'system') return
+    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    media.addEventListener('change', applyTheme)
+    return () => media.removeEventListener('change', applyTheme)
+  }, [theme])
 
   function t(key: string, vars: Vars = {}): string {
     const template =
@@ -76,6 +113,8 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
         setLanguage,
         currency,
         setCurrency,
+        theme,
+        setTheme,
         t,
         formatCurrency: (amount) =>
           formatCurrencyPure(amount, currency, locale),

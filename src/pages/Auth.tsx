@@ -113,12 +113,12 @@ export default function Auth() {
         </button>
       </div>
 
-      <div className="relative flex flex-col items-center overflow-hidden bg-forest px-6 py-10 text-center lg:hidden">
+      <div className="relative flex flex-col items-center overflow-hidden bg-primary px-6 py-10 text-center lg:hidden">
         <Icon
           name="horse"
           className="pointer-events-none absolute -right-10 -bottom-10 h-40 w-40 text-white/10"
         />
-        <p className="relative text-xs font-semibold tracking-[0.25em] text-cream/70 uppercase">
+        <p className="relative text-xs font-semibold tracking-[0.25em] text-white/70 uppercase">
           {t('common.appName')}
         </p>
         <h1 className="relative mt-3 max-w-xs text-xl font-semibold text-white">
@@ -126,19 +126,19 @@ export default function Auth() {
         </h1>
       </div>
 
-      <div className="relative hidden w-1/2 shrink-0 overflow-hidden bg-forest px-12 py-16 lg:flex lg:flex-col lg:justify-center">
+      <div className="relative hidden w-1/2 shrink-0 overflow-hidden bg-primary px-12 py-16 lg:flex lg:flex-col lg:justify-center">
         <Icon
           name="horse"
           className="pointer-events-none absolute -right-16 -bottom-16 h-96 w-96 text-white/10"
         />
         <div className="relative max-w-md">
-          <p className="text-sm font-semibold tracking-[0.25em] text-cream/70 uppercase">
+          <p className="text-sm font-semibold tracking-[0.25em] text-white/70 uppercase">
             {t('common.appName')}
           </p>
           <h1 className="mt-4 text-3xl font-semibold text-white">
             {t('auth.marketingHeadline')}
           </h1>
-          <p className="mt-4 text-base text-cream/80">
+          <p className="mt-4 text-base text-white/80">
             {t('auth.marketingSubtitle')}
           </p>
           <ul className="mt-10 space-y-5">
@@ -147,7 +147,7 @@ export default function Auth() {
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white">
                   <Icon name={feature.icon} className="h-5 w-5" />
                 </span>
-                <p className="mt-1.5 text-sm text-cream/90">{t(feature.key)}</p>
+                <p className="mt-1.5 text-sm text-white/90">{t(feature.key)}</p>
               </li>
             ))}
           </ul>
