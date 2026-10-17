@@ -133,6 +133,12 @@ export default function AppLayout() {
 
   return (
     <div className="min-h-screen lg:flex">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-xl focus:bg-forest focus:px-4 focus:py-2.5 focus:text-sm focus:font-medium focus:text-white focus:shadow-soft"
+      >
+        {t('nav.skipToContent')}
+      </a>
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-30 bg-black/40 lg:hidden"
@@ -274,7 +280,11 @@ export default function AppLayout() {
             </div>
           </div>
         </header>
-        <main className="flex-1 overflow-x-hidden px-4 py-6 md:px-6">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="flex-1 overflow-x-hidden px-4 py-6 md:px-6"
+        >
           <Suspense
             fallback={
               <p className="text-sm text-slate-500">{t('common.loading')}</p>

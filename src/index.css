@@ -15,6 +15,11 @@
      white-text-safe brand colors in both themes. */
   --color-primary: #3a6b52;
   --color-secondary: #8b6b4a;
+  /* Tailwind's default slate-500 (#64748b) sits at 4.40:1 on the cream
+     background, just under the 4.5:1 WCAG AA text threshold. Nudged
+     darker by ~4% — visually near-identical, clears the threshold with
+     margin (4.73:1). */
+  --color-slate-500: #606f85;
   --radius-xl: 1rem;
   --radius-2xl: 1.25rem;
   --shadow-soft: 0 10px 30px rgba(58, 107, 82, 0.08);
