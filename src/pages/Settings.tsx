@@ -1,6 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Icon, type IconName } from '../components/Icon'
-import { createStaffInvite, inviteUrl } from '../features/invites/api'
 import {
   getMyProfile,
   getStable,
@@ -15,6 +14,7 @@ import {
   type Currency,
   type Language,
 } from '../lib/PreferencesContext'
+import { StaffAccessPanel } from './settings/StaffAccessPanel'
 
 type FormState = {
   name: string
@@ -142,9 +142,6 @@ export default function Settings() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
-  const [staffInvite, setStaffInvite] = useState<string | null>(null)
-  const [staffInviteSaving, setStaffInviteSaving] = useState(false)
-  const [staffInviteError, setStaffInviteError] = useState<string | null>(null)
   const [logoUploading, setLogoUploading] = useState(false)
   const [logoError, setLogoError] = useState<string | null>(null)
 
@@ -172,23 +169,6 @@ export default function Settings() {
   }, [])
 
   const canEdit = profile?.role === 'stable_owner'
-
-  async function handleGenerateStaffInvite() {
-    if (!profile?.stable_id || !session) return
-    setStaffInviteSaving(true)
-    setStaffInviteError(null)
-    try {
-      const created = await createStaffInvite({
-        stableId: profile.stable_id,
-        createdBy: session.user.id,
-      })
-      setStaffInvite(inviteUrl(created.token))
-    } catch (err) {
-      setStaffInviteError((err as Error).message)
-    } finally {
-      setStaffInviteSaving(false)
-    }
-  }
 
   async function handleLogoChange(file: File | undefined) {
     if (!file || !stable) return
@@ -441,37 +421,11 @@ export default function Settings() {
             <ComingSoonPanel labelKey="settings.navIntegrations" />
           )}
 
-          {section === 'staffAccess' && canEdit && (
-            <div className="panel p-6">
-              <h2 className="section-title">{t('settings.staffInvite')}</h2>
-              <p className="mt-2 text-sm text-slate-500">
-                {t('settings.staffInviteHint')}
-              </p>
-              {staffInviteError && (
-                <p role="alert" className="mt-2 text-sm text-red-600">
-                  {staffInviteError}
-                </p>
-              )}
-              {staffInvite ? (
-                <input
-                  readOnly
-                  className="field mt-3 text-xs"
-                  value={staffInvite}
-                  onFocus={(e) => e.target.select()}
-                />
-              ) : (
-                <button
-                  type="button"
-                  disabled={staffInviteSaving}
-                  onClick={handleGenerateStaffInvite}
-                  className="btn-ghost mt-3"
-                >
-                  {staffInviteSaving
-                    ? t('common.saving')
-                    : t('settings.generateStaffInvite')}
-                </button>
-              )}
-            </div>
+          {section === 'staffAccess' && canEdit && profile?.stable_id && session && (
+            <StaffAccessPanel
+              stableId={profile.stable_id}
+              createdBy={session.user.id}
+            />
           )}
           {section === 'staffAccess' && !canEdit && (
             <div className="panel p-6 text-sm text-slate-500">

@@ -1335,6 +1335,7 @@ export type Database = {
           owner_id: string | null
           role: Database["public"]["Enums"]["user_role"] | null
           stable_id: string
+          staff_id: string | null
           token: string
           used_at: string | null
           used_by: string | null
@@ -1348,6 +1349,7 @@ export type Database = {
           owner_id?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
           stable_id: string
+          staff_id?: string | null
           token?: string
           used_at?: string | null
           used_by?: string | null
@@ -1361,6 +1363,7 @@ export type Database = {
           owner_id?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
           stable_id?: string
+          staff_id?: string | null
           token?: string
           used_at?: string | null
           used_by?: string | null
@@ -1385,6 +1388,13 @@ export type Database = {
             columns: ["stable_id"]
             isOneToOne: false
             referencedRelation: "stables"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stable_invites_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
             referencedColumns: ["id"]
           },
           {
@@ -1437,6 +1447,57 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      staff: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          phone: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          stable_id: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          stable_id: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          stable_id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_stable_id_fkey"
+            columns: ["stable_id"]
+            isOneToOne: false
+            referencedRelation: "stables"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       stalls: {
         Row: {
@@ -1896,6 +1957,7 @@ export type Database = {
         }
       }
       generate_monthly_invoices: { Args: never; Returns: undefined }
+      horse_stable_id: { Args: { p_horse_id: string }; Returns: string }
       link_horse_owner_account: {
         Args: { p_inviter_id: string; p_owner_id: string; p_user_id: string }
         Returns: undefined
@@ -1968,7 +2030,15 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      revoke_staff_access: { Args: { p_staff_id: string }; Returns: undefined }
       send_feeding_shift_reminders: { Args: never; Returns: undefined }
+      set_staff_role: {
+        Args: {
+          p_role: Database["public"]["Enums"]["user_role"]
+          p_staff_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       calendar_event_type:

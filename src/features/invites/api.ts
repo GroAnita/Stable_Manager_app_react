@@ -26,6 +26,7 @@ export async function createOwnerInvite(params: {
 export async function createStaffInvite(params: {
   stableId: string
   createdBy: string
+  staffId: string
 }): Promise<StableInvite> {
   const { data, error } = await supabase
     .from('stable_invites')
@@ -33,10 +34,26 @@ export async function createStaffInvite(params: {
       stable_id: params.stableId,
       created_by: params.createdBy,
       kind: 'staff',
-      role: 'stable_employee',
+      staff_id: params.staffId,
     })
     .select()
     .single()
+  if (error) throw error
+  return data
+}
+
+export async function getActiveStaffInvite(
+  staffId: string,
+): Promise<StableInvite | null> {
+  const { data, error } = await supabase
+    .from('stable_invites')
+    .select('*')
+    .eq('staff_id', staffId)
+    .is('used_at', null)
+    .gt('expires_at', new Date().toISOString())
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
   if (error) throw error
   return data
 }
