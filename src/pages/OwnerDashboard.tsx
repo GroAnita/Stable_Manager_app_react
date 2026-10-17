@@ -21,7 +21,7 @@ const quickLinks: { labelKey: string; to: string; icon: IconName | 'horse' }[] =
     {
       labelKey: 'ownerDashboard.myFeedingRota',
       to: '/my-feeding-rota',
-      icon: 'checkSquare',
+      icon: 'feedBag',
     },
     {
       labelKey: 'ownerDashboard.myProfile',

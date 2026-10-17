@@ -31,7 +31,7 @@ const navGroups: { labelKey: string; items: NavItem[] }[] = [
       { key: 'paddocks', to: '/paddocks', icon: 'map' },
       { key: 'calendar', to: '/calendar', icon: 'calendar' },
       { key: 'tasks', to: '/tasks', icon: 'checkSquare' },
-      { key: 'feedingRota', to: '/feeding-rota', icon: 'checkSquare' },
+      { key: 'feedingRota', to: '/feeding-rota', icon: 'feedBag' },
       { key: 'noticeBoard', to: '/notice-board', icon: 'bell' },
     ],
   },
@@ -58,7 +58,7 @@ const ownerNavItems: NavItem[] = [
   { key: 'myHorse', to: '/my-horse', icon: 'horse' },
   { key: 'myContract', to: '/my-contract', icon: 'fileText' },
   { key: 'calendar', to: '/calendar', icon: 'calendar' },
-  { key: 'myFeedingRota', to: '/my-feeding-rota', icon: 'checkSquare' },
+  { key: 'myFeedingRota', to: '/my-feeding-rota', icon: 'feedBag' },
   { key: 'noticeBoard', to: '/notice-board', icon: 'bell' },
 ]
 
