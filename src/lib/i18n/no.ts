@@ -233,6 +233,10 @@ export const no: typeof en = {
     markAllRead: 'Merk alle som lest',
     pushComingSoon:
       'Push-påminnelser kommer snart. Foreløpig vises påminnelser her og i varselsenteret ditt.',
+
+    viewFeedingInfo: 'Hva trenger hestene?',
+    hideFeedingInfo: 'Skjul fôringsinfo',
+    noHorsesInScope: 'Ingen hester er satt opp for dette skiftet ennå.',
   },
   ownerDashboard: {
     title: 'Velkommen',

@@ -1,7 +1,13 @@
 import { supabase } from '../../lib/supabaseClient'
+import {
+  getHorseFeedingPlan,
+  getHorseFeedingTimes,
+  type FeedingTime,
+} from '../horses/api'
 import type { Database } from '../../types/supabase'
 
-export type ShiftType = Database['public']['Tables']['feeding_shift_types']['Row']
+export type ShiftType =
+  Database['public']['Tables']['feeding_shift_types']['Row']
 export type ShiftTypeInsert =
   Database['public']['Tables']['feeding_shift_types']['Insert']
 export type ShiftTypeUpdate =
@@ -39,15 +45,17 @@ export type FeedingShift =
 
 export type SwapRequest =
   Database['public']['Tables']['feeding_shift_swap_requests']['Row'] & {
-    shift: Pick<
-      Database['public']['Tables']['feeding_shifts']['Row'],
-      'id' | 'date'
-    > & {
-      shift_type: Pick<
-        Database['public']['Tables']['feeding_shift_types']['Row'],
-        'label' | 'time_of_day'
-      > | null
-    } | null
+    shift:
+      | (Pick<
+          Database['public']['Tables']['feeding_shifts']['Row'],
+          'id' | 'date'
+        > & {
+          shift_type: Pick<
+            Database['public']['Tables']['feeding_shift_types']['Row'],
+            'label' | 'time_of_day'
+          > | null
+        })
+      | null
     requested_by: Pick<
       Database['public']['Tables']['owners']['Row'],
       'id' | 'full_name'
@@ -130,7 +138,12 @@ export async function setShiftTypeHorses(
   if (horseIds.length === 0) return
   const { error: insertError } = await supabase
     .from('feeding_shift_type_horses')
-    .insert(horseIds.map((horseId) => ({ shift_type_id: shiftTypeId, horse_id: horseId })))
+    .insert(
+      horseIds.map((horseId) => ({
+        shift_type_id: shiftTypeId,
+        horse_id: horseId,
+      })),
+    )
   if (insertError) throw insertError
 }
 
@@ -276,7 +289,12 @@ export { lastPublishedOwnerByType }
 export async function upsertDraftShifts(
   stableId: string,
   createdBy: string,
-  plans: { shift_type_id: string; date: string; assigned_owner_id: string | null; unassignable: boolean }[],
+  plans: {
+    shift_type_id: string
+    date: string
+    assigned_owner_id: string | null
+    unassignable: boolean
+  }[],
 ): Promise<void> {
   if (plans.length === 0) return
   const { error } = await supabase.from('feeding_shifts').upsert(
@@ -357,6 +375,54 @@ export async function markShiftCompleted(
     .single()
   if (error) throw error
   return data
+}
+
+export type ShiftHorseFeeding = {
+  horse: { id: string; name: string }
+  feedingTimes: FeedingTime[]
+  specialInstructions: string | null
+}
+
+/** What every horse in a shift's scope actually needs fed, reusing each
+ * horse's existing feeding plan/times rather than duplicating the data. */
+export async function getShiftFeedingInfo(
+  shift: FeedingShift,
+): Promise<ShiftHorseFeeding[]> {
+  let horseList: { id: string; name: string }[]
+  if (shift.shift_type?.scope === 'horses') {
+    const horseIds = await listShiftTypeHorseIds(shift.shift_type_id)
+    if (horseIds.length === 0) return []
+    const { data, error } = await supabase
+      .from('horses')
+      .select('id, name')
+      .in('id', horseIds)
+      .order('name')
+    if (error) throw error
+    horseList = data
+  } else {
+    const { data, error } = await supabase
+      .from('horses')
+      .select('id, name')
+      .eq('stable_id', shift.stable_id)
+      .eq('active', true)
+      .order('name')
+    if (error) throw error
+    horseList = data
+  }
+
+  return Promise.all(
+    horseList.map(async (horse) => {
+      const [plan, times] = await Promise.all([
+        getHorseFeedingPlan(horse.id),
+        getHorseFeedingTimes(horse.id),
+      ])
+      return {
+        horse,
+        feedingTimes: times,
+        specialInstructions: plan?.special_instructions ?? null,
+      }
+    }),
+  )
 }
 
 // ---------------------------------------------------------------------------

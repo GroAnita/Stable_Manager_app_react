@@ -231,6 +231,10 @@ export const en = {
     markAllRead: 'Mark all as read',
     pushComingSoon:
       'Push reminders are coming soon. For now, reminders appear here and in your notification centre.',
+
+    viewFeedingInfo: 'What do the horses need?',
+    hideFeedingInfo: 'Hide feeding info',
+    noHorsesInScope: 'No horses are set up for this shift yet.',
   },
   ownerDashboard: {
     title: 'Welcome',

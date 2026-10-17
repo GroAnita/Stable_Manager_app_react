@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { ShiftFeedingInfo } from '../components/ShiftFeedingInfo'
 import {
   listMySwapRequests,
   listMyUpcomingShifts,
@@ -21,7 +22,9 @@ export default function MyFeedingRota() {
   const [swaps, setSwaps] = useState<SwapRequest[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [swapTargetByShift, setSwapTargetByShift] = useState<Record<string, string>>({})
+  const [swapTargetByShift, setSwapTargetByShift] = useState<
+    Record<string, string>
+  >({})
 
   function load() {
     Promise.all([
@@ -113,6 +116,9 @@ export default function MyFeedingRota() {
             <p className="text-sm text-slate-600">
               {nextDuty.shift_type?.time_of_day?.slice(0, 5)}
             </p>
+            <div className="mt-3">
+              <ShiftFeedingInfo shift={nextDuty} />
+            </div>
           </div>
         ) : (
           <p className="mt-3 text-sm text-slate-500">
@@ -170,7 +176,9 @@ export default function MyFeedingRota() {
                       }))
                     }
                   >
-                    <option value="">{t('feedingRota.selectSwapTarget')}</option>
+                    <option value="">
+                      {t('feedingRota.selectSwapTarget')}
+                    </option>
                     {participants
                       .filter((p) => p.active && p.owner_id !== myOwnerId)
                       .map((p) => (
@@ -188,6 +196,9 @@ export default function MyFeedingRota() {
                     {t('feedingRota.requestSwap')}
                   </button>
                 </div>
+                <div className="mt-3">
+                  <ShiftFeedingInfo shift={shift} />
+                </div>
               </div>
             ))}
           </div>
@@ -195,7 +206,9 @@ export default function MyFeedingRota() {
       </div>
 
       <div className="panel p-6">
-        <h2 className="section-title">{t('feedingRota.incomingSwapRequests')}</h2>
+        <h2 className="section-title">
+          {t('feedingRota.incomingSwapRequests')}
+        </h2>
         {incomingSwaps.length === 0 ? (
           <p className="mt-3 text-sm text-slate-500">
             {t('feedingRota.noSwapRequests')}
@@ -236,7 +249,9 @@ export default function MyFeedingRota() {
 
       {outgoingSwaps.length > 0 && (
         <div className="panel p-6">
-          <h2 className="section-title">{t('feedingRota.outgoingSwapRequests')}</h2>
+          <h2 className="section-title">
+            {t('feedingRota.outgoingSwapRequests')}
+          </h2>
           <div className="mt-3 space-y-2">
             {outgoingSwaps.map((swap) => (
               <div

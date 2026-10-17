@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Badge } from '../components/Badge'
 import { Icon } from '../components/Icon'
+import { ShiftFeedingInfo } from '../components/ShiftFeedingInfo'
 import { Modal } from '../components/Modal'
 import {
   listAllPublishedShifts,
@@ -870,6 +871,7 @@ export default function CalendarView() {
               {formatDate(feedingDetail.date)} ·{' '}
               {feedingDetail.shift_type?.time_of_day?.slice(0, 5)}
             </p>
+            <ShiftFeedingInfo shift={feedingDetail} />
             <p className="text-slate-700">
               {feedingDetail.assigned_owner?.full_name ??
                 t('feedingRota.unassignedOption')}
