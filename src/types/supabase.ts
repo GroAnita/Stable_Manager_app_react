@@ -569,6 +569,10 @@ export type Database = {
           created_by: string | null
           date: string
           id: string
+          let_in_at: string | null
+          let_in_by: string | null
+          let_out_at: string | null
+          let_out_by: string | null
           reminder_day_before_sent_at: string | null
           reminder_hour_before_sent_at: string | null
           shift_type_id: string
@@ -585,6 +589,10 @@ export type Database = {
           created_by?: string | null
           date: string
           id?: string
+          let_in_at?: string | null
+          let_in_by?: string | null
+          let_out_at?: string | null
+          let_out_by?: string | null
           reminder_day_before_sent_at?: string | null
           reminder_hour_before_sent_at?: string | null
           shift_type_id: string
@@ -601,6 +609,10 @@ export type Database = {
           created_by?: string | null
           date?: string
           id?: string
+          let_in_at?: string | null
+          let_in_by?: string | null
+          let_out_at?: string | null
+          let_out_by?: string | null
           reminder_day_before_sent_at?: string | null
           reminder_hour_before_sent_at?: string | null
           shift_type_id?: string
@@ -629,6 +641,20 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feeding_shifts_let_in_by_fkey"
+            columns: ["let_in_by"]
+            isOneToOne: false
+            referencedRelation: "owners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feeding_shifts_let_out_by_fkey"
+            columns: ["let_out_by"]
+            isOneToOne: false
+            referencedRelation: "owners"
             referencedColumns: ["id"]
           },
           {

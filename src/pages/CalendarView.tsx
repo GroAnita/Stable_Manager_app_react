@@ -209,7 +209,7 @@ function EventFields({
 }
 
 export default function CalendarView() {
-  const { t, formatDate } = usePreferences()
+  const { t, formatDate, formatTime } = usePreferences()
   const { profile } = useAuth()
   const canManage = profile?.role !== 'horse_owner'
   const [events, setEvents] = useState<CalendarEvent[]>([])
@@ -885,6 +885,24 @@ export default function CalendarView() {
                   })
                 : t('feedingRota.notConfirmed')}
             </p>
+            {(feedingDetail.let_out_at || feedingDetail.let_in_at) && (
+              <p className="flex flex-wrap gap-x-2 text-emerald-700">
+                {feedingDetail.let_out_at && (
+                  <span>
+                    {t('feedingRota.letOutStatus', {
+                      time: formatTime(feedingDetail.let_out_at),
+                    })}
+                  </span>
+                )}
+                {feedingDetail.let_in_at && (
+                  <span>
+                    {t('feedingRota.letInStatus', {
+                      time: formatTime(feedingDetail.let_in_at),
+                    })}
+                  </span>
+                )}
+              </p>
+            )}
             {canManage && (
               <label>
                 <span className="field-label">{t('feedingRota.reassign')}</span>

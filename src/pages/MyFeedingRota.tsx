@@ -4,20 +4,25 @@ import {
   listMySwapRequests,
   listMyUpcomingShifts,
   listRotaParticipants,
+  listShiftTypes,
   markShiftCompleted,
+  markShiftLetIn,
+  markShiftLetOut,
   requestShiftSwap,
   respondToShiftSwap,
   type FeedingShift,
   type RotaParticipant,
+  type ShiftType,
   type SwapRequest,
 } from '../features/feedingRota/api'
 import { getMyOwnerRecord } from '../features/owners/api'
 import { usePreferences } from '../lib/PreferencesContext'
 
 export default function MyFeedingRota() {
-  const { t, formatDate } = usePreferences()
+  const { t, formatDate, formatTime } = usePreferences()
   const [myOwnerId, setMyOwnerId] = useState<string | null>(null)
   const [shifts, setShifts] = useState<FeedingShift[]>([])
+  const [shiftTypes, setShiftTypes] = useState<ShiftType[]>([])
   const [participants, setParticipants] = useState<RotaParticipant[]>([])
   const [swaps, setSwaps] = useState<SwapRequest[]>([])
   const [loading, setLoading] = useState(true)
@@ -30,12 +35,14 @@ export default function MyFeedingRota() {
     Promise.all([
       getMyOwnerRecord(),
       listMyUpcomingShifts(),
+      listShiftTypes(),
       listRotaParticipants(),
       listMySwapRequests(),
     ])
-      .then(([owner, upcoming, parts, swapRequests]) => {
+      .then(([owner, upcoming, types, parts, swapRequests]) => {
         setMyOwnerId(owner?.id ?? null)
         setShifts(upcoming)
+        setShiftTypes(types)
         setParticipants(parts)
         setSwaps(swapRequests)
       })
@@ -44,6 +51,12 @@ export default function MyFeedingRota() {
   }
 
   useEffect(load, [])
+
+  const sortedShiftTypes = [...shiftTypes].sort((a, b) =>
+    a.time_of_day.localeCompare(b.time_of_day),
+  )
+  const letOutTypeIds = new Set(sortedShiftTypes.slice(0, 2).map((s) => s.id))
+  const letInTypeIds = new Set(sortedShiftTypes.slice(-2).map((s) => s.id))
 
   const myShifts = shifts.filter((s) => s.assigned_owner_id === myOwnerId)
   const nextDuty = myShifts.find((s) => !s.completed_at) ?? null
@@ -60,6 +73,28 @@ export default function MyFeedingRota() {
     setError(null)
     try {
       await markShiftCompleted(shiftId, myOwnerId)
+      load()
+    } catch (err) {
+      setError((err as Error).message)
+    }
+  }
+
+  async function handleLetOut(shiftId: string) {
+    if (!myOwnerId) return
+    setError(null)
+    try {
+      await markShiftLetOut(shiftId, myOwnerId)
+      load()
+    } catch (err) {
+      setError((err as Error).message)
+    }
+  }
+
+  async function handleLetIn(shiftId: string) {
+    if (!myOwnerId) return
+    setError(null)
+    try {
+      await markShiftLetIn(shiftId, myOwnerId)
       load()
     } catch (err) {
       setError((err as Error).message)
@@ -156,6 +191,24 @@ export default function MyFeedingRota() {
                     )}
                   </p>
                 </div>
+                {(shift.let_out_at || shift.let_in_at) && (
+                  <p className="mt-1 flex flex-wrap gap-x-3 text-sm text-emerald-700">
+                    {shift.let_out_at && (
+                      <span>
+                        {t('feedingRota.letOutStatus', {
+                          time: formatTime(shift.let_out_at),
+                        })}
+                      </span>
+                    )}
+                    {shift.let_in_at && (
+                      <span>
+                        {t('feedingRota.letInStatus', {
+                          time: formatTime(shift.let_in_at),
+                        })}
+                      </span>
+                    )}
+                  </p>
+                )}
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   {!shift.completed_at && (
                     <button
@@ -166,6 +219,28 @@ export default function MyFeedingRota() {
                       {t('feedingRota.markCompleted')}
                     </button>
                   )}
+                  {!shift.let_out_at &&
+                    shift.shift_type &&
+                    letOutTypeIds.has(shift.shift_type.id) && (
+                      <button
+                        type="button"
+                        className="btn-ghost"
+                        onClick={() => handleLetOut(shift.id)}
+                      >
+                        {t('feedingRota.letOutButton')}
+                      </button>
+                    )}
+                  {!shift.let_in_at &&
+                    shift.shift_type &&
+                    letInTypeIds.has(shift.shift_type.id) && (
+                      <button
+                        type="button"
+                        className="btn-ghost"
+                        onClick={() => handleLetIn(shift.id)}
+                      >
+                        {t('feedingRota.letInButton')}
+                      </button>
+                    )}
                   <select
                     className="field"
                     value={swapTargetByShift[shift.id] ?? ''}

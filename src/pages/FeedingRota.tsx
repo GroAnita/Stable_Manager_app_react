@@ -56,7 +56,7 @@ function addDaysIso(dateIso: string, days: number): string {
 }
 
 export default function FeedingRota() {
-  const { t, formatDate } = usePreferences()
+  const { t, formatDate, formatTime } = usePreferences()
   const { session } = useAuth()
 
   const [shiftTypes, setShiftTypes] = useState<ShiftType[]>([])
@@ -604,6 +604,24 @@ export default function FeedingRota() {
                         {t('feedingRota.completedBy', {
                           name: shift.assigned_owner?.full_name ?? '—',
                         })}
+                      </p>
+                    )}
+                    {(shift.let_out_at || shift.let_in_at) && (
+                      <p className="mt-1 flex flex-wrap gap-x-2 text-xs text-emerald-600">
+                        {shift.let_out_at && (
+                          <span>
+                            {t('feedingRota.letOutStatus', {
+                              time: formatTime(shift.let_out_at),
+                            })}
+                          </span>
+                        )}
+                        {shift.let_in_at && (
+                          <span>
+                            {t('feedingRota.letInStatus', {
+                              time: formatTime(shift.let_in_at),
+                            })}
+                          </span>
+                        )}
                       </p>
                     )}
                   </div>

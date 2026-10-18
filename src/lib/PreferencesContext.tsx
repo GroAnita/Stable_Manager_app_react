@@ -10,6 +10,7 @@ import { no } from './i18n/no'
 import {
   formatCurrency as formatCurrencyPure,
   formatDate as formatDatePure,
+  formatTime as formatTimePure,
 } from './format'
 
 export type Language = 'en' | 'no'
@@ -51,6 +52,7 @@ type PreferencesContextValue = {
   t: (key: string, vars?: Vars) => string
   formatCurrency: (amount: number) => string
   formatDate: (dateStr: string | null) => string
+  formatTime: (dateStr: string | null) => string
 }
 
 const PreferencesContext = createContext<PreferencesContextValue | undefined>(
@@ -119,6 +121,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
         formatCurrency: (amount) =>
           formatCurrencyPure(amount, currency, locale),
         formatDate: (dateStr) => formatDatePure(dateStr, locale),
+        formatTime: (dateStr) => formatTimePure(dateStr, locale),
       }}
     >
       {children}

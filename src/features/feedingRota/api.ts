@@ -377,6 +377,40 @@ export async function markShiftCompleted(
   return data
 }
 
+export async function markShiftLetOut(
+  shiftId: string,
+  ownerId: string,
+): Promise<FeedingShift> {
+  const { data, error } = await supabase
+    .from('feeding_shifts')
+    .update({
+      let_out_by: ownerId,
+      let_out_at: new Date().toISOString(),
+    })
+    .eq('id', shiftId)
+    .select(SHIFT_SELECT)
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function markShiftLetIn(
+  shiftId: string,
+  ownerId: string,
+): Promise<FeedingShift> {
+  const { data, error } = await supabase
+    .from('feeding_shifts')
+    .update({
+      let_in_by: ownerId,
+      let_in_at: new Date().toISOString(),
+    })
+    .eq('id', shiftId)
+    .select(SHIFT_SELECT)
+    .single()
+  if (error) throw error
+  return data
+}
+
 export type ShiftHorseFeeding = {
   horse: { id: string; name: string }
   feedingTimes: FeedingTime[]
