@@ -16,6 +16,7 @@ import {
   type Theme,
 } from '../lib/PreferencesContext'
 import { StaffAccessPanel } from './settings/StaffAccessPanel'
+import { SubscriptionPanel } from './settings/SubscriptionPanel'
 
 type FormState = {
   name: string
@@ -401,8 +402,12 @@ export default function Settings() {
               </div>
             ))}
 
-          {section === 'subscription' && (
-            <ComingSoonPanel labelKey="settings.navSubscription" />
+          {section === 'subscription' && stable && (
+            <SubscriptionPanel
+              stable={stable}
+              canEdit={canEdit}
+              onChange={setStable}
+            />
           )}
           {section === 'feedingRounds' && (
             <ComingSoonPanel labelKey="settings.navFeedingRounds" />

@@ -1465,6 +1465,7 @@ export type Database = {
           name: string
           owner_user_id: string
           phone: string | null
+          plan: Database["public"]["Enums"]["stable_plan"]
           postal_code: string | null
           updated_at: string
         }
@@ -1478,6 +1479,7 @@ export type Database = {
           name: string
           owner_user_id: string
           phone?: string | null
+          plan?: Database["public"]["Enums"]["stable_plan"]
           postal_code?: string | null
           updated_at?: string
         }
@@ -1491,6 +1493,7 @@ export type Database = {
           name?: string
           owner_user_id?: string
           phone?: string | null
+          plan?: Database["public"]["Enums"]["stable_plan"]
           postal_code?: string | null
           updated_at?: string
         }
@@ -1587,6 +1590,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscription_plans: {
+        Row: {
+          horse_max: number | null
+          horse_min: number
+          key: Database["public"]["Enums"]["stable_plan"]
+          name: string
+          price_nok: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          horse_max?: number | null
+          horse_min: number
+          key: Database["public"]["Enums"]["stable_plan"]
+          name: string
+          price_nok: number
+          sort_order: number
+          updated_at?: string
+        }
+        Update: {
+          horse_max?: number | null
+          horse_min?: number
+          key?: Database["public"]["Enums"]["stable_plan"]
+          name?: string
+          price_nok?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       tasks: {
         Row: {
@@ -1994,6 +2027,7 @@ export type Database = {
           name: string
           owner_user_id: string
           phone: string | null
+          plan: Database["public"]["Enums"]["stable_plan"]
           postal_code: string | null
           updated_at: string
         }
@@ -2118,6 +2152,7 @@ export type Database = {
         | "feeding_shift_swap_declined"
         | "feeding_shift_reminder"
       payment_status: "paid" | "due" | "overdue"
+      stable_plan: "small" | "medium" | "large" | "xlarge"
       stall_status: "available" | "occupied" | "reserved" | "maintenance"
       task_priority: "low" | "medium" | "high"
       user_role: "stable_owner" | "stable_employee" | "horse_owner"
@@ -2280,6 +2315,7 @@ export const Constants = {
         "feeding_shift_reminder",
       ],
       payment_status: ["paid", "due", "overdue"],
+      stable_plan: ["small", "medium", "large", "xlarge"],
       stall_status: ["available", "occupied", "reserved", "maintenance"],
       task_priority: ["low", "medium", "high"],
       user_role: ["stable_owner", "stable_employee", "horse_owner"],

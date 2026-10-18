@@ -81,3 +81,15 @@ export async function updateStable(
   if (error) throw error
   return data
 }
+
+export type SubscriptionPlan =
+  Database['public']['Tables']['subscription_plans']['Row']
+
+export async function listSubscriptionPlans(): Promise<SubscriptionPlan[]> {
+  const { data, error } = await supabase
+    .from('subscription_plans')
+    .select('*')
+    .order('sort_order')
+  if (error) throw error
+  return data
+}
