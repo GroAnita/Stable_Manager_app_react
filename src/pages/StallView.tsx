@@ -12,6 +12,7 @@ import {
 } from '../features/stalls/api'
 import { usePreferences } from '../lib/PreferencesContext'
 import { getCurrentStableId } from '../lib/stableContext'
+import { TurnoutShelterSection } from './stallView/TurnoutShelterSection'
 
 type StallStatus = Stall['status']
 type Filter = 'all' | StallStatus
@@ -354,6 +355,8 @@ export default function StallView() {
           </div>
         )}
       </Modal>
+
+      <TurnoutShelterSection />
     </div>
   )
 }

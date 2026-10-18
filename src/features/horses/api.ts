@@ -58,6 +58,10 @@ export type HorseDetail = Horse & {
     Database['public']['Tables']['paddocks']['Row'],
     'id' | 'name' | 'size' | 'notes'
   > | null
+  turnout_shelter: Pick<
+    Database['public']['Tables']['turnout_shelters']['Row'],
+    'id' | 'name' | 'size' | 'notes'
+  > | null
 }
 
 export type Vaccination = Database['public']['Tables']['vaccinations']['Row']
@@ -161,7 +165,7 @@ export async function listMyHorses(): Promise<HorseDetail[]> {
   const { data, error } = await supabase
     .from('horses')
     .select(
-      '*, owner:owners!horses_owner_id_fkey(id, full_name, phone), stall:stalls(id, stall_number, size, notes), paddock:paddocks(id, name, size, notes)',
+      '*, owner:owners!horses_owner_id_fkey(id, full_name, phone), stall:stalls(id, stall_number, size, notes), paddock:paddocks(id, name, size, notes), turnout_shelter:turnout_shelters(id, name, size, notes)',
     )
     .order('name')
   if (error) throw error
@@ -172,7 +176,7 @@ export async function getHorse(id: string): Promise<HorseDetail> {
   const { data, error } = await supabase
     .from('horses')
     .select(
-      '*, owner:owners!horses_owner_id_fkey(id, full_name, phone), stall:stalls(id, stall_number, size, notes), paddock:paddocks(id, name, size, notes)',
+      '*, owner:owners!horses_owner_id_fkey(id, full_name, phone), stall:stalls(id, stall_number, size, notes), paddock:paddocks(id, name, size, notes), turnout_shelter:turnout_shelters(id, name, size, notes)',
     )
     .eq('id', id)
     .single()

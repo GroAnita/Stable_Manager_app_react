@@ -790,6 +790,7 @@ export type Database = {
           stable_id: string
           stall_id: string | null
           status: string
+          turnout_shelter_id: string | null
           updated_at: string
           vaccination_status: string | null
         }
@@ -822,6 +823,7 @@ export type Database = {
           stable_id: string
           stall_id?: string | null
           status?: string
+          turnout_shelter_id?: string | null
           updated_at?: string
           vaccination_status?: string | null
         }
@@ -854,6 +856,7 @@ export type Database = {
           stable_id?: string
           stall_id?: string | null
           status?: string
+          turnout_shelter_id?: string | null
           updated_at?: string
           vaccination_status?: string | null
         }
@@ -884,6 +887,13 @@ export type Database = {
             columns: ["stall_id"]
             isOneToOne: false
             referencedRelation: "stalls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "horses_turnout_shelter_id_fkey"
+            columns: ["turnout_shelter_id"]
+            isOneToOne: false
+            referencedRelation: "turnout_shelters"
             referencedColumns: ["id"]
           },
         ]
@@ -1707,6 +1717,44 @@ export type Database = {
           },
           {
             foreignKeyName: "tasks_stable_id_fkey"
+            columns: ["stable_id"]
+            isOneToOne: false
+            referencedRelation: "stables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      turnout_shelters: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          notes: string | null
+          size: string | null
+          stable_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          notes?: string | null
+          size?: string | null
+          stable_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          size?: string | null
+          stable_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "turnout_shelters_stable_id_fkey"
             columns: ["stable_id"]
             isOneToOne: false
             referencedRelation: "stables"

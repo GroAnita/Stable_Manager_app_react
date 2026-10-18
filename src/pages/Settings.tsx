@@ -43,7 +43,6 @@ const CURRENCY_OPTIONS: Currency[] = ['EUR', 'NOK', 'SEK', 'GBP']
 type SettingsSection =
   | 'stableInfo'
   | 'subscription'
-  | 'feedingRounds'
   | 'staffAccess'
   | 'billing'
   | 'integrations'
@@ -67,16 +66,6 @@ const SETTINGS_NAV: { groupKey: string; items: SettingsNavItem[] }[] = [
         labelKey: 'settings.navSubscription',
         icon: 'creditCard',
         badgeKey: 'settings.navSubscriptionBadge',
-      },
-    ],
-  },
-  {
-    groupKey: 'settings.navGroupOperations',
-    items: [
-      {
-        key: 'feedingRounds',
-        labelKey: 'settings.navFeedingRounds',
-        icon: 'clock',
       },
     ],
   },
@@ -408,9 +397,6 @@ export default function Settings() {
               canEdit={canEdit}
               onChange={setStable}
             />
-          )}
-          {section === 'feedingRounds' && (
-            <ComingSoonPanel labelKey="settings.navFeedingRounds" />
           )}
           {section === 'billing' && (
             <ComingSoonPanel labelKey="settings.navBilling" />

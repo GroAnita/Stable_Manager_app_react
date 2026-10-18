@@ -78,6 +78,22 @@ export function OverviewTab({
             </p>
           )}
         </div>
+        <div className="rounded-2xl bg-slate-50 p-4">
+          <p className="text-sm text-slate-400">
+            {t('horseDetail.turnoutShelterAssignment')}
+          </p>
+          <p className="mt-1 font-medium text-slate-900">
+            {horse.turnout_shelter?.name ??
+              t('horseDetail.noTurnoutShelterAssigned')}
+            {horse.turnout_shelter?.size && ` · ${horse.turnout_shelter.size}`}
+          </p>
+          {horse.turnout_shelter && (
+            <p className="text-sm text-slate-500">
+              {horse.turnout_shelter.notes ||
+                t('horseDetail.noTurnoutShelterNotes')}
+            </p>
+          )}
+        </div>
       </div>
       <div className="space-y-4">
         <div>

@@ -12,9 +12,11 @@ import {
   listOwnerOptions,
   listPaddockOptions,
   listStallOptions,
+  listTurnoutShelterOptions,
   type OwnerOption,
   type PaddockOption,
   type StallOption,
+  type TurnoutShelterOption,
 } from '../lib/options'
 import { usePreferences } from '../lib/PreferencesContext'
 import { getCurrentStableId } from '../lib/stableContext'
@@ -37,6 +39,7 @@ type FormState = {
   owner_id: string
   stall_id: string
   paddock_id: string
+  turnout_shelter_id: string
   active: boolean
   away: boolean
 }
@@ -59,6 +62,7 @@ const emptyForm: FormState = {
   owner_id: '',
   stall_id: '',
   paddock_id: '',
+  turnout_shelter_id: '',
   active: true,
   away: false,
 }
@@ -73,6 +77,9 @@ export default function HorseForm() {
   const [owners, setOwners] = useState<OwnerOption[]>([])
   const [stalls, setStalls] = useState<StallOption[]>([])
   const [paddocks, setPaddocks] = useState<PaddockOption[]>([])
+  const [turnoutShelters, setTurnoutShelters] = useState<
+    TurnoutShelterOption[]
+  >([])
   const [loading, setLoading] = useState(isEdit)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -86,6 +93,9 @@ export default function HorseForm() {
       .catch((err: Error) => setError(err.message))
     listPaddockOptions()
       .then(setPaddocks)
+      .catch((err: Error) => setError(err.message))
+    listTurnoutShelterOptions()
+      .then(setTurnoutShelters)
       .catch((err: Error) => setError(err.message))
   }, [])
 
@@ -113,6 +123,7 @@ export default function HorseForm() {
           owner_id: horse.owner_id ?? '',
           stall_id: horse.stall_id ?? '',
           paddock_id: horse.paddock_id ?? '',
+          turnout_shelter_id: horse.turnout_shelter_id ?? '',
           active: horse.active,
           away: horse.away,
         })
@@ -154,6 +165,7 @@ export default function HorseForm() {
         owner_id: form.owner_id || null,
         stall_id: form.stall_id || null,
         paddock_id: form.paddock_id || null,
+        turnout_shelter_id: form.turnout_shelter_id || null,
         active: form.active,
         away: form.away,
       }
@@ -307,6 +319,23 @@ export default function HorseForm() {
             {paddocks.map((paddock) => (
               <option key={paddock.id} value={paddock.id}>
                 {paddock.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span className="field-label">{t('horseForm.turnoutShelter')}</span>
+          <select
+            className="field"
+            value={form.turnout_shelter_id}
+            onChange={(e) =>
+              updateField('turnout_shelter_id', e.target.value)
+            }
+          >
+            <option value="">—</option>
+            {turnoutShelters.map((shelter) => (
+              <option key={shelter.id} value={shelter.id}>
+                {shelter.name}
               </option>
             ))}
           </select>
