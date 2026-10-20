@@ -65,6 +65,8 @@ export const en = {
     showPassword: 'Show password',
     hidePassword: 'Hide password',
     pleaseWait: 'Please wait…',
+    orContinueWith: 'Or continue with',
+    continueWithGoogle: 'Continue with Google',
     signIn: 'Sign in',
     signUp: 'Sign up',
     noAccount: "Don't have an account? ",

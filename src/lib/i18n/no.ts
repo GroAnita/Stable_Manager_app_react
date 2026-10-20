@@ -67,6 +67,8 @@ export const no: typeof en = {
     showPassword: 'Vis passord',
     hidePassword: 'Skjul passord',
     pleaseWait: 'Vennligst vent…',
+    orContinueWith: 'Eller fortsett med',
+    continueWithGoogle: 'Fortsett med Google',
     signIn: 'Logg inn',
     signUp: 'Registrer deg',
     noAccount: 'Har du ikke en konto? ',
