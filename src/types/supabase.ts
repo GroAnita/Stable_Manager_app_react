@@ -310,6 +310,47 @@ export type Database = {
           },
         ]
       }
+      expenses: {
+        Row: {
+          amount: number
+          category: string | null
+          created_at: string
+          expense_date: string
+          id: string
+          notes: string | null
+          stable_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          category?: string | null
+          created_at?: string
+          expense_date: string
+          id?: string
+          notes?: string | null
+          stable_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          category?: string | null
+          created_at?: string
+          expense_date?: string
+          id?: string
+          notes?: string | null
+          stable_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_stable_id_fkey"
+            columns: ["stable_id"]
+            isOneToOne: false
+            referencedRelation: "stables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       feeding_plans: {
         Row: {
           created_at: string
