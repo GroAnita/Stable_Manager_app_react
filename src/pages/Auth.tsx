@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import 'flag-icons/css/flag-icons.min.css'
+import logoDark from '../assets/stalldrift-logo-dark.svg'
 import { Icon, type IconName } from '../components/Icon'
 import {
   requestPasswordReset,
@@ -137,9 +138,11 @@ export default function Auth() {
           name="horse"
           className="pointer-events-none absolute -right-10 -bottom-10 h-40 w-40 text-white/10"
         />
-        <p className="relative text-xs font-semibold tracking-[0.25em] text-white/85 uppercase">
-          {t('common.appName')}
-        </p>
+        <img
+          src={logoDark}
+          alt={t('common.appName')}
+          className="relative h-7 w-auto"
+        />
         <h1 className="relative mt-3 max-w-xs text-xl font-semibold text-white">
           {t('auth.marketingHeadline')}
         </h1>
@@ -151,9 +154,7 @@ export default function Auth() {
           className="pointer-events-none absolute -right-16 -bottom-16 h-96 w-96 text-white/10"
         />
         <div className="relative max-w-md">
-          <p className="text-sm font-semibold tracking-[0.25em] text-white/85 uppercase">
-            {t('common.appName')}
-          </p>
+          <img src={logoDark} alt={t('common.appName')} className="h-9 w-auto" />
           <h1 className="mt-4 text-3xl font-semibold text-white">
             {t('auth.marketingHeadline')}
           </h1>

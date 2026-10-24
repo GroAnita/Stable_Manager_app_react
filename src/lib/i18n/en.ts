@@ -1,6 +1,6 @@
 export const en = {
   common: {
-    appName: 'Stable Manager',
+    appName: 'StallDrift',
     save: 'Save',
     saving: 'Saving…',
     cancel: 'Cancel',

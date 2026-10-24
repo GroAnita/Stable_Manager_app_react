@@ -104,6 +104,22 @@
   background: rgba(136, 184, 154, 0.3);
 }
 
+/* Swaps the logo variant with the resolved .dark class, same pattern as
+   the scrollbar overrides above — avoids needing a Tailwind dark: variant
+   since this app's dark mode is a toggled class, not prefers-color-scheme. */
+.logo-for-light {
+  display: block;
+}
+.logo-for-dark {
+  display: none;
+}
+.dark .logo-for-light {
+  display: none;
+}
+.dark .logo-for-dark {
+  display: block;
+}
+
 @layer base {
   * {
     @apply border-slate-200;

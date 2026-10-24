@@ -6,6 +6,8 @@ import {
   useLocation,
   useNavigate,
 } from 'react-router-dom'
+import logoDark from '../assets/stalldrift-logo-dark.svg'
+import logoLight from '../assets/stalldrift-logo-light.svg'
 import { Icon, type IconName } from '../components/Icon'
 import { NotificationBell } from '../components/NotificationBell'
 import { OnboardingChecklist } from '../components/OnboardingChecklist'
@@ -151,9 +153,18 @@ export default function AppLayout() {
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-forest">
-            {t('common.appName')}
+        <div className="flex items-center justify-between lg:justify-center">
+          <h1>
+            <img
+              src={logoLight}
+              alt={t('common.appName')}
+              className="logo-for-light h-11 w-auto"
+            />
+            <img
+              src={logoDark}
+              alt={t('common.appName')}
+              className="logo-for-dark h-11 w-auto"
+            />
           </h1>
           <button
             type="button"
