@@ -31,6 +31,7 @@ export type IconName =
   | 'sun'
   | 'creditCard'
   | 'feedBag'
+  | 'share'
 
 const strokeIcons: Record<IconName, ReactNode> = {
   home: (
@@ -226,6 +227,15 @@ const strokeIcons: Record<IconName, ReactNode> = {
       <path d="M9 3c-1.5 1.5-3 3-3 6v9a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9c0-3-1.5-4.5-3-6" />
       <path d="M9 3h6" />
       <path d="M7 11h10" />
+    </>
+  ),
+  share: (
+    <>
+      <circle cx="18" cy="5" r="3" />
+      <circle cx="6" cy="12" r="3" />
+      <circle cx="18" cy="19" r="3" />
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
     </>
   ),
 }

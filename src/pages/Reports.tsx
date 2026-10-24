@@ -211,6 +211,51 @@ export default function Reports() {
     }
   }
 
+  function buildShareText(): string {
+    const lines: string[] = [`${t('reports.title')} – ${monthLabel}`, '']
+    lines.push(`${t('reports.invoiced')}: ${formatCurrency(invoiced)}`)
+    lines.push(`${t('reports.collected')}: ${formatCurrency(collected)}`)
+    lines.push(`${t('reports.expensesTotal')}: ${formatCurrency(expensesTotal)}`)
+    lines.push(`${t('reports.net')}: ${formatCurrency(net)}`)
+
+    if (hayLines.length > 0) {
+      lines.push('', `${t('reports.hayUsed')}:`)
+      hayLines.forEach((line) =>
+        lines.push(`- ${line.item.item}: ${line.quantity} ${line.item.unit ?? ''}`),
+      )
+    }
+    if (beddingLines.length > 0) {
+      lines.push('', `${t('reports.beddingUsed')}:`)
+      beddingLines.forEach((line) =>
+        lines.push(`- ${line.item.item}: ${line.quantity} ${line.item.unit ?? ''}`),
+      )
+    }
+    if (expenses.length > 0) {
+      lines.push('', `${t('reports.expensesTitle')}:`)
+      expenses.forEach((expense) =>
+        lines.push(
+          `- ${formatDate(expense.expense_date)} – ${categoryLabel(t, expense.category)} – ${formatCurrency(expense.amount)}${expense.notes ? ` (${expense.notes})` : ''}`,
+        ),
+      )
+    }
+
+    return lines.join('\n')
+  }
+
+  async function handleShare() {
+    const title = `${t('reports.title')} – ${monthLabel}`
+    const text = buildShareText()
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, text })
+      } catch {
+        // user cancelled the share sheet — nothing to do
+      }
+    } else {
+      window.location.href = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(text)}`
+    }
+  }
+
   return (
     <div className="page-shell print-area">
       <div className="page-header print:hidden">
@@ -244,10 +289,16 @@ export default function Reports() {
             <Icon name="chevronRight" className="h-4 w-4" />
           </button>
         </div>
-        <button type="button" className="btn-primary" onClick={() => window.print()}>
-          <Icon name="fileText" className="h-4 w-4" />
-          {t('reports.print')}
-        </button>
+        <div className="flex items-center gap-2">
+          <button type="button" className="btn-ghost" onClick={handleShare}>
+            <Icon name="share" className="h-4 w-4" />
+            {t('reports.share')}
+          </button>
+          <button type="button" className="btn-primary" onClick={() => window.print()}>
+            <Icon name="fileText" className="h-4 w-4" />
+            {t('reports.print')}
+          </button>
+        </div>
       </div>
 
       <h2 className="hidden text-xl font-semibold text-slate-900 capitalize print:block">

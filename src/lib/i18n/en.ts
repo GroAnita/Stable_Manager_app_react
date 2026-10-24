@@ -717,6 +717,7 @@ export const en = {
     title: 'Reports',
     subtitle: 'Monthly overview to print for your accountant.',
     print: 'Print',
+    share: 'Share',
     previousMonth: 'Previous month',
     nextMonth: 'Next month',
     hayUsed: 'Hay used',

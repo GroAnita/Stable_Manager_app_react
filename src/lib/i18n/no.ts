@@ -718,6 +718,7 @@ export const no: typeof en = {
     title: 'Rapporter',
     subtitle: 'Månedlig oversikt du kan skrive ut til regnskapsfører.',
     print: 'Skriv ut',
+    share: 'Del',
     previousMonth: 'Forrige måned',
     nextMonth: 'Neste måned',
     hayUsed: 'Høy brukt',
