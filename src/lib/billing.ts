@@ -51,3 +51,53 @@ export function billingCycleDueDate(dateStr: string): string {
 export function daysInBillingCycleFor(dueDateIso: string): number {
   return daysInBillingCycle(new Date(dueDateIso))
 }
+
+export type InvoiceLineItem = { description: string; amount: number }
+
+// Payment notes are generated as newline-separated lines; lines that carry
+// their own "— amount" (hay, bedding) are itemized, and the remaining base
+// line (e.g. "Monthly board fee") absorbs whatever's left of the total so
+// the line items always sum back to the payment amount.
+export function parseInvoiceLineItems(
+  notes: string | null,
+  total: number,
+): InvoiceLineItem[] {
+  const lines = (notes ?? '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+
+  if (lines.length === 0) return [{ description: '', amount: total }]
+
+  const items: InvoiceLineItem[] = []
+  let explicitSum = 0
+  let baseIndex = -1
+
+  lines.forEach((line) => {
+    const match = line.match(/^(.*?)\s+—\s+([\d]+(?:[.,]\d+)?)\s*$/)
+    if (match) {
+      const amount = Number(match[2].replace(',', '.'))
+      items.push({ description: match[1], amount })
+      explicitSum += amount
+    } else {
+      items.push({ description: line, amount: 0 })
+      if (baseIndex === -1) baseIndex = items.length - 1
+    }
+  })
+
+  if (baseIndex !== -1) {
+    items[baseIndex] = {
+      ...items[baseIndex],
+      amount: Math.round((total - explicitSum) * 100) / 100,
+    }
+  }
+
+  return items
+}
+
+// Norwegian bank account numbers are conventionally grouped 4.2.5 digits.
+export function formatBankAccountNumber(value: string): string {
+  const digits = value.replace(/\D/g, '')
+  if (digits.length !== 11) return value
+  return `${digits.slice(0, 4)}.${digits.slice(4, 6)}.${digits.slice(6)}`
+}

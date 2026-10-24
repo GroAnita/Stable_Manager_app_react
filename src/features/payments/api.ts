@@ -63,6 +63,49 @@ export async function markPaymentPaid(id: string): Promise<void> {
   if (error) throw error
 }
 
+export type PaymentDetail = Payment & {
+  owner: Pick<
+    Database['public']['Tables']['owners']['Row'],
+    'id' | 'full_name' | 'address' | 'postal_code' | 'city' | 'phone' | 'email'
+  > | null
+  contract: {
+    id: string
+    horse: Pick<Database['public']['Tables']['horses']['Row'], 'id' | 'name'> | null
+  } | null
+  stable: Pick<
+    Database['public']['Tables']['stables']['Row'],
+    | 'name'
+    | 'logo_url'
+    | 'org_number'
+    | 'vat_registered'
+    | 'business_register_registered'
+    | 'address'
+    | 'postal_code'
+    | 'city'
+    | 'phone'
+    | 'email'
+    | 'bank_account_number'
+    | 'payment_terms_days'
+    | 'invoice_footer_text'
+  > | null
+}
+
+export async function getPaymentDetail(id: string): Promise<PaymentDetail> {
+  const { data, error } = await supabase
+    .from('payments')
+    .select(
+      `*,
+       owner:owners(id, full_name, address, postal_code, city, phone, email),
+       contract:contracts(id, horse:horses(id, name)),
+       stable:stables(name, logo_url, org_number, vat_registered, business_register_registered,
+         address, postal_code, city, phone, email, bank_account_number, payment_terms_days, invoice_footer_text)`,
+    )
+    .eq('id', id)
+    .single()
+  if (error) throw error
+  return data
+}
+
 export async function getPayment(id: string): Promise<Payment | null> {
   const { data, error } = await supabase
     .from('payments')

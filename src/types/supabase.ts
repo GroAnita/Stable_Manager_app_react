@@ -1493,45 +1493,63 @@ export type Database = {
       stables: {
         Row: {
           address: string | null
+          bank_account_number: string | null
+          business_register_registered: boolean
           city: string | null
           created_at: string
           email: string | null
           id: string
+          invoice_footer_text: string | null
           logo_url: string | null
           name: string
+          org_number: string | null
           owner_user_id: string
+          payment_terms_days: number
           phone: string | null
           plan: Database["public"]["Enums"]["stable_plan"]
           postal_code: string | null
           updated_at: string
+          vat_registered: boolean
         }
         Insert: {
           address?: string | null
+          bank_account_number?: string | null
+          business_register_registered?: boolean
           city?: string | null
           created_at?: string
           email?: string | null
           id?: string
+          invoice_footer_text?: string | null
           logo_url?: string | null
           name: string
+          org_number?: string | null
           owner_user_id: string
+          payment_terms_days?: number
           phone?: string | null
           plan?: Database["public"]["Enums"]["stable_plan"]
           postal_code?: string | null
           updated_at?: string
+          vat_registered?: boolean
         }
         Update: {
           address?: string | null
+          bank_account_number?: string | null
+          business_register_registered?: boolean
           city?: string | null
           created_at?: string
           email?: string | null
           id?: string
+          invoice_footer_text?: string | null
           logo_url?: string | null
           name?: string
+          org_number?: string | null
           owner_user_id?: string
+          payment_terms_days?: number
           phone?: string | null
           plan?: Database["public"]["Enums"]["stable_plan"]
           postal_code?: string | null
           updated_at?: string
+          vat_registered?: boolean
         }
         Relationships: []
       }
@@ -2093,17 +2111,23 @@ export type Database = {
         }
         Returns: {
           address: string | null
+          bank_account_number: string | null
+          business_register_registered: boolean
           city: string | null
           created_at: string
           email: string | null
           id: string
+          invoice_footer_text: string | null
           logo_url: string | null
           name: string
+          org_number: string | null
           owner_user_id: string
+          payment_terms_days: number
           phone: string | null
           plan: Database["public"]["Enums"]["stable_plan"]
           postal_code: string | null
           updated_at: string
+          vat_registered: boolean
         }
         SetofOptions: {
           from: "*"

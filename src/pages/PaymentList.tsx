@@ -3,6 +3,7 @@ import { Badge } from '../components/Badge'
 import { Card } from '../components/Card'
 import { EmptyState } from '../components/EmptyState'
 import { Icon } from '../components/Icon'
+import { InvoiceView } from '../components/InvoiceView'
 import { Modal } from '../components/Modal'
 import {
   getPaymentSummary,
@@ -24,6 +25,9 @@ export default function PaymentList() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [selected, setSelected] = useState<PaymentListItem | null>(null)
+  const [invoicePaymentId, setInvoicePaymentId] = useState<string | null>(
+    null,
+  )
   const [markingPaid, setMarkingPaid] = useState<string | null>(null)
 
   useEffect(() => {
@@ -270,9 +274,28 @@ export default function PaymentList() {
                 </ul>
               </div>
             )}
+            <div className="border-t border-slate-100 pt-3">
+              <button
+                type="button"
+                className="btn-ghost"
+                onClick={() => {
+                  const id = selected.id
+                  setSelected(null)
+                  setInvoicePaymentId(id)
+                }}
+              >
+                <Icon name="fileText" className="h-4 w-4" />
+                {t('paymentList.viewInvoice')}
+              </button>
+            </div>
           </div>
         )}
       </Modal>
+
+      <InvoiceView
+        paymentId={invoicePaymentId}
+        onClose={() => setInvoicePaymentId(null)}
+      />
     </div>
   )
 }

@@ -16,6 +16,7 @@ import {
   type Language,
   type Theme,
 } from '../lib/PreferencesContext'
+import { BillingPanel } from './settings/BillingPanel'
 import { StaffAccessPanel } from './settings/StaffAccessPanel'
 import { SubscriptionPanel } from './settings/SubscriptionPanel'
 
@@ -417,8 +418,8 @@ export default function Settings() {
               onChange={setStable}
             />
           )}
-          {section === 'billing' && (
-            <ComingSoonPanel labelKey="settings.navBilling" />
+          {section === 'billing' && stable && (
+            <BillingPanel stable={stable} canEdit={canEdit} onChange={setStable} />
           )}
           {section === 'integrations' && (
             <ComingSoonPanel labelKey="settings.navIntegrations" />
