@@ -8,6 +8,7 @@ import {
 } from 'react-router-dom'
 import { Icon, type IconName } from '../components/Icon'
 import { NotificationBell } from '../components/NotificationBell'
+import { OnboardingChecklist } from '../components/OnboardingChecklist'
 import { signOut } from '../lib/authService'
 import { useAuth } from '../lib/AuthContext'
 import { usePreferences } from '../lib/PreferencesContext'
@@ -294,6 +295,9 @@ export default function AppLayout() {
           </Suspense>
         </main>
       </div>
+      {profile?.role === 'stable_owner' && profile.stable_id && (
+        <OnboardingChecklist stableId={profile.stable_id} />
+      )}
     </div>
   )
 }

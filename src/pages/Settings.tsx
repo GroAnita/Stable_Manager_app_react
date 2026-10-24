@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Icon, type IconName } from '../components/Icon'
 import {
   getMyProfile,
@@ -48,6 +49,20 @@ type SettingsSection =
   | 'integrations'
   | 'account'
   | 'languageAppearance'
+
+const SETTINGS_SECTIONS: SettingsSection[] = [
+  'stableInfo',
+  'subscription',
+  'staffAccess',
+  'billing',
+  'integrations',
+  'account',
+  'languageAppearance',
+]
+
+function isSettingsSection(value: string | null): value is SettingsSection {
+  return SETTINGS_SECTIONS.includes(value as SettingsSection)
+}
 
 type SettingsNavItem = {
   key: SettingsSection
@@ -120,7 +135,11 @@ export default function Settings() {
   const { session } = useAuth()
   const { t, language, setLanguage, currency, setCurrency, theme, setTheme } =
     usePreferences()
-  const [section, setSection] = useState<SettingsSection>('stableInfo')
+  const [searchParams] = useSearchParams()
+  const sectionParam = searchParams.get('section')
+  const [section, setSection] = useState<SettingsSection>(
+    isSettingsSection(sectionParam) ? sectionParam : 'stableInfo',
+  )
   const [profile, setProfile] = useState<Profile | null>(null)
   const [stable, setStable] = useState<Stable | null>(null)
   const [form, setForm] = useState<FormState | null>(null)
