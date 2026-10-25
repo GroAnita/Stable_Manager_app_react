@@ -153,9 +153,11 @@ export default function Auth() {
           name="horse"
           className="pointer-events-none absolute -right-16 -bottom-16 h-96 w-96 text-white/10"
         />
-        <div className="relative max-w-md">
-          <img src={logoDark} alt={t('common.appName')} className="h-9 w-auto" />
-          <h1 className="mt-4 text-3xl font-semibold text-white">
+        <div className="relative flex w-full justify-center">
+          <img src={logoDark} alt={t('common.appName')} className="h-32 w-auto" />
+        </div>
+        <div className="relative mt-10 max-w-md">
+          <h1 className="text-3xl font-semibold text-white">
             {t('auth.marketingHeadline')}
           </h1>
           <p className="mt-4 text-base text-white/80">
