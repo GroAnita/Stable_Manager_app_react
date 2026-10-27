@@ -740,6 +740,72 @@ export const no: typeof en = {
     loading: 'Laster rapport…',
     failedToLoad: 'Kunne ikke laste rapport: {error}',
   },
+  fireSafety: {
+    title: 'Brannsikkerhet',
+    subtitle:
+      'Norske krav, en sjekkliste for kontroller, og praktiske råd for stallen.',
+    emergencyLabel: 'Ved brann',
+    emergencyCallout: 'Ring brannvesenet med en gang — ikke vent.',
+    requirementsTitle: 'Krav til hestestaller i Norge',
+    requirementsSubtitle: 'Fra forskrift om velferd for hest, § 12 Brannsikring.',
+    horseCountAbove:
+      'Stallen din har {count} hester — flere enn 10, så dere er pålagt å ha brannvarslingsanlegg.',
+    horseCountBelow:
+      'Stallen din har {count} hester. Kravet om brannvarslingsanlegg gjelder når stallen har flere enn 10 hester.',
+    requirementPrevention:
+      'Bygningens konstruksjon, bruk av materialer, samt ettersyn og vedlikehold skal sikre at brannfaren blir minst mulig.',
+    requirementEvacuation:
+      'Hestene skal lett kunne slippes ut ved brann eller andre nødssituasjoner — ganger og dører skal være utformet slik at hestene raskt kan evakueres.',
+    requirementVentilation:
+      'Ventilasjonsanlegg skal være konstruert slik at det ikke sprer brann- eller røykgasser fra andre rom inn i dyrerommene.',
+    requirementExtinguisher:
+      'Alle bygninger med hester skal ha brannslange koblet til vannanlegget, eller et tilstrekkelig antall håndslukkeapparater — uansett antall hester.',
+    requirementAlarm:
+      'Driftsbygninger med flere enn 10 hester skal ha et tilfredsstillende system for varsling av brann.',
+    requirementExits:
+      'Stallrom med flere enn 10 hester skal ha minst 2 utganger som hesten lett kan passere, og som fører ut i friluft (Mattilsynet kan dispensere fra dette hvis stallen har et tilfredsstillende brannvarslingsanlegg).',
+    requirementElectrical:
+      'Det elektriske anlegget skal ha faglig kontroll minst hvert tredje år.',
+    requirementDrill: 'Det skal gjennomføres jevnlige brannøvelser.',
+    sourceNote:
+      'Oppsummert fra forskrift om velferd for hest § 12 og Mattilsynets veiledning. Regelverket kan endres — sjekk alltid gjeldende krav hos Mattilsynet før du legger dette til grunn.',
+    checklistTitle: 'Sjekkliste',
+    checklistSubtitle:
+      'Hold oversikt over når disse sist ble sjekket, så ingenting blir glemt.',
+    check: {
+      extinguisher: 'Slukkeutstyr / brannslange',
+      fire_alarm: 'Brannvarslingsanlegg',
+      electrical: 'Elektrisk anlegg',
+      escape_routes: 'Rømningsveier / utganger',
+      fire_drill: 'Brannøvelse',
+    },
+    lastChecked: 'Sist sjekket {date} — neste anbefalte {next}',
+    neverChecked: 'Ikke sjekket ennå',
+    markChecked: 'Merk som sjekket i dag',
+    status: {
+      ok: 'OK',
+      dueSoon: 'Snart tid',
+      overdue: 'Forfalt',
+      never: 'Ikke sjekket',
+    },
+    tipsTitle: 'Tips og råd',
+    tipElectrical:
+      'Omtrent halvparten av alle branner i landbruket starter i det elektriske anlegget. La en elektriker kontrollere anlegget jevnlig, hold sikringsskapet lukket og rent, og vurder overspenningsvern.',
+    tipEquipment:
+      'La aldri utstyr stå på lading uten tilsyn, og tildekk aldri motorer, lamper, ovner eller annet elektrisk utstyr.',
+    tipHousekeeping:
+      'Hold stallgangen og stallrommene ryddige og feide — høy og flis er svært lett antennelig. Oppbevar ikke mer fôr eller strø i stallen enn nødvendig.',
+    tipHalters:
+      'Ha grimer og tau lett tilgjengelig, for eksempel på hver boksdør, slik at hestene raskt kan ledes ut.',
+    tipInform:
+      'Sørg for at oppstallere og ansatte kjenner rutinene ved brann, rømningsveier og oppmøtested.',
+    tipPlan:
+      'Lag en evakueringsplan, heng den opp synlig i stallen, og gå gjennom den jevnlig — gjerne sammen med lokalt brannvesen.',
+    tipEvacuation:
+      'Ikke slipp evakuerte hester løs utenfor — mange vil løpe tilbake inn i en brennende stall. Før dem til en luftegård eller hold dem i tau.',
+    tipTestAlarm: 'Test brannvarslingsanlegget jevnlig, ikke bare ved installasjon.',
+    tipCallEarly: 'Ring 110 med en gang ved brann — ikke vent for å se hvor ille det blir.',
+  },
   stallView: {
     title: 'Bokser',
     subtitle: 'Stalloppsett og belegg.',
@@ -900,6 +966,7 @@ export const no: typeof en = {
     navGroupFinance: 'Økonomi',
     navGroupMe: 'Meg',
     navStableInfo: 'Stallinformasjon',
+    navFireSafety: 'Brannsikkerhet',
     navSubscription: 'Abonnement',
     navSubscriptionBadge: 'Prøve',
     subscriptionSubtitle: 'Prøveperioden og hvilken plan stallen er på',

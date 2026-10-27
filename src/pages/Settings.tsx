@@ -17,6 +17,7 @@ import {
   type Theme,
 } from '../lib/PreferencesContext'
 import { BillingPanel } from './settings/BillingPanel'
+import { FireSafetyPanel } from './settings/FireSafetyPanel'
 import { StaffAccessPanel } from './settings/StaffAccessPanel'
 import { SubscriptionPanel } from './settings/SubscriptionPanel'
 
@@ -44,6 +45,7 @@ const CURRENCY_OPTIONS: Currency[] = ['EUR', 'NOK', 'SEK', 'GBP']
 
 type SettingsSection =
   | 'stableInfo'
+  | 'fireSafety'
   | 'subscription'
   | 'staffAccess'
   | 'billing'
@@ -53,6 +55,7 @@ type SettingsSection =
 
 const SETTINGS_SECTIONS: SettingsSection[] = [
   'stableInfo',
+  'fireSafety',
   'subscription',
   'staffAccess',
   'billing',
@@ -77,6 +80,11 @@ const SETTINGS_NAV: { groupKey: string; items: SettingsNavItem[] }[] = [
     groupKey: 'settings.navGroupStable',
     items: [
       { key: 'stableInfo', labelKey: 'settings.navStableInfo', icon: 'home' },
+      {
+        key: 'fireSafety',
+        labelKey: 'settings.navFireSafety',
+        icon: 'flame',
+      },
       {
         key: 'subscription',
         labelKey: 'settings.navSubscription',
@@ -411,6 +419,9 @@ export default function Settings() {
               </div>
             ))}
 
+          {section === 'fireSafety' && stable && (
+            <FireSafetyPanel stable={stable} canEdit={canEdit} />
+          )}
           {section === 'subscription' && stable && (
             <SubscriptionPanel
               stable={stable}

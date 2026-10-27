@@ -740,6 +740,75 @@ export const en = {
     loading: 'Loading report…',
     failedToLoad: 'Failed to load report: {error}',
   },
+  fireSafety: {
+    title: 'Fire safety',
+    subtitle:
+      'Norwegian requirements, a check-up checklist, and practical advice for the stable.',
+    emergencyLabel: 'In case of fire',
+    emergencyCallout: 'Call the fire department immediately — do not wait.',
+    requirementsTitle: 'Requirements for horse stables in Norway',
+    requirementsSubtitle:
+      'From the Animal Welfare Regulation for Horses, § 12 Fire safety (Forskrift om velferd for hest).',
+    horseCountAbove:
+      'Your stable has {count} horses — more than 10, so a fire warning system is required by law.',
+    horseCountBelow:
+      'Your stable has {count} horses. The legal requirement for a fire warning system applies once a stable holds more than 10 horses.',
+    requirementPrevention:
+      'The building’s construction, materials, and maintenance shall keep fire risk as low as possible.',
+    requirementEvacuation:
+      'Horses must be able to be let out quickly in a fire or other emergency — passages and doors must allow fast evacuation.',
+    requirementVentilation:
+      'Ventilation systems must not spread fire or smoke gases from other rooms into the horse areas.',
+    requirementExtinguisher:
+      'Every building with horses must have a fire hose connected to the water supply, or enough hand-held extinguishers — regardless of horse count.',
+    requirementAlarm:
+      'Stables with more than 10 horses must have a satisfactory fire warning system.',
+    requirementExits:
+      'Stable rooms with more than 10 horses must have at least 2 exits horses can easily pass through, leading outdoors (Mattilsynet can grant dispensation from this if the stable has a satisfactory fire warning system).',
+    requirementElectrical:
+      'The electrical installation must be professionally inspected at least every 3 years.',
+    requirementDrill: 'Regular fire drills must be carried out.',
+    sourceNote:
+      'Summarized from Forskrift om velferd for hest § 12 and Mattilsynet’s guidance. Regulations can change — always confirm current requirements with Mattilsynet before relying on this for compliance.',
+    checklistTitle: 'Checklist',
+    checklistSubtitle:
+      'Keep track of when these were last checked, so nothing gets forgotten.',
+    check: {
+      extinguisher: 'Fire extinguishers / fire hose',
+      fire_alarm: 'Fire alarm system',
+      electrical: 'Electrical installation',
+      escape_routes: 'Escape routes / exits',
+      fire_drill: 'Fire drill',
+    },
+    lastChecked: 'Last checked {date} — next recommended {next}',
+    neverChecked: 'Not checked yet',
+    markChecked: 'Mark as checked today',
+    status: {
+      ok: 'OK',
+      dueSoon: 'Due soon',
+      overdue: 'Overdue',
+      never: 'Not checked',
+    },
+    tipsTitle: 'Tips and advice',
+    tipElectrical:
+      'About half of all farm fires start in the electrical system. Have an electrician inspect it regularly, keep the fuse box closed and clean, and consider surge protection.',
+    tipEquipment:
+      'Never leave charging equipment unattended, and never cover motors, lamps, heaters or other electrical equipment.',
+    tipHousekeeping:
+      'Keep the aisle and stable rooms tidy and swept — hay and shavings are highly flammable. Don’t store more feed or bedding in the stable than necessary.',
+    tipHalters:
+      'Keep halters and lead ropes within easy reach, for example on each stall door, so horses can be led out quickly.',
+    tipInform:
+      'Make sure boarders and staff know the routines for fire, evacuation, and where to meet outside.',
+    tipPlan:
+      'Write an evacuation plan, keep it visible in the stable, and review it regularly — ideally with your local fire department.',
+    tipEvacuation:
+      'Don’t release evacuated horses loose outside — many will run back into a burning stable. Lead them to a paddock or hold them.',
+    tipTestAlarm:
+      'Test the fire alarm system regularly, not just when it’s installed.',
+    tipCallEarly:
+      'Call 110 immediately if there’s a fire — don’t wait to see how bad it gets.',
+  },
   stallView: {
     title: 'Stalls',
     subtitle: 'Stable layout and occupancy.',
@@ -901,6 +970,7 @@ export const en = {
     navGroupFinance: 'Finance',
     navGroupMe: 'Me',
     navStableInfo: 'Stable information',
+    navFireSafety: 'Fire safety',
     navSubscription: 'Subscription',
     navSubscriptionBadge: 'Trial',
     subscriptionSubtitle: 'The trial period and the plan the stable is on',

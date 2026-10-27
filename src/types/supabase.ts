@@ -768,6 +768,44 @@ export type Database = {
           },
         ]
       }
+      fire_safety_checks: {
+        Row: {
+          check_type: string
+          created_at: string
+          id: string
+          last_checked_date: string
+          notes: string | null
+          stable_id: string
+          updated_at: string
+        }
+        Insert: {
+          check_type: string
+          created_at?: string
+          id?: string
+          last_checked_date: string
+          notes?: string | null
+          stable_id: string
+          updated_at?: string
+        }
+        Update: {
+          check_type?: string
+          created_at?: string
+          id?: string
+          last_checked_date?: string
+          notes?: string | null
+          stable_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fire_safety_checks_stable_id_fkey"
+            columns: ["stable_id"]
+            isOneToOne: false
+            referencedRelation: "stables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       horse_additional_owners: {
         Row: {
           created_at: string
