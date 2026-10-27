@@ -19,6 +19,16 @@ export function monthRange(
   return { from: toIsoDate(from), to: toIsoDate(to), days: to.getDate() }
 }
 
+export function categoryLabel(
+  t: (key: string) => string,
+  value: string | null,
+): string {
+  if (!value) return '—'
+  const key = `category.${value.toLowerCase()}`
+  const translated = t(key)
+  return translated === key ? value : translated
+}
+
 export type UsageLine = { item: PriceListItem; quantity: number }
 
 // Estimated from current active contracts' allocations, same approximation
@@ -35,8 +45,7 @@ export function usageByCategory(
     .map((item) => ({
       item,
       quantity:
-        Math.round(contractDailyRate(item.id, allocations) * days * 100) /
-        100,
+        Math.round(contractDailyRate(item.id, allocations) * days * 100) / 100,
     }))
     .filter((line) => line.quantity > 0)
 }

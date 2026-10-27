@@ -300,6 +300,13 @@ export const no: typeof en = {
     nothingDueOrOverdue: 'Ingenting forfaller eller er forfalt.',
     viewAllPayments: 'Se alle betalinger',
     due: 'forfaller',
+    billsToPay: 'Fakturaer å betale',
+    next30Days: 'Neste 30 dager',
+    nothingBillsDue: 'Ingen fakturaer forfaller snart.',
+    viewAllBills: 'Se alle utgifter',
+    billDueToday: 'Forfaller i dag',
+    billDueTomorrow: 'Forfaller i morgen',
+    billDueInDays: 'Forfaller om {count} dager',
     recentActivity: 'Nylig aktivitet',
     noRecentActivity: 'Ingen nylig aktivitet.',
     loading: 'Laster oversikt…',
@@ -747,7 +754,8 @@ export const no: typeof en = {
     expensesTotal: 'Utgifter',
     net: 'Netto',
     noUsageData: 'Ingen aktive kontrakter bruker dette.',
-    estimateNote: 'Anslått ut fra gjeldende kontrakter, ikke en historisk logg.',
+    estimateNote:
+      'Anslått ut fra gjeldende kontrakter, ikke en historisk logg.',
     expensesTitle: 'Utgifter',
     addExpense: 'Legg til utgift',
     expenseCategory: 'Kategori',
@@ -771,7 +779,8 @@ export const no: typeof en = {
     emergencyLabel: 'Ved brann',
     emergencyCallout: 'Ring brannvesenet med en gang — ikke vent.',
     requirementsTitle: 'Krav til hestestaller i Norge',
-    requirementsSubtitle: 'Fra forskrift om velferd for hest, § 12 Brannsikring.',
+    requirementsSubtitle:
+      'Fra forskrift om velferd for hest, § 12 Brannsikring.',
     horseCountAbove:
       'Stallen din har {count} hester — flere enn 10, så dere er pålagt å ha brannvarslingsanlegg.',
     horseCountBelow:
@@ -827,8 +836,10 @@ export const no: typeof en = {
       'Lag en evakueringsplan, heng den opp synlig i stallen, og gå gjennom den jevnlig — gjerne sammen med lokalt brannvesen.',
     tipEvacuation:
       'Ikke slipp evakuerte hester løs utenfor — mange vil løpe tilbake inn i en brennende stall. Før dem til en luftegård eller hold dem i tau.',
-    tipTestAlarm: 'Test brannvarslingsanlegget jevnlig, ikke bare ved installasjon.',
-    tipCallEarly: 'Ring 110 med en gang ved brann — ikke vent for å se hvor ille det blir.',
+    tipTestAlarm:
+      'Test brannvarslingsanlegget jevnlig, ikke bare ved installasjon.',
+    tipCallEarly:
+      'Ring 110 med en gang ved brann — ikke vent for å se hvor ille det blir.',
   },
   stallView: {
     title: 'Bokser',
@@ -999,8 +1010,10 @@ export const no: typeof en = {
     subscriptionSubtitle: 'Prøveperioden og hvilken plan stallen er på',
     trialLastsUntil: 'Prøveperioden varer til',
     trialEnded: 'Prøveperioden tok slutt',
-    trialHint: 'Alle funksjoner er inkludert. Velg en plan før perioden er over.',
-    trialEndedHint: 'Prøveperioden din er over. Velg en plan for å fortsette å bruke StallDrift.',
+    trialHint:
+      'Alle funksjoner er inkludert. Velg en plan før perioden er over.',
+    trialEndedHint:
+      'Prøveperioden din er over. Velg en plan for å fortsette å bruke StallDrift.',
     planLabel: 'Plan',
     planRangeUpTo: 'Opptil {max} hester',
     planRangeBetween: '{min}–{max} hester',
@@ -1016,7 +1029,8 @@ export const no: typeof en = {
     billingSenderSubtitle: 'Dette vises som avsender på hver faktura.',
     billingSearch: 'Søk etter firma eller org.nr',
     billingSearchPlaceholder: 'Firmanavn eller 9-sifret org.nr',
-    billingSearchHint: 'Skriv minst tre bokstaver av navnet, eller et nisifret org.nr.',
+    billingSearchHint:
+      'Skriv minst tre bokstaver av navnet, eller et nisifret org.nr.',
     billingCompanyName: 'Firmanavn',
     billingOrgNumber: 'Organisasjonsnummer',
     billingDigitsHint: '{count} sifre.',
@@ -1055,6 +1069,7 @@ export const no: typeof en = {
     noEventsRange: 'Ingen hendelser i denne perioden.',
     noEventsDay: 'Ingen hendelser denne dagen.',
     stableEventFallback: 'Stallhendelse',
+    billLabel: 'Faktura forfaller',
     addModalTitle: 'Legg til kalenderhendelse',
     eventTitle: 'Tittel',
     eventType: 'Type',

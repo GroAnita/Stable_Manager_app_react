@@ -18,7 +18,10 @@ import {
   type UpcomingPayment,
   type UpcomingVisit,
 } from '../features/dashboard/api'
+import { listUpcomingBills, type Expense } from '../features/expenses/api'
+import { BILL_REMINDER_WINDOW_DAYS, daysUntilDue } from '../lib/bills'
 import { usePreferences } from '../lib/PreferencesContext'
+import { categoryLabel } from '../lib/reports'
 
 type DashboardData = {
   stats: DashboardStats
@@ -26,6 +29,7 @@ type DashboardData = {
   payments: (UpcomingPayment | OverduePayment)[]
   visits: UpcomingVisit[]
   activity: RecentActivityItem[]
+  bills: Expense[]
 }
 
 export default function Dashboard() {
@@ -41,10 +45,11 @@ export default function Dashboard() {
       listPaymentsNeedingAttention(),
       listUpcomingVisits(),
       listRecentActivity(),
+      listUpcomingBills(),
     ])
-      .then(([stats, todayTasks, payments, visits, activity]) => {
+      .then(([stats, todayTasks, payments, visits, activity, bills]) => {
         if (cancelled) return
-        setData({ stats, todayTasks, payments, visits, activity })
+        setData({ stats, todayTasks, payments, visits, activity, bills })
       })
       .catch((err: Error) => {
         if (!cancelled) setError(err.message)
@@ -58,7 +63,7 @@ export default function Dashboard() {
   if (!data)
     return <p className="text-sm text-slate-500">{t('dashboard.loading')}</p>
 
-  const { stats, todayTasks, payments, visits, activity } = data
+  const { stats, todayTasks, payments, visits, activity, bills } = data
 
   const statCards: {
     label: string
@@ -257,6 +262,60 @@ export default function Dashboard() {
             className="mt-4 inline-block text-sm font-medium text-forest hover:underline"
           >
             {t('dashboard.viewAllPayments')}
+          </Link>
+        </div>
+
+        <div className="panel p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="section-title">{t('dashboard.billsToPay')}</h2>
+            <span className="text-sm text-slate-400">
+              {t('dashboard.next30Days')}
+            </span>
+          </div>
+          {bills.length === 0 ? (
+            <p className="text-sm text-slate-500">
+              {t('dashboard.nothingBillsDue')}
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {bills.map((bill) => {
+                const days = daysUntilDue(bill.expense_date)
+                const dueLabel =
+                  days <= 0
+                    ? t('dashboard.billDueToday')
+                    : days === 1
+                      ? t('dashboard.billDueTomorrow')
+                      : t('dashboard.billDueInDays', { count: days })
+                return (
+                  <div
+                    key={bill.id}
+                    className="flex items-start justify-between gap-3 rounded-2xl bg-slate-50 px-4 py-3"
+                  >
+                    <div>
+                      <p className="font-medium text-slate-800">
+                        {categoryLabel(t, bill.category)}
+                      </p>
+                      <p className="mt-1 text-sm text-slate-500">
+                        {formatCurrency(bill.amount)}
+                        {bill.notes ? ` · ${bill.notes}` : ''}
+                      </p>
+                    </div>
+                    <Badge
+                      status={
+                        days <= BILL_REMINDER_WINDOW_DAYS ? 'high' : 'due soon'
+                      }
+                      label={dueLabel}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+          )}
+          <Link
+            to="/reports"
+            className="mt-4 inline-block text-sm font-medium text-forest hover:underline"
+          >
+            {t('dashboard.viewAllBills')}
           </Link>
         </div>
 

@@ -19,7 +19,7 @@ import {
 } from '../features/priceList/api'
 import { useAuth } from '../lib/AuthContext'
 import { usePreferences } from '../lib/PreferencesContext'
-import { monthRange, usageByCategory } from '../lib/reports'
+import { categoryLabel, monthRange, usageByCategory } from '../lib/reports'
 
 const EXPENSE_CATEGORIES = [
   'Feed',
@@ -30,16 +30,6 @@ const EXPENSE_CATEGORIES = [
   'Insurance',
   'Other',
 ]
-
-function categoryLabel(
-  t: (key: string) => string,
-  value: string | null,
-): string {
-  if (!value) return '—'
-  const key = `category.${value.toLowerCase()}`
-  const translated = t(key)
-  return translated === key ? value : translated
-}
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10)
@@ -215,19 +205,25 @@ export default function Reports() {
     const lines: string[] = [`${t('reports.title')} – ${monthLabel}`, '']
     lines.push(`${t('reports.invoiced')}: ${formatCurrency(invoiced)}`)
     lines.push(`${t('reports.collected')}: ${formatCurrency(collected)}`)
-    lines.push(`${t('reports.expensesTotal')}: ${formatCurrency(expensesTotal)}`)
+    lines.push(
+      `${t('reports.expensesTotal')}: ${formatCurrency(expensesTotal)}`,
+    )
     lines.push(`${t('reports.net')}: ${formatCurrency(net)}`)
 
     if (hayLines.length > 0) {
       lines.push('', `${t('reports.hayUsed')}:`)
       hayLines.forEach((line) =>
-        lines.push(`- ${line.item.item}: ${line.quantity} ${line.item.unit ?? ''}`),
+        lines.push(
+          `- ${line.item.item}: ${line.quantity} ${line.item.unit ?? ''}`,
+        ),
       )
     }
     if (beddingLines.length > 0) {
       lines.push('', `${t('reports.beddingUsed')}:`)
       beddingLines.forEach((line) =>
-        lines.push(`- ${line.item.item}: ${line.quantity} ${line.item.unit ?? ''}`),
+        lines.push(
+          `- ${line.item.item}: ${line.quantity} ${line.item.unit ?? ''}`,
+        ),
       )
     }
     if (expenses.length > 0) {
@@ -294,7 +290,11 @@ export default function Reports() {
             <Icon name="share" className="h-4 w-4" />
             {t('reports.share')}
           </button>
-          <button type="button" className="btn-primary" onClick={() => window.print()}>
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={() => window.print()}
+          >
             <Icon name="fileText" className="h-4 w-4" />
             {t('reports.print')}
           </button>
@@ -380,7 +380,9 @@ export default function Reports() {
             </div>
           </div>
           {(hayLines.length > 0 || beddingLines.length > 0) && (
-            <p className="text-xs text-slate-400">{t('reports.estimateNote')}</p>
+            <p className="text-xs text-slate-400">
+              {t('reports.estimateNote')}
+            </p>
           )}
 
           <div className="panel p-5">
@@ -407,7 +409,9 @@ export default function Reports() {
                       <th>{t('reports.expenseDate')}</th>
                       <th>{t('reports.expenseCategory')}</th>
                       <th>{t('reports.expenseNotes')}</th>
-                      <th className="text-right">{t('reports.expenseAmount')}</th>
+                      <th className="text-right">
+                        {t('reports.expenseAmount')}
+                      </th>
                       <th className="print:hidden"></th>
                     </tr>
                   </thead>

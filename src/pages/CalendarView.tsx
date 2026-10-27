@@ -8,6 +8,7 @@ import {
   reassignShift,
   type FeedingShift,
 } from '../features/feedingRota/api'
+import { listUpcomingBills, type Expense } from '../features/expenses/api'
 import {
   createHorseEvent,
   deleteHorseEvent,
@@ -24,10 +25,12 @@ import {
   type OwnerOption,
 } from '../lib/options'
 import { usePreferences } from '../lib/PreferencesContext'
+import { categoryLabel } from '../lib/reports'
 import { getCurrentStableId } from '../lib/stableContext'
 import type { Database } from '../types/supabase'
 
 const FEEDING_SHIFT_COLOR = '#0284C7'
+const BILL_COLOR = '#A16207'
 
 function feedingShiftMoment(shift: FeedingShift): Date {
   const time = shift.shift_type?.time_of_day?.slice(0, 5) ?? '00:00'
@@ -209,10 +212,11 @@ function EventFields({
 }
 
 export default function CalendarView() {
-  const { t, formatDate, formatTime } = usePreferences()
+  const { t, formatCurrency, formatDate, formatTime } = usePreferences()
   const { profile } = useAuth()
   const canManage = profile?.role !== 'horse_owner'
   const [events, setEvents] = useState<CalendarEvent[]>([])
+  const [bills, setBills] = useState<Expense[]>([])
   const [horses, setHorses] = useState<HorseOption[]>([])
   const [owners, setOwners] = useState<OwnerOption[]>([])
   const [feedingShifts, setFeedingShifts] = useState<FeedingShift[]>([])
@@ -247,16 +251,27 @@ export default function CalendarView() {
       listAllPublishedShifts(),
       canManage ? listOwnerOptions() : Promise.resolve([]),
       canManage ? Promise.resolve(null) : getMyOwnerRecord(),
+      canManage ? listUpcomingBills(60) : Promise.resolve([]),
     ])
-      .then(([eventsData, horsesData, shiftsData, ownerOpts, myOwner]) => {
-        if (!cancelled) {
-          setEvents(eventsData)
-          setHorses(horsesData)
-          setFeedingShifts(shiftsData)
-          setOwners(ownerOpts)
-          setMyOwnerId(myOwner?.id ?? null)
-        }
-      })
+      .then(
+        ([
+          eventsData,
+          horsesData,
+          shiftsData,
+          ownerOpts,
+          myOwner,
+          billsData,
+        ]) => {
+          if (!cancelled) {
+            setEvents(eventsData)
+            setHorses(horsesData)
+            setFeedingShifts(shiftsData)
+            setOwners(ownerOpts)
+            setMyOwnerId(myOwner?.id ?? null)
+            setBills(billsData)
+          }
+        },
+      )
       .catch((err: Error) => {
         if (!cancelled) setError(err.message)
       })
@@ -313,6 +328,25 @@ export default function CalendarView() {
       if (myDutiesOnly && shift.assigned_owner_id !== myOwnerId) return false
       return true
     })
+  }
+
+  const visibleBills = useMemo(
+    () =>
+      myDutiesOnly || !canManage
+        ? []
+        : bills
+            .filter((bill) => {
+              const date = new Date(`${bill.expense_date}T00:00:00`)
+              return date >= range.start && date <= range.end
+            })
+            .sort((a, b) => a.expense_date.localeCompare(b.expense_date)),
+    [bills, range, myDutiesOnly, canManage],
+  )
+
+  function billsOn(iso: string): Expense[] {
+    return myDutiesOnly || !canManage
+      ? []
+      : bills.filter((bill) => bill.expense_date === iso)
   }
 
   function findHorseFor(form: EventFormState): HorseOption | null {
@@ -441,6 +475,7 @@ export default function CalendarView() {
     : []
 
   const dayShiftsForModal = dayModalDate ? feedingShiftsOn(dayModalDate) : []
+  const dayBillsForModal = dayModalDate ? billsOn(dayModalDate) : []
 
   function renderMonthGrid() {
     const start = startOfMonth(currentDate)
@@ -488,7 +523,9 @@ export default function CalendarView() {
                 )
                 .sort((a, b) => a.start_time.localeCompare(b.start_time))
           const dayShifts = feedingShiftsOn(iso)
-          const totalCount = dayEvents.length + dayShifts.length
+          const dayBills = billsOn(iso)
+          const totalCount =
+            dayEvents.length + dayShifts.length + dayBills.length
           return (
             <button
               key={iso}
@@ -519,18 +556,36 @@ export default function CalendarView() {
                     </span>
                   </div>
                 ))}
-                {dayEvents.slice(0, 3 - dayShifts.length).map((event) => (
-                  <div
-                    key={event.id}
-                    className="flex items-center gap-1 truncate text-xs text-slate-600"
-                  >
-                    <span
-                      className="h-1.5 w-1.5 shrink-0 rounded-full"
-                      style={{ background: EVENT_COLORS[event.event_type] }}
-                    />
-                    <span className="truncate">{event.title}</span>
-                  </div>
-                ))}
+                {dayBills
+                  .slice(0, Math.max(0, 3 - dayShifts.length))
+                  .map((bill) => (
+                    <div
+                      key={bill.id}
+                      className="flex items-center gap-1 truncate text-xs text-slate-600"
+                    >
+                      <span
+                        className="h-1.5 w-1.5 shrink-0 rounded-full"
+                        style={{ background: BILL_COLOR }}
+                      />
+                      <span className="truncate">
+                        {categoryLabel(t, bill.category)}
+                      </span>
+                    </div>
+                  ))}
+                {dayEvents
+                  .slice(0, Math.max(0, 3 - dayShifts.length - dayBills.length))
+                  .map((event) => (
+                    <div
+                      key={event.id}
+                      className="flex items-center gap-1 truncate text-xs text-slate-600"
+                    >
+                      <span
+                        className="h-1.5 w-1.5 shrink-0 rounded-full"
+                        style={{ background: EVENT_COLORS[event.event_type] }}
+                      />
+                      <span className="truncate">{event.title}</span>
+                    </div>
+                  ))}
               </div>
             </button>
           )
@@ -540,7 +595,11 @@ export default function CalendarView() {
   }
 
   function renderAgenda() {
-    if (visibleEvents.length === 0 && visibleFeedingShifts.length === 0)
+    if (
+      visibleEvents.length === 0 &&
+      visibleFeedingShifts.length === 0 &&
+      visibleBills.length === 0
+    )
       return (
         <div className="panel p-10 text-center text-sm text-slate-500">
           {t('calendarView.noEventsRange')}
@@ -614,6 +673,32 @@ export default function CalendarView() {
             </div>
             <p className="shrink-0 whitespace-nowrap text-sm text-slate-500">
               {formatDate(event.start_time)}
+            </p>
+          </div>
+        ))}
+        {visibleBills.map((bill) => (
+          <div
+            key={bill.id}
+            className="panel flex w-full items-start justify-between gap-4 p-4 text-left"
+          >
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span
+                  className="h-3 w-3 shrink-0 rounded-full"
+                  style={{ background: BILL_COLOR }}
+                />
+                <p className="min-w-0 font-medium wrap-break-word text-slate-900">
+                  {categoryLabel(t, bill.category)}
+                </p>
+                <Badge status="due soon" label={t('calendarView.billLabel')} />
+              </div>
+              <p className="mt-1 text-sm text-slate-500">
+                {formatCurrency(bill.amount)}
+                {bill.notes ? ` · ${bill.notes}` : ''}
+              </p>
+            </div>
+            <p className="shrink-0 whitespace-nowrap text-sm text-slate-500">
+              {formatDate(bill.expense_date)}
             </p>
           </div>
         ))}
@@ -728,6 +813,15 @@ export default function CalendarView() {
                   {t(`status.${type}`)}
                 </div>
               ))}
+              {canManage && (
+                <div className="flex items-center gap-2">
+                  <span
+                    className="h-3 w-3 rounded-full"
+                    style={{ background: BILL_COLOR }}
+                  />
+                  {t('calendarView.billLabel')}
+                </div>
+              )}
             </div>
             {mode === 'month' ? renderMonthGrid() : renderAgenda()}
           </div>
@@ -739,7 +833,9 @@ export default function CalendarView() {
         onClose={() => setDayModalDate(null)}
         title={dayModalDate ? formatDate(dayModalDate) : ''}
       >
-        {dayEventsForModal.length === 0 && dayShiftsForModal.length === 0 ? (
+        {dayEventsForModal.length === 0 &&
+        dayShiftsForModal.length === 0 &&
+        dayBillsForModal.length === 0 ? (
           <p className="text-sm text-slate-500">
             {t('calendarView.noEventsDay')}
           </p>
@@ -807,6 +903,32 @@ export default function CalendarView() {
                       minute: '2-digit',
                     })}
                     {event.horse?.name ? ` · ${event.horse.name}` : ''}
+                  </p>
+                </div>
+              </div>
+            ))}
+            {dayBillsForModal.map((bill) => (
+              <div
+                key={bill.id}
+                className="flex w-full items-start gap-3 rounded-2xl border border-slate-100 p-3 text-left"
+              >
+                <span
+                  className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full"
+                  style={{ background: BILL_COLOR }}
+                />
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-medium text-slate-900">
+                      {categoryLabel(t, bill.category)}
+                    </p>
+                    <Badge
+                      status="due soon"
+                      label={t('calendarView.billLabel')}
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {formatCurrency(bill.amount)}
+                    {bill.notes ? ` · ${bill.notes}` : ''}
                   </p>
                 </div>
               </div>
