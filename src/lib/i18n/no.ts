@@ -740,6 +740,11 @@ export const no: typeof en = {
     loading: 'Laster rapport…',
     failedToLoad: 'Kunne ikke laste rapport: {error}',
   },
+  emergencyCall: {
+    label: 'Ring brannvesenet (110)',
+    confirm: 'Trykk igjen for å ringe',
+    confirmLabel: 'Trykk igjen for å ringe brannvesenet på 110',
+  },
   fireSafety: {
     title: 'Brannsikkerhet',
     subtitle:

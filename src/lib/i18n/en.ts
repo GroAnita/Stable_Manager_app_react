@@ -740,6 +740,11 @@ export const en = {
     loading: 'Loading report…',
     failedToLoad: 'Failed to load report: {error}',
   },
+  emergencyCall: {
+    label: 'Call the fire department (110)',
+    confirm: 'Tap again to call',
+    confirmLabel: 'Tap again to call the fire department on 110',
+  },
   fireSafety: {
     title: 'Fire safety',
     subtitle:

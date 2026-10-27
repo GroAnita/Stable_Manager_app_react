@@ -8,6 +8,7 @@ import {
 } from 'react-router-dom'
 import logoDark from '../assets/stalldrift-logo-dark.svg'
 import logoLight from '../assets/stalldrift-logo-light.svg'
+import { EmergencyCallButton } from '../components/EmergencyCallButton'
 import { Icon, type IconName } from '../components/Icon'
 import { NotificationBell } from '../components/NotificationBell'
 import { OnboardingChecklist } from '../components/OnboardingChecklist'
@@ -268,6 +269,7 @@ export default function AppLayout() {
               </p>
             </div>
             <div className="order-3 flex items-center gap-2 lg:ml-auto">
+              <EmergencyCallButton />
               <NotificationBell />
               <button
                 type="button"
