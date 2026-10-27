@@ -100,21 +100,29 @@ export async function getContract(id: string): Promise<Contract> {
 export type ContractDetail = Contract & {
   horse: Pick<
     Database['public']['Tables']['horses']['Row'],
-    'id' | 'name' | 'away'
+    'id' | 'name' | 'away' | 'breed' | 'color' | 'gender' | 'microchip_number'
   > | null
   owner: Pick<
     Database['public']['Tables']['owners']['Row'],
-    'id' | 'full_name' | 'phone'
+    'id' | 'full_name' | 'phone' | 'email' | 'address' | 'postal_code' | 'city'
   > | null
   stall: Pick<
     Database['public']['Tables']['stalls']['Row'],
     'id' | 'stall_number'
   > | null
+  boarding_item: PriceListItemOption | null
   hay_item: PriceListItemOption | null
   bedding_item: PriceListItemOption | null
   stable: Pick<
     Database['public']['Tables']['stables']['Row'],
-    'name' | 'address' | 'city' | 'postal_code' | 'phone' | 'email'
+    | 'name'
+    | 'address'
+    | 'city'
+    | 'postal_code'
+    | 'phone'
+    | 'email'
+    | 'org_number'
+    | 'default_contract_terms'
   > | null
 }
 
@@ -123,12 +131,13 @@ export async function getContractDetail(id: string): Promise<ContractDetail> {
     .from('contracts')
     .select(
       `*,
-       horse:horses(id, name, away),
-       owner:owners(id, full_name, phone),
+       horse:horses(id, name, away, breed, color, gender, microchip_number),
+       owner:owners(id, full_name, phone, email, address, postal_code, city),
        stall:stalls(id, stall_number),
+       boarding_item:price_list_items!contracts_boarding_price_list_item_id_fkey(id, item, unit, price),
        hay_item:price_list_items!contracts_hay_price_list_item_id_fkey(id, item, unit, price),
        bedding_item:price_list_items!contracts_bedding_price_list_item_id_fkey(id, item, unit, price),
-       stable:stables(name, address, city, postal_code, phone, email)`,
+       stable:stables(name, address, city, postal_code, phone, email, org_number, default_contract_terms)`,
     )
     .eq('id', id)
     .single()

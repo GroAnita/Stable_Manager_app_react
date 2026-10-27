@@ -132,6 +132,7 @@ export type Database = {
           bedding_price_list_item_id: string | null
           bedding_quantity: number
           boarding_price_list_item_id: string | null
+          contract_terms: string | null
           created_at: string
           deposit: number | null
           end_date: string | null
@@ -154,6 +155,7 @@ export type Database = {
           bedding_price_list_item_id?: string | null
           bedding_quantity?: number
           boarding_price_list_item_id?: string | null
+          contract_terms?: string | null
           created_at?: string
           deposit?: number | null
           end_date?: string | null
@@ -176,6 +178,7 @@ export type Database = {
           bedding_price_list_item_id?: string | null
           bedding_quantity?: number
           boarding_price_list_item_id?: string | null
+          contract_terms?: string | null
           created_at?: string
           deposit?: number | null
           end_date?: string | null
@@ -1576,6 +1579,7 @@ export type Database = {
           business_register_registered: boolean
           city: string | null
           created_at: string
+          default_contract_terms: string | null
           email: string | null
           id: string
           invoice_footer_text: string | null
@@ -1596,6 +1600,7 @@ export type Database = {
           business_register_registered?: boolean
           city?: string | null
           created_at?: string
+          default_contract_terms?: string | null
           email?: string | null
           id?: string
           invoice_footer_text?: string | null
@@ -1616,6 +1621,7 @@ export type Database = {
           business_register_registered?: boolean
           city?: string | null
           created_at?: string
+          default_contract_terms?: string | null
           email?: string | null
           id?: string
           invoice_footer_text?: string | null
@@ -2194,6 +2200,7 @@ export type Database = {
           business_register_registered: boolean
           city: string | null
           created_at: string
+          default_contract_terms: string | null
           email: string | null
           id: string
           invoice_footer_text: string | null

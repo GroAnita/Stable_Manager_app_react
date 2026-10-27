@@ -11,6 +11,7 @@ import {
   type ContractInsert,
   type PriceListItemOption,
 } from '../features/contracts/api'
+import { getStable } from '../features/settings/api'
 import {
   beddingAmountIncVat,
   currentBillingCycleDays,
@@ -51,6 +52,7 @@ type FormState = {
   included_services: IncludedService | ''
   additional_services: string
   notes: string
+  contract_terms: string
 }
 
 const emptyForm: FormState = {
@@ -70,6 +72,7 @@ const emptyForm: FormState = {
   included_services: '',
   additional_services: '',
   notes: '',
+  contract_terms: '',
 }
 
 export default function ContractForm() {
@@ -108,12 +111,26 @@ export default function ContractForm() {
       .then((stableId) => (stableId ? getEmptyBoxRate(stableId) : null))
       .then(setEmptyBoxRate)
       .catch((err: Error) => setError(err.message))
+    if (!isEdit) {
+      getCurrentStableId()
+        .then((stableId) => (stableId ? getStable(stableId) : null))
+        .then((stable) => {
+          if (stable?.default_contract_terms) {
+            setForm((prev) => ({
+              ...prev,
+              contract_terms: stable.default_contract_terms ?? '',
+            }))
+          }
+        })
+        .catch((err: Error) => setError(err.message))
+    }
     listHayItems()
       .then(setHayItems)
       .catch((err: Error) => setError(err.message))
     listBeddingItems()
       .then(setBeddingItems)
       .catch((err: Error) => setError(err.message))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -143,6 +160,7 @@ export default function ContractForm() {
             (contract.included_services as IncludedService | null) ?? '',
           additional_services: contract.additional_services ?? '',
           notes: contract.notes ?? '',
+          contract_terms: contract.contract_terms ?? '',
         })
       })
       .catch((err: Error) => setError(err.message))
@@ -227,6 +245,7 @@ export default function ContractForm() {
         included_services: form.included_services,
         additional_services: form.additional_services || null,
         notes: form.notes || null,
+        contract_terms: form.contract_terms || null,
       }
 
       if (isEdit && id) {
@@ -561,6 +580,20 @@ export default function ContractForm() {
             value={form.notes}
             onChange={(e) => updateField('notes', e.target.value)}
           />
+        </label>
+
+        <label className="md:col-span-2 xl:col-span-3">
+          <span className="field-label">
+            {t('contractForm.contractTerms')}
+          </span>
+          <textarea
+            className="field min-h-40"
+            value={form.contract_terms}
+            onChange={(e) => updateField('contract_terms', e.target.value)}
+          />
+          <p className="mt-1 text-xs text-slate-400">
+            {t('contractForm.contractTermsHint')}
+          </p>
         </label>
 
         <div className="rounded-2xl bg-slate-50 p-4 md:col-span-2 xl:col-span-3">

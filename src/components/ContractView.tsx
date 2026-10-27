@@ -85,6 +85,11 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
               .filter(Boolean)
               .join(' · ')}
           </p>
+          {contract.stable.org_number && (
+            <p className="text-sm text-slate-500">
+              {t('settings.billingOrgNumber')}: {contract.stable.org_number}
+            </p>
+          )}
         </div>
       )}
 
@@ -92,12 +97,56 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
         <div>
           <span className="field-label">{t('contractForm.horse')}</span>
           <p className="text-slate-900">{contract.horse?.name ?? '—'}</p>
+          {contract.horse &&
+            [
+              contract.horse.breed,
+              contract.horse.color,
+              contract.horse.gender,
+              contract.horse.microchip_number
+                ? `${t('contractView.microchipNumber')}: ${contract.horse.microchip_number}`
+                : null,
+            ].some(Boolean) && (
+              <p className="text-slate-500">
+                {[
+                  contract.horse.breed,
+                  contract.horse.color,
+                  contract.horse.gender,
+                  contract.horse.microchip_number
+                    ? `${t('contractView.microchipNumber')}: ${contract.horse.microchip_number}`
+                    : null,
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </p>
+            )}
         </div>
         <div>
           <span className="field-label">{t('contractForm.owner')}</span>
           <p className="text-slate-900">{contract.owner?.full_name ?? '—'}</p>
-          {contract.owner?.phone && (
-            <p className="text-slate-500">{contract.owner.phone}</p>
+          {contract.owner &&
+            [
+              contract.owner.address,
+              contract.owner.postal_code,
+              contract.owner.city,
+            ]
+              .filter(Boolean)
+              .join(', ') && (
+              <p className="text-slate-500">
+                {[
+                  contract.owner.address,
+                  contract.owner.postal_code,
+                  contract.owner.city,
+                ]
+                  .filter(Boolean)
+                  .join(', ')}
+              </p>
+            )}
+          {[contract.owner?.phone, contract.owner?.email].some(Boolean) && (
+            <p className="text-slate-500">
+              {[contract.owner?.phone, contract.owner?.email]
+                .filter(Boolean)
+                .join(' · ')}
+            </p>
           )}
         </div>
         <div>
@@ -142,7 +191,15 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
         </h3>
         <div className="mt-2 space-y-1 text-sm text-slate-600">
           <div className="flex justify-between">
-            <span>{t('contractForm.summaryRent')}</span>
+            <span>
+              {t('contractForm.summaryRent')}
+              {!horseIsAway && contract.boarding_item && (
+                <span className="text-slate-400">
+                  {' '}
+                  — {contract.boarding_item.item}
+                </span>
+              )}
+            </span>
             <span>{formatCurrency(rent)}</span>
           </div>
           {horseIsAway && (
@@ -157,6 +214,12 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
                   kg: contract.included_hay_kg ?? 0,
                   days: cycleDays,
                 })}
+                {contract.hay_item && (
+                  <span className="text-slate-400">
+                    {' '}
+                    — {contract.hay_item.item}
+                  </span>
+                )}
               </span>
               <span>{formatCurrency(hayValue)}</span>
             </div>
@@ -167,6 +230,12 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
                 {t('contractForm.summaryBedding', {
                   qty: contract.bedding_quantity ?? 0,
                 })}
+                {contract.bedding_item && (
+                  <span className="text-slate-400">
+                    {' '}
+                    — {contract.bedding_item.item}
+                  </span>
+                )}
               </span>
               <span>{formatCurrency(beddingValue)}</span>
             </div>
@@ -197,6 +266,38 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
           </p>
         </div>
       )}
+
+      {contract.contract_terms && (
+        <div>
+          <span className="field-label">
+            {t('contractView.contractTerms')}
+          </span>
+          <p className="whitespace-pre-wrap text-sm text-slate-700">
+            {contract.contract_terms}
+          </p>
+        </div>
+      )}
+
+      <div className="pt-6">
+        <span className="field-label">{t('contractView.signatureTitle')}</span>
+        <p className="mt-4 border-b border-slate-300 pb-8 text-sm text-slate-400">
+          {t('contractView.signaturePlaceDate')}
+        </p>
+        <div className="mt-8 grid grid-cols-2 gap-8">
+          <div>
+            <p className="border-b border-slate-300 pb-8" />
+            <p className="mt-2 text-xs text-slate-500">
+              {t('contractView.signatureStableOwner')}
+            </p>
+          </div>
+          <div>
+            <p className="border-b border-slate-300 pb-8" />
+            <p className="mt-2 text-xs text-slate-500">
+              {t('contractView.signatureHorseOwner')}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

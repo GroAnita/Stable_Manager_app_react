@@ -28,6 +28,7 @@ type FormState = {
   address: string
   city: string
   postal_code: string
+  default_contract_terms: string
 }
 
 function toFormState(stable: Stable): FormState {
@@ -38,6 +39,7 @@ function toFormState(stable: Stable): FormState {
     address: stable.address ?? '',
     city: stable.city ?? '',
     postal_code: stable.postal_code ?? '',
+    default_contract_terms: stable.default_contract_terms ?? '',
   }
 }
 
@@ -217,6 +219,7 @@ export default function Settings() {
         address: form.address || null,
         city: form.city || null,
         postal_code: form.postal_code || null,
+        default_contract_terms: form.default_contract_terms || null,
       })
       setStable(updated)
       setSaved(true)
@@ -396,6 +399,22 @@ export default function Settings() {
                     />
                   </label>
                 </div>
+                <label className="mt-5 block">
+                  <span className="field-label">
+                    {t('settings.defaultContractTerms')}
+                  </span>
+                  <textarea
+                    disabled={!canEdit}
+                    className="field min-h-32"
+                    value={form.default_contract_terms}
+                    onChange={(e) =>
+                      updateField('default_contract_terms', e.target.value)
+                    }
+                  />
+                  <p className="mt-1 text-xs text-slate-400">
+                    {t('settings.defaultContractTermsHint')}
+                  </p>
+                </label>
                 {canEdit && (
                   <div className="mt-6 flex items-center justify-end gap-3">
                     {saved && (

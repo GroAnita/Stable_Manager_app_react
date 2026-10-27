@@ -53,6 +53,7 @@ export default function ContractList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<Filter>('all')
+  const [search, setSearch] = useState('')
   const [viewingId, setViewingId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -72,13 +73,18 @@ export default function ContractList() {
     }
   }, [])
 
-  const filtered = useMemo(
-    () =>
-      filter === 'all'
-        ? contracts
-        : contracts.filter((c) => c.status === filter),
-    [contracts, filter],
-  )
+  const filtered = useMemo(() => {
+    const query = search.toLowerCase()
+    return contracts.filter((c) => {
+      const matchesStatus = filter === 'all' || c.status === filter
+      const matchesSearch =
+        !query ||
+        [c.horse?.name, c.owner?.full_name].some((value) =>
+          value?.toLowerCase().includes(query),
+        )
+      return matchesStatus && matchesSearch
+    })
+  }, [contracts, filter, search])
 
   async function handleDelete(contract: ContractListItem) {
     const name = contract.horse?.name ?? t('contractList.fallbackHorse')
@@ -105,6 +111,13 @@ export default function ContractList() {
       </div>
 
       <div className="panel p-4">
+        <input
+          type="search"
+          className="field mb-3"
+          placeholder={t('contractList.searchPlaceholder')}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
         <div className="flex flex-wrap gap-2">
           {FILTER_KEYS.map((item) => (
             <button
