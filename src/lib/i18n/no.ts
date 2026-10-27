@@ -514,6 +514,7 @@ export const no: typeof en = {
     colorWhite: 'Hvit',
     owner: 'Eier',
     stall: 'Boks',
+    stallOccupied: 'Opptatt ({name})',
     paddock: 'Paddock',
     turnoutShelter: 'Utegang',
     arrivalDate: 'Ankomstdato',

@@ -327,11 +327,20 @@ export default function ContractForm() {
             onChange={(e) => updateField('stall_id', e.target.value)}
           >
             <option value="">{t('contractForm.selectStall')}</option>
-            {stalls.map((stall) => (
-              <option key={stall.id} value={stall.id}>
-                {stall.stall_number}
-              </option>
-            ))}
+            {stalls.map((stall) => {
+              const occupiedByOther =
+                stall.occupant && stall.occupant.id !== form.horse_id
+              return (
+                <option key={stall.id} value={stall.id}>
+                  {stall.stall_number} —{' '}
+                  {occupiedByOther
+                    ? t('horseForm.stallOccupied', {
+                        name: stall.occupant!.name,
+                      })
+                    : t('status.available')}
+                </option>
+              )
+            })}
           </select>
         </label>
 

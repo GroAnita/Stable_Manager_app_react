@@ -8,7 +8,9 @@ export type OwnerOption = Pick<
 export type StallOption = Pick<
   Database['public']['Tables']['stalls']['Row'],
   'id' | 'stall_number'
->
+> & {
+  occupant: Pick<Database['public']['Tables']['horses']['Row'], 'id' | 'name'> | null
+}
 export type PaddockOption = Pick<
   Database['public']['Tables']['paddocks']['Row'],
   'id' | 'name'
@@ -38,10 +40,14 @@ export async function listOwnerOptions(): Promise<OwnerOption[]> {
 export async function listStallOptions(): Promise<StallOption[]> {
   const { data, error } = await supabase
     .from('stalls')
-    .select('id, stall_number')
+    .select('id, stall_number, horses(id, name, active)')
     .order('stall_number')
   if (error) throw error
-  return data
+  return data.map((stall) => ({
+    id: stall.id,
+    stall_number: stall.stall_number,
+    occupant: stall.horses.find((horse) => horse.active) ?? null,
+  }))
 }
 
 export async function listPaddockOptions(): Promise<PaddockOption[]> {

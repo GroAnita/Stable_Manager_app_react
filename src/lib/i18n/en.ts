@@ -513,6 +513,7 @@ export const en = {
     colorWhite: 'White',
     owner: 'Owner',
     stall: 'Stall',
+    stallOccupied: 'Occupied ({name})',
     paddock: 'Paddock',
     turnoutShelter: '24/7 turnout',
     arrivalDate: 'Arrival date',
