@@ -1,3 +1,4 @@
+import { webOrigin } from '../../lib/platform'
 import { supabase } from '../../lib/supabaseClient'
 import type { Database } from '../../types/supabase'
 
@@ -66,5 +67,5 @@ export async function acceptInvite(token: string): Promise<void> {
 }
 
 export function inviteUrl(token: string): string {
-  return `${window.location.origin}/invite/${token}`
+  return `${webOrigin()}/invite/${token}`
 }

@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { Capacitor } from '@capacitor/core'
+import { Share } from '@capacitor/share'
 import { Card } from '../components/Card'
 import { Icon } from '../components/Icon'
 import { Modal } from '../components/Modal'
@@ -241,6 +243,14 @@ export default function Reports() {
   async function handleShare() {
     const title = `${t('reports.title')} – ${monthLabel}`
     const text = buildShareText()
+    if (Capacitor.isNativePlatform()) {
+      try {
+        await Share.share({ title, text })
+      } catch {
+        // user cancelled the share sheet — nothing to do
+      }
+      return
+    }
     if (navigator.share) {
       try {
         await navigator.share({ title, text })

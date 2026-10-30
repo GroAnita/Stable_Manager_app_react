@@ -1,5 +1,6 @@
 import { Capacitor } from '@capacitor/core'
 import { Browser } from '@capacitor/browser'
+import { webOrigin } from './platform'
 import { supabase } from './supabaseClient'
 
 const NATIVE_OAUTH_REDIRECT = 'com.stalldrift.app://auth-callback'
@@ -69,7 +70,7 @@ export async function signOut() {
 
 export async function requestPasswordReset(email: string) {
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}/reset-password`,
+    redirectTo: `${webOrigin()}/reset-password`,
   })
   if (error) throw error
 }
