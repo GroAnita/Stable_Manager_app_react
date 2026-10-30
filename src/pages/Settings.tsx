@@ -563,6 +563,8 @@ export default function Settings() {
                   role: profile?.role,
                   platform: Capacitor.isNativePlatform() ? 'ios' : 'web',
                 })}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn-primary mt-5 inline-flex items-center gap-2"
               >
                 <Icon name="mail" className="h-4 w-4" />
