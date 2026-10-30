@@ -12,7 +12,7 @@ import { supabase } from './lib/supabaseClient'
 
 if (Capacitor.isNativePlatform()) {
   CapacitorApp.addListener('appUrlOpen', ({ url }) => {
-    if (!url.startsWith('com.stalldrift.app://auth-callback')) return
+    if (!url.startsWith('no.nestundigital.stalldrift://auth-callback')) return
     Browser.close()
     supabase.auth.exchangeCodeForSession(url).then(({ error }) => {
       if (error) console.error('Google sign-in failed:', error.message)

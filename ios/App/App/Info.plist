@@ -27,7 +27,7 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.stalldrift.app</string>
+				<string>no.nestundigital.stalldrift</string>
 			</array>
 		</dict>
 	</array>

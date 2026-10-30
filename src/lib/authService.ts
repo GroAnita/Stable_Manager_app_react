@@ -3,7 +3,7 @@ import { Browser } from '@capacitor/browser'
 import { webOrigin } from './platform'
 import { supabase } from './supabaseClient'
 
-const NATIVE_OAUTH_REDIRECT = 'com.stalldrift.app://auth-callback'
+const NATIVE_OAUTH_REDIRECT = 'no.nestundigital.stalldrift://auth-callback'
 
 export async function signIn({
   email,
