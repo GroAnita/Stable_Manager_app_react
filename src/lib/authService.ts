@@ -1,4 +1,8 @@
+import { Capacitor } from '@capacitor/core'
+import { Browser } from '@capacitor/browser'
 import { supabase } from './supabaseClient'
+
+const NATIVE_OAUTH_REDIRECT = 'com.stalldrift.app://auth-callback'
 
 export async function signIn({
   email,
@@ -34,6 +38,23 @@ export async function signUp({
 }
 
 export async function signInWithGoogle() {
+  if (Capacitor.isNativePlatform()) {
+    // Google refuses to sign in from an embedded WebView, so get the
+    // OAuth URL from Supabase without auto-navigating and open it in the
+    // system browser instead. Supabase redirects back to our custom URL
+    // scheme once Google hands off, which main.tsx listens for.
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: NATIVE_OAUTH_REDIRECT,
+        skipBrowserRedirect: true,
+      },
+    })
+    if (error) throw error
+    if (data.url) await Browser.open({ url: data.url })
+    return
+  }
+
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo: `${window.location.origin}/auth` },
