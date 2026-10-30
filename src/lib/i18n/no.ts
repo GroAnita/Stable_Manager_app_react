@@ -1025,6 +1025,11 @@ export const no: typeof en = {
     navIntegrations: 'Integrasjoner',
     navAccount: 'Min konto og tofaktor',
     navLanguageAppearance: 'Språk og utseende',
+    navSupport: 'Support',
+    supportTitle: 'Kontakt support',
+    supportSubtitle:
+      'Har du et spørsmål eller har funnet en feil? Vi hjelper deg gjerne.',
+    supportEmailButton: 'Send e-post til support',
     billingSenderTitle: 'Avsender',
     billingSenderSubtitle: 'Dette vises som avsender på hver faktura.',
     billingSearch: 'Søk etter firma eller org.nr',

@@ -1025,6 +1025,10 @@ export const en = {
     navIntegrations: 'Integrations',
     navAccount: 'My account & two-factor',
     navLanguageAppearance: 'Language & appearance',
+    navSupport: 'Support',
+    supportTitle: 'Contact support',
+    supportSubtitle: "Have a question or found a bug? We're happy to help.",
+    supportEmailButton: 'Email support',
     billingSenderTitle: 'Sender',
     billingSenderSubtitle:
       'This is what appears as the sender on every invoice.',

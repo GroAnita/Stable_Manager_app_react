@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { Capacitor } from '@capacitor/core'
 import { Icon, type IconName } from '../components/Icon'
 import {
   getMyProfile,
@@ -16,6 +17,7 @@ import {
   type Language,
   type Theme,
 } from '../lib/PreferencesContext'
+import { SUPPORT_EMAIL, supportMailto } from '../lib/support'
 import { BillingPanel } from './settings/BillingPanel'
 import { FireSafetyPanel } from './settings/FireSafetyPanel'
 import { StaffAccessPanel } from './settings/StaffAccessPanel'
@@ -54,6 +56,7 @@ type SettingsSection =
   | 'integrations'
   | 'account'
   | 'languageAppearance'
+  | 'support'
 
 const SETTINGS_SECTIONS: SettingsSection[] = [
   'stableInfo',
@@ -64,6 +67,7 @@ const SETTINGS_SECTIONS: SettingsSection[] = [
   'integrations',
   'account',
   'languageAppearance',
+  'support',
 ]
 
 function isSettingsSection(value: string | null): value is SettingsSection {
@@ -125,6 +129,7 @@ const SETTINGS_NAV: { groupKey: string; items: SettingsNavItem[] }[] = [
         labelKey: 'settings.navLanguageAppearance',
         icon: 'sun',
       },
+      { key: 'support', labelKey: 'settings.navSupport', icon: 'mail' },
     ],
   },
 ]
@@ -533,6 +538,37 @@ export default function Settings() {
                   </select>
                 </label>
               </div>
+            </div>
+          )}
+
+          {section === 'support' && (
+            <div className="panel p-6">
+              <div className="flex items-start gap-4 border-b border-slate-100 pb-5">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-forest/10 text-forest">
+                  <Icon name="mail" className="h-6 w-6" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900">
+                    {t('settings.supportTitle')}
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {t('settings.supportSubtitle')}
+                  </p>
+                </div>
+              </div>
+              <a
+                href={supportMailto({
+                  stableName: stable?.name,
+                  accountEmail: session?.user.email,
+                  role: profile?.role,
+                  platform: Capacitor.isNativePlatform() ? 'ios' : 'web',
+                })}
+                className="btn-primary mt-5 inline-flex items-center gap-2"
+              >
+                <Icon name="mail" className="h-4 w-4" />
+                {t('settings.supportEmailButton')}
+              </a>
+              <p className="mt-3 text-sm text-slate-500">{SUPPORT_EMAIL}</p>
             </div>
           )}
         </div>
