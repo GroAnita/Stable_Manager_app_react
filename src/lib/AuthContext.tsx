@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import { getMyProfile, type Profile } from '../features/settings/api'
+import { registerForPushNotifications } from './push'
 import { supabase } from './supabaseClient'
 
 type AuthContextValue = {
@@ -71,6 +72,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       cancelled = true
     }
   }, [session])
+
+  useEffect(() => {
+    if (profile?.role !== 'horse_owner') return
+    registerForPushNotifications().catch((err: Error) =>
+      console.error('Push registration failed:', err.message),
+    )
+  }, [profile])
 
   return (
     <AuthContext.Provider

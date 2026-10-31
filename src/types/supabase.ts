@@ -1491,6 +1491,38 @@ export type Database = {
           },
         ]
       }
+      push_tokens: {
+        Row: {
+          created_at: string
+          id: string
+          owner_id: string
+          platform: string
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          owner_id: string
+          platform?: string
+          token: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          owner_id?: string
+          platform?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_tokens_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "owners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stable_invites: {
         Row: {
           created_at: string
