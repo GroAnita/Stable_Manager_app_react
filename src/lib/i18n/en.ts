@@ -1,6 +1,6 @@
 export const en = {
   common: {
-    appName: 'StallDrift',
+    appName: 'ND-Stalldrift',
     save: 'Save',
     saving: 'Saving…',
     cancel: 'Cancel',
@@ -1044,7 +1044,7 @@ export const en = {
     trialHint:
       'All features are included. Choose a plan before the period ends.',
     trialEndedHint:
-      'Your trial has ended. Choose a plan to keep using StallDrift.',
+      'Your trial has ended. Choose a plan to keep using ND-Stalldrift.',
     planLabel: 'Plan',
     planRangeUpTo: 'Up to {max} horses',
     planRangeBetween: '{min}–{max} horses',

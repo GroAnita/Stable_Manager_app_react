@@ -2,7 +2,7 @@ import type { en } from './en'
 
 export const no: typeof en = {
   common: {
-    appName: 'StallDrift',
+    appName: 'ND-Stalldrift',
     save: 'Lagre',
     saving: 'Lagrer…',
     cancel: 'Avbryt',
@@ -1044,7 +1044,7 @@ export const no: typeof en = {
     trialHint:
       'Alle funksjoner er inkludert. Velg en plan før perioden er over.',
     trialEndedHint:
-      'Prøveperioden din er over. Velg en plan for å fortsette å bruke StallDrift.',
+      'Prøveperioden din er over. Velg en plan for å fortsette å bruke ND-Stalldrift.',
     planLabel: 'Plan',
     planRangeUpTo: 'Opptil {max} hester',
     planRangeBetween: '{min}–{max} hester',

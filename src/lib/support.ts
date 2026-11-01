@@ -1,7 +1,7 @@
 export const SUPPORT_EMAIL = 'support@nestundigital.no'
 
 // support@nestundigital.no is shared across several Nestun Digital apps, so
-// the subject carries a fixed [StallDrift] tag — kept in English regardless
+// the subject carries a fixed [ND-Stalldrift] tag — kept in English regardless
 // of UI language — that support can filter or label on. The context block
 // below is for the same reason: a consistent, support-side format rather
 // than translated prose.
@@ -16,7 +16,7 @@ export function supportMailto({
   role?: string | null
   platform: 'web' | 'ios'
 }): string {
-  const subject = '[StallDrift] Support request'
+  const subject = '[ND-Stalldrift] Support request'
   const body = [
     '',
     '',
