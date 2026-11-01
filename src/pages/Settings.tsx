@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Capacitor } from '@capacitor/core'
+import { AnalyticsConsentToggle } from '../components/AnalyticsConsentToggle'
 import { Icon, type IconName } from '../components/Icon'
 import {
   getMyProfile,
@@ -503,6 +504,14 @@ export default function Settings() {
                   </span>{' '}
                   {profile?.role.replace('_', ' ') ?? '—'}
                 </p>
+              </div>
+              <div className="mt-6 border-t border-slate-100 pt-5">
+                <h3 className="text-sm font-semibold text-slate-800">
+                  {t('settings.privacyTitle')}
+                </h3>
+                <div className="mt-3">
+                  <AnalyticsConsentToggle />
+                </div>
               </div>
             </div>
           )}

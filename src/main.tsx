@@ -5,6 +5,7 @@ import { App as CapacitorApp } from '@capacitor/app'
 import { Browser } from '@capacitor/browser'
 import { Capacitor } from '@capacitor/core'
 import './index.css'
+import { ConsentBanner } from './components/ConsentBanner'
 import { AuthProvider } from './lib/AuthContext'
 import { initClarity } from './lib/clarity'
 import { PreferencesProvider } from './lib/PreferencesContext'
@@ -29,6 +30,7 @@ createRoot(document.getElementById('root')!).render(
       <AuthProvider>
         <RouterProvider router={router} />
       </AuthProvider>
+      <ConsentBanner />
     </PreferencesProvider>
   </StrictMode>,
 )

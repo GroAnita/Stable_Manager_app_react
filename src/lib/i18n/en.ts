@@ -979,6 +979,12 @@ export const en = {
     failedToLoad: 'Failed to load inventory: {error}',
     noStableFound: 'No stable found for the current user. Please sign in.',
   },
+  consent: {
+    message:
+      'We use Microsoft Clarity to understand how the app is used, so we can improve it. No data is sold. You can change your mind anytime in Settings.',
+    accept: 'Accept',
+    decline: 'Decline',
+  },
   settings: {
     title: 'Settings',
     subtitle: "Manage your stable's information.",
@@ -1001,6 +1007,10 @@ export const en = {
     account: 'Account',
     accountEmail: 'Email:',
     accountRole: 'Role:',
+    privacyTitle: 'Privacy',
+    privacyAnalyticsLabel: 'Allow analytics (Microsoft Clarity)',
+    privacyAnalyticsHint:
+      'Helps us see which parts of the app are confusing or get used the most, so we know what to improve. Turning this off will reload the page to stop tracking right away.',
     staffInvite: 'Staff access',
     staffInviteHint:
       'Generate a link to send a staff member so they can create a login with access to your stable.',

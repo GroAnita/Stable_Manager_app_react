@@ -1,4 +1,4 @@
-// Loads the Microsoft Clarity tracking snippet, if a project ID is configured.
+// Loads the Microsoft Clarity tracking snippet, gated on user consent.
 // See: https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-setup
 
 declare global {
@@ -7,26 +7,60 @@ declare global {
   }
 }
 
+export type AnalyticsConsent = 'accepted' | 'declined'
+
+const CONSENT_KEY = 'stalldrift.analyticsConsent'
+
+export function isClarityConfigured(): boolean {
+  return Boolean(import.meta.env.VITE_CLARITY_PROJECT_ID)
+}
+
+export function getAnalyticsConsent(): AnalyticsConsent | null {
+  try {
+    const value = localStorage.getItem(CONSENT_KEY)
+    return value === 'accepted' || value === 'declined' ? value : null
+  } catch {
+    return null
+  }
+}
+
+export function setAnalyticsConsent(consent: AnalyticsConsent) {
+  try {
+    localStorage.setItem(CONSENT_KEY, consent)
+  } catch {
+    // ignore storage errors (e.g. private browsing)
+  }
+  if (consent === 'accepted') {
+    loadClarityScript()
+  } else if (window.clarity) {
+    // Clarity is already running in this page — a reload is the only
+    // reliable way to make it stop recording right away.
+    window.location.reload()
+  }
+}
+
 export function initClarity() {
+  if (getAnalyticsConsent() === 'accepted') {
+    loadClarityScript()
+  }
+}
+
+function loadClarityScript() {
   const projectId = import.meta.env.VITE_CLARITY_PROJECT_ID
-  if (!projectId) return
-  if (window.clarity) return
+  if (!projectId || window.clarity) return
 
   ;(function (
     w: Window,
     d: Document,
     scriptTag: string,
-    queueProp: string,
+    queueProp: 'clarity',
     id: string,
   ) {
     type ClarityFn = {
       (...args: unknown[]): void
       q?: unknown[]
     }
-    const c = (w[queueProp as 'clarity'] = function (
-      this: unknown,
-      ...args: unknown[]
-    ) {
+    const c = (w[queueProp] = function (...args: unknown[]) {
       ;(c as ClarityFn).q = (c as ClarityFn).q || []
       ;(c as ClarityFn).q!.push(args)
     } as ClarityFn)

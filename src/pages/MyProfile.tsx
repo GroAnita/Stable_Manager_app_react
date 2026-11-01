@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { AnalyticsConsentToggle } from '../components/AnalyticsConsentToggle'
 import {
   getMyOwnerRecord,
   updateOwner,
@@ -213,6 +214,13 @@ export default function MyProfile() {
           </div>
         </form>
       )}
+
+      <div className="panel p-5">
+        <h2 className="section-title">{t('settings.privacyTitle')}</h2>
+        <div className="mt-3">
+          <AnalyticsConsentToggle />
+        </div>
+      </div>
     </div>
   )
 }

@@ -979,6 +979,12 @@ export const no: typeof en = {
     failedToLoad: 'Kunne ikke laste lager: {error}',
     noStableFound: 'Fant ingen stall for denne brukeren. Vennligst logg inn.',
   },
+  consent: {
+    message:
+      'Vi bruker Microsoft Clarity for å forstå hvordan appen brukes, slik at vi kan forbedre den. Ingen data selges. Du kan endre dette når du vil under Innstillinger.',
+    accept: 'Godta',
+    decline: 'Avslå',
+  },
   settings: {
     title: 'Innstillinger',
     subtitle: 'Administrer informasjon om stallen din.',
@@ -1001,6 +1007,10 @@ export const no: typeof en = {
     account: 'Konto',
     accountEmail: 'E-post:',
     accountRole: 'Rolle:',
+    privacyTitle: 'Personvern',
+    privacyAnalyticsLabel: 'Tillat analyse (Microsoft Clarity)',
+    privacyAnalyticsHint:
+      'Hjelper oss å se hvilke deler av appen som er forvirrende eller mest brukt, slik at vi vet hva vi bør forbedre. Å slå dette av laster siden på nytt for å stoppe sporingen umiddelbart.',
     staffInvite: 'Ansattes tilgang',
     staffInviteHint:
       'Lag en lenke du kan sende til en ansatt, slik at de kan lage en pålogging med tilgang til stallen din.',
