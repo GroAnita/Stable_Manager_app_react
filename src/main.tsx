@@ -6,9 +6,12 @@ import { Browser } from '@capacitor/browser'
 import { Capacitor } from '@capacitor/core'
 import './index.css'
 import { AuthProvider } from './lib/AuthContext'
+import { initClarity } from './lib/clarity'
 import { PreferencesProvider } from './lib/PreferencesContext'
 import { router } from './router'
 import { supabase } from './lib/supabaseClient'
+
+initClarity()
 
 if (Capacitor.isNativePlatform()) {
   CapacitorApp.addListener('appUrlOpen', ({ url }) => {
