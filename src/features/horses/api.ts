@@ -162,6 +162,21 @@ export async function listHorses(): Promise<HorseListItem[]> {
   return data
 }
 
+export type SchoolHorseOption = { id: string; name: string }
+
+/** Horses tagged as belonging to the riding school rather than a
+ * boarder — visible to any stable member (not just their owner) so a
+ * rider without their own horse can pick one when booking a lesson. */
+export async function listSchoolHorses(): Promise<SchoolHorseOption[]> {
+  const { data, error } = await supabase
+    .from('horses')
+    .select('id, name')
+    .eq('is_school_horse', true)
+    .order('name')
+  if (error) throw error
+  return data
+}
+
 export async function listMyHorses(): Promise<HorseDetail[]> {
   const { data, error } = await supabase
     .from('horses')

@@ -1,9 +1,16 @@
 import { useState } from 'react'
+import { CoursesPanel } from './lessons/CoursesPanel'
 import { SchedulePanel } from './lessons/SchedulePanel'
 import { SchoolHorsesPanel } from './lessons/SchoolHorsesPanel'
 import { usePreferences } from '../lib/PreferencesContext'
 
-type LessonsSection = 'schedule' | 'schoolHorses'
+type LessonsSection = 'schedule' | 'courses' | 'schoolHorses'
+
+const SECTIONS: { key: LessonsSection; labelKey: string }[] = [
+  { key: 'schedule', labelKey: 'lessons.navSchedule' },
+  { key: 'courses', labelKey: 'lessons.navCourses' },
+  { key: 'schoolHorses', labelKey: 'lessons.navSchoolHorses' },
+]
 
 export default function Lessons() {
   const { t } = usePreferences()
@@ -20,32 +27,25 @@ export default function Lessons() {
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
         <nav className="flex shrink-0 flex-col gap-1 lg:w-56">
-          <button
-            type="button"
-            onClick={() => setSection('schedule')}
-            className={`rounded-2xl px-3 py-2.5 text-left text-sm font-medium ${
-              section === 'schedule'
-                ? 'bg-forest/10 text-forest'
-                : 'text-ink/70 hover:bg-card'
-            }`}
-          >
-            {t('lessons.navSchedule')}
-          </button>
-          <button
-            type="button"
-            onClick={() => setSection('schoolHorses')}
-            className={`rounded-2xl px-3 py-2.5 text-left text-sm font-medium ${
-              section === 'schoolHorses'
-                ? 'bg-forest/10 text-forest'
-                : 'text-ink/70 hover:bg-card'
-            }`}
-          >
-            {t('lessons.navSchoolHorses')}
-          </button>
+          {SECTIONS.map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => setSection(item.key)}
+              className={`rounded-2xl px-3 py-2.5 text-left text-sm font-medium ${
+                section === item.key
+                  ? 'bg-forest/10 text-forest'
+                  : 'text-ink/70 hover:bg-card'
+              }`}
+            >
+              {t(item.labelKey)}
+            </button>
+          ))}
         </nav>
 
         <div className="min-w-0 flex-1">
           {section === 'schedule' && <SchedulePanel />}
+          {section === 'courses' && <CoursesPanel />}
           {section === 'schoolHorses' && <SchoolHorsesPanel />}
         </div>
       </div>

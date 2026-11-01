@@ -248,6 +248,87 @@ export type Database = {
           },
         ]
       }
+      courses: {
+        Row: {
+          booking_mode: Database["public"]["Enums"]["course_booking_mode"]
+          capacity: number
+          created_at: string
+          created_by: string | null
+          end_time: string
+          id: string
+          instructor_name: string | null
+          level: string | null
+          location: string | null
+          price: number | null
+          spare_release_days_before: number
+          stable_id: string
+          start_time: string
+          status: Database["public"]["Enums"]["course_status"]
+          term_end_date: string
+          term_start_date: string
+          title: string
+          updated_at: string
+          weekday: number
+        }
+        Insert: {
+          booking_mode?: Database["public"]["Enums"]["course_booking_mode"]
+          capacity?: number
+          created_at?: string
+          created_by?: string | null
+          end_time: string
+          id?: string
+          instructor_name?: string | null
+          level?: string | null
+          location?: string | null
+          price?: number | null
+          spare_release_days_before?: number
+          stable_id: string
+          start_time: string
+          status?: Database["public"]["Enums"]["course_status"]
+          term_end_date: string
+          term_start_date: string
+          title: string
+          updated_at?: string
+          weekday: number
+        }
+        Update: {
+          booking_mode?: Database["public"]["Enums"]["course_booking_mode"]
+          capacity?: number
+          created_at?: string
+          created_by?: string | null
+          end_time?: string
+          id?: string
+          instructor_name?: string | null
+          level?: string | null
+          location?: string | null
+          price?: number | null
+          spare_release_days_before?: number
+          stable_id?: string
+          start_time?: string
+          status?: Database["public"]["Enums"]["course_status"]
+          term_end_date?: string
+          term_start_date?: string
+          title?: string
+          updated_at?: string
+          weekday?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courses_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courses_stable_id_fkey"
+            columns: ["stable_id"]
+            isOneToOne: false
+            referencedRelation: "stables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           contract_id: string | null
@@ -309,6 +390,48 @@ export type Database = {
             columns: ["stable_id"]
             isOneToOne: false
             referencedRelation: "stables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      enrolments: {
+        Row: {
+          course_id: string
+          enrolled_at: string
+          id: string
+          rider_id: string | null
+          status: string
+          withdrawn_at: string | null
+        }
+        Insert: {
+          course_id: string
+          enrolled_at?: string
+          id?: string
+          rider_id?: string | null
+          status?: string
+          withdrawn_at?: string | null
+        }
+        Update: {
+          course_id?: string
+          enrolled_at?: string
+          id?: string
+          rider_id?: string | null
+          status?: string
+          withdrawn_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enrolments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enrolments_rider_id_fkey"
+            columns: ["rider_id"]
+            isOneToOne: false
+            referencedRelation: "riders"
             referencedColumns: ["id"]
           },
         ]
@@ -1075,39 +1198,51 @@ export type Database = {
       }
       lesson_bookings: {
         Row: {
+          cancelled_at: string | null
           created_at: string
-          horse_id: string
+          enrolment_id: string | null
+          horse_id: string | null
           id: string
-          lesson_id: string
           owner_id: string
+          rider_id: string | null
+          session_id: string
+          status: string
         }
         Insert: {
+          cancelled_at?: string | null
           created_at?: string
-          horse_id: string
+          enrolment_id?: string | null
+          horse_id?: string | null
           id?: string
-          lesson_id: string
           owner_id: string
+          rider_id?: string | null
+          session_id: string
+          status?: string
         }
         Update: {
+          cancelled_at?: string | null
           created_at?: string
-          horse_id?: string
+          enrolment_id?: string | null
+          horse_id?: string | null
           id?: string
-          lesson_id?: string
           owner_id?: string
+          rider_id?: string | null
+          session_id?: string
+          status?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "lesson_bookings_enrolment_id_fkey"
+            columns: ["enrolment_id"]
+            isOneToOne: false
+            referencedRelation: "enrolments"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "lesson_bookings_horse_id_fkey"
             columns: ["horse_id"]
             isOneToOne: false
             referencedRelation: "horses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "lesson_bookings_lesson_id_fkey"
-            columns: ["lesson_id"]
-            isOneToOne: false
-            referencedRelation: "lessons"
             referencedColumns: ["id"]
           },
           {
@@ -1117,11 +1252,26 @@ export type Database = {
             referencedRelation: "owners"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "lesson_bookings_rider_id_fkey"
+            columns: ["rider_id"]
+            isOneToOne: false
+            referencedRelation: "riders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_bookings_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_sessions"
+            referencedColumns: ["id"]
+          },
         ]
       }
-      lessons: {
+      lesson_sessions: {
         Row: {
           capacity: number
+          course_id: string | null
           created_at: string
           created_by: string | null
           ends_at: string
@@ -1130,11 +1280,13 @@ export type Database = {
           notes: string | null
           stable_id: string
           starts_at: string
+          status: string
           title: string
           updated_at: string
         }
         Insert: {
           capacity?: number
+          course_id?: string | null
           created_at?: string
           created_by?: string | null
           ends_at: string
@@ -1143,11 +1295,13 @@ export type Database = {
           notes?: string | null
           stable_id: string
           starts_at: string
+          status?: string
           title: string
           updated_at?: string
         }
         Update: {
           capacity?: number
+          course_id?: string | null
           created_at?: string
           created_by?: string | null
           ends_at?: string
@@ -1156,10 +1310,18 @@ export type Database = {
           notes?: string | null
           stable_id?: string
           starts_at?: string
+          status?: string
           title?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "lesson_sessions_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "lessons_created_by_fkey"
             columns: ["created_by"]
@@ -1622,6 +1784,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "push_tokens_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "owners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      riders: {
+        Row: {
+          birthday: string | null
+          created_at: string
+          full_name: string
+          id: string
+          notes: string | null
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          birthday?: string | null
+          created_at?: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          owner_id: string
+          updated_at?: string
+        }
+        Update: {
+          birthday?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          owner_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "riders_owner_id_fkey"
             columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "owners"
@@ -2330,6 +2530,35 @@ export type Database = {
         Returns: Database["public"]["Enums"]["user_role"]
       }
       auth_stable_id: { Args: never; Returns: string }
+      book_dropin_session: {
+        Args: {
+          p_horse_id?: string
+          p_owner_id: string
+          p_rider_id?: string
+          p_session_id: string
+        }
+        Returns: {
+          cancelled_at: string | null
+          created_at: string
+          enrolment_id: string | null
+          horse_id: string | null
+          id: string
+          owner_id: string
+          rider_id: string | null
+          session_id: string
+          status: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "lesson_bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      can_assign_horse_to_booking: {
+        Args: { p_horse_id: string; p_owner_id: string }
+        Returns: boolean
+      }
       create_stable: {
         Args: {
           p_address?: string
@@ -2368,6 +2597,52 @@ export type Database = {
           to: "stables"
           isOneToOne: true
           isSetofReturn: false
+        }
+      }
+      enrol_in_course: {
+        Args: {
+          p_course_id: string
+          p_horse_id?: string
+          p_owner_id: string
+          p_rider_id?: string
+        }
+        Returns: {
+          course_id: string
+          enrolled_at: string
+          id: string
+          rider_id: string | null
+          status: string
+          withdrawn_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "enrolments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      generate_course_sessions: {
+        Args: { p_course_id: string; p_sessions: Json }
+        Returns: {
+          capacity: number
+          course_id: string | null
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          id: string
+          instructor_name: string | null
+          notes: string | null
+          stable_id: string
+          starts_at: string
+          status: string
+          title: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "lesson_sessions"
+          isOneToOne: false
+          isSetofReturn: true
         }
       }
       generate_monthly_invoices: { Args: never; Returns: undefined }
@@ -2453,6 +2728,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      withdraw_from_course: {
+        Args: { p_enrolment_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       calendar_event_type:
@@ -2464,6 +2743,8 @@ export type Database = {
         | "stable_event"
         | "arena_booking"
       contract_status: "active" | "ending_soon" | "expired" | "cancelled"
+      course_booking_mode: "term_only" | "dropin_only" | "mixed"
+      course_status: "draft" | "active" | "completed" | "cancelled"
       document_type:
         | "passport"
         | "insurance"
@@ -2626,6 +2907,8 @@ export const Constants = {
         "arena_booking",
       ],
       contract_status: ["active", "ending_soon", "expired", "cancelled"],
+      course_booking_mode: ["term_only", "dropin_only", "mixed"],
+      course_status: ["draft", "active", "completed", "cancelled"],
       document_type: [
         "passport",
         "insurance",
