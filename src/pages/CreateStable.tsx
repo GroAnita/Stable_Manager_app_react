@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { createStable } from '../features/settings/api'
+import { createStable, type StableType } from '../features/settings/api'
 import { useAuth } from '../lib/AuthContext'
+import { STABLE_TYPES } from '../lib/features'
 import { usePreferences } from '../lib/PreferencesContext'
 
 type FormState = {
@@ -11,6 +12,7 @@ type FormState = {
   postal_code: string
   phone: string
   email: string
+  stable_type: StableType
 }
 
 const emptyForm: FormState = {
@@ -20,6 +22,7 @@ const emptyForm: FormState = {
   postal_code: '',
   phone: '',
   email: '',
+  stable_type: 'boarding',
 }
 
 export default function CreateStable() {
@@ -46,6 +49,7 @@ export default function CreateStable() {
         postal_code: form.postal_code || null,
         phone: form.phone || null,
         email: form.email || null,
+        stable_type: form.stable_type,
       })
       await refreshProfile()
       navigate('/dashboard', { replace: true })
@@ -79,6 +83,24 @@ export default function CreateStable() {
               value={form.name}
               onChange={(e) => updateField('name', e.target.value)}
             />
+          </label>
+          <label>
+            <span className="field-label">
+              {t('onboarding.stableTypeLabel')}
+            </span>
+            <select
+              className="field"
+              value={form.stable_type}
+              onChange={(e) =>
+                updateField('stable_type', e.target.value as StableType)
+              }
+            >
+              {STABLE_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {t(`onboarding.stableTypeOptions.${type}`)}
+                </option>
+              ))}
+            </select>
           </label>
           <label>
             <span className="field-label">{t('settings.phone')}</span>

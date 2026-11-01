@@ -1070,6 +1070,109 @@ export type Database = {
           },
         ]
       }
+      lesson_bookings: {
+        Row: {
+          created_at: string
+          horse_id: string
+          id: string
+          lesson_id: string
+          owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          horse_id: string
+          id?: string
+          lesson_id: string
+          owner_id: string
+        }
+        Update: {
+          created_at?: string
+          horse_id?: string
+          id?: string
+          lesson_id?: string
+          owner_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_bookings_horse_id_fkey"
+            columns: ["horse_id"]
+            isOneToOne: false
+            referencedRelation: "horses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_bookings_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_bookings_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "owners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lessons: {
+        Row: {
+          capacity: number
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          id: string
+          instructor_name: string | null
+          notes: string | null
+          stable_id: string
+          starts_at: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          capacity?: number
+          created_at?: string
+          created_by?: string | null
+          ends_at: string
+          id?: string
+          instructor_name?: string | null
+          notes?: string | null
+          stable_id: string
+          starts_at: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          capacity?: number
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string
+          id?: string
+          instructor_name?: string | null
+          notes?: string | null
+          stable_id?: string
+          starts_at?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lessons_stable_id_fkey"
+            columns: ["stable_id"]
+            isOneToOne: false
+            referencedRelation: "stables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       medical_records: {
         Row: {
           created_at: string
@@ -1613,6 +1716,7 @@ export type Database = {
           created_at: string
           default_contract_terms: string | null
           email: string | null
+          enabled_features: Json
           id: string
           invoice_footer_text: string | null
           logo_url: string | null
@@ -1623,6 +1727,7 @@ export type Database = {
           phone: string | null
           plan: Database["public"]["Enums"]["stable_plan"]
           postal_code: string | null
+          stable_type: Database["public"]["Enums"]["stable_type"]
           updated_at: string
           vat_registered: boolean
         }
@@ -1634,6 +1739,7 @@ export type Database = {
           created_at?: string
           default_contract_terms?: string | null
           email?: string | null
+          enabled_features?: Json
           id?: string
           invoice_footer_text?: string | null
           logo_url?: string | null
@@ -1644,6 +1750,7 @@ export type Database = {
           phone?: string | null
           plan?: Database["public"]["Enums"]["stable_plan"]
           postal_code?: string | null
+          stable_type?: Database["public"]["Enums"]["stable_type"]
           updated_at?: string
           vat_registered?: boolean
         }
@@ -1655,6 +1762,7 @@ export type Database = {
           created_at?: string
           default_contract_terms?: string | null
           email?: string | null
+          enabled_features?: Json
           id?: string
           invoice_footer_text?: string | null
           logo_url?: string | null
@@ -1665,6 +1773,7 @@ export type Database = {
           phone?: string | null
           plan?: Database["public"]["Enums"]["stable_plan"]
           postal_code?: string | null
+          stable_type?: Database["public"]["Enums"]["stable_type"]
           updated_at?: string
           vat_registered?: boolean
         }
@@ -2212,6 +2321,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      auth_owns_horse: { Args: { p_horse_id: string }; Returns: boolean }
       auth_role: {
         Args: never
         Returns: Database["public"]["Enums"]["user_role"]
@@ -2225,6 +2335,7 @@ export type Database = {
           p_name: string
           p_phone?: string
           p_postal_code?: string
+          p_stable_type?: string
         }
         Returns: {
           address: string | null
@@ -2234,6 +2345,7 @@ export type Database = {
           created_at: string
           default_contract_terms: string | null
           email: string | null
+          enabled_features: Json
           id: string
           invoice_footer_text: string | null
           logo_url: string | null
@@ -2244,6 +2356,7 @@ export type Database = {
           phone: string | null
           plan: Database["public"]["Enums"]["stable_plan"]
           postal_code: string | null
+          stable_type: Database["public"]["Enums"]["stable_type"]
           updated_at: string
           vat_registered: boolean
         }
@@ -2369,6 +2482,7 @@ export type Database = {
         | "feeding_shift_reminder"
       payment_status: "paid" | "due" | "overdue"
       stable_plan: "small" | "medium" | "large" | "xlarge"
+      stable_type: "boarding" | "riding_school" | "sales" | "private"
       stall_status: "available" | "occupied" | "reserved" | "maintenance"
       task_priority: "low" | "medium" | "high"
       user_role: "stable_owner" | "stable_employee" | "horse_owner"
@@ -2532,6 +2646,7 @@ export const Constants = {
       ],
       payment_status: ["paid", "due", "overdue"],
       stable_plan: ["small", "medium", "large", "xlarge"],
+      stable_type: ["boarding", "riding_school", "sales", "private"],
       stall_status: ["available", "occupied", "reserved", "maintenance"],
       task_priority: ["low", "medium", "high"],
       user_role: ["stable_owner", "stable_employee", "horse_owner"],

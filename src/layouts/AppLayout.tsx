@@ -14,6 +14,7 @@ import { NotificationBell } from '../components/NotificationBell'
 import { OnboardingChecklist } from '../components/OnboardingChecklist'
 import { signOut } from '../lib/authService'
 import { useAuth } from '../lib/AuthContext'
+import { useFeature } from '../lib/features'
 import { usePreferences } from '../lib/PreferencesContext'
 import 'flag-icons/css/flag-icons.min.css'
 
@@ -50,6 +51,18 @@ const navGroups: { labelKey: string; items: NavItem[] }[] = [
     ],
   },
 ]
+
+const lessonsItem: NavItem = {
+  key: 'lessons',
+  to: '/lessons',
+  icon: 'award',
+}
+
+const myLessonsItem: NavItem = {
+  key: 'myLessons',
+  to: '/my-lessons',
+  icon: 'award',
+}
 
 const settingsItem: NavItem = {
   key: 'settings',
@@ -115,6 +128,26 @@ export default function AppLayout() {
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const isOwner = profile?.role === 'horse_owner'
+  const lessonBookingEnabled = useFeature('lesson_booking')
+
+  const visibleNavGroups = lessonBookingEnabled
+    ? [
+        ...navGroups.slice(0, 1),
+        {
+          labelKey: 'nav.groupLessons',
+          items: [lessonsItem],
+        },
+        ...navGroups.slice(1),
+      ]
+    : navGroups
+
+  const visibleOwnerNavItems = lessonBookingEnabled
+    ? [...ownerNavItems, myLessonsItem]
+    : ownerNavItems
+
+  const ownerAllowedPaths = lessonBookingEnabled
+    ? [...OWNER_ALLOWED_PATHS, '/my-lessons']
+    : OWNER_ALLOWED_PATHS
 
   function selectEnglish() {
     setLanguage('en')
@@ -131,7 +164,7 @@ export default function AppLayout() {
     navigate('/auth', { replace: true })
   }
 
-  if (isOwner && !OWNER_ALLOWED_PATHS.includes(location.pathname)) {
+  if (isOwner && !ownerAllowedPaths.includes(location.pathname)) {
     return <Navigate to="/owner-dashboard" replace />
   }
 
@@ -182,7 +215,7 @@ export default function AppLayout() {
         >
           {isOwner ? (
             <div className="flex flex-col gap-1">
-              {ownerNavItems.map((item) => (
+              {visibleOwnerNavItems.map((item) => (
                 <SidebarLink
                   key={item.to}
                   item={item}
@@ -198,7 +231,7 @@ export default function AppLayout() {
                   onClick={() => setSidebarOpen(false)}
                 />
               </div>
-              {navGroups.map((group) => (
+              {visibleNavGroups.map((group) => (
                 <div key={group.labelKey} className="flex flex-col gap-1">
                   <p className="px-4 text-xs font-semibold tracking-wide text-ink/40 uppercase">
                     {t(group.labelKey)}

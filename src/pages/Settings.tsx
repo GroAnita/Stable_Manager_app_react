@@ -19,6 +19,7 @@ import {
 } from '../lib/PreferencesContext'
 import { SUPPORT_EMAIL, supportMailto } from '../lib/support'
 import { BillingPanel } from './settings/BillingPanel'
+import { FeaturesPanel } from './settings/FeaturesPanel'
 import { FireSafetyPanel } from './settings/FireSafetyPanel'
 import { StaffAccessPanel } from './settings/StaffAccessPanel'
 import { SubscriptionPanel } from './settings/SubscriptionPanel'
@@ -49,6 +50,7 @@ const CURRENCY_OPTIONS: Currency[] = ['EUR', 'NOK', 'SEK', 'GBP']
 
 type SettingsSection =
   | 'stableInfo'
+  | 'features'
   | 'fireSafety'
   | 'subscription'
   | 'staffAccess'
@@ -60,6 +62,7 @@ type SettingsSection =
 
 const SETTINGS_SECTIONS: SettingsSection[] = [
   'stableInfo',
+  'features',
   'fireSafety',
   'subscription',
   'staffAccess',
@@ -86,6 +89,11 @@ const SETTINGS_NAV: { groupKey: string; items: SettingsNavItem[] }[] = [
     groupKey: 'settings.navGroupStable',
     items: [
       { key: 'stableInfo', labelKey: 'settings.navStableInfo', icon: 'home' },
+      {
+        key: 'features',
+        labelKey: 'settings.navFeatures',
+        icon: 'sliders',
+      },
       {
         key: 'fireSafety',
         labelKey: 'settings.navFireSafety',
@@ -443,6 +451,13 @@ export default function Settings() {
               </div>
             ))}
 
+          {section === 'features' && stable && (
+            <FeaturesPanel
+              stable={stable}
+              canEdit={canEdit}
+              onUpdate={setStable}
+            />
+          )}
           {section === 'fireSafety' && stable && (
             <FireSafetyPanel stable={stable} canEdit={canEdit} />
           )}

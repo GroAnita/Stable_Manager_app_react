@@ -3,8 +3,9 @@ import type { Database } from '../../types/supabase'
 
 export type Stable = Database['public']['Tables']['stables']['Row']
 export type StableUpdate = Database['public']['Tables']['stables']['Update']
+export type StableType = Database['public']['Enums']['stable_type']
 export type Profile = Database['public']['Tables']['profiles']['Row'] & {
-  stable: Pick<Stable, 'name' | 'logo_url'> | null
+  stable: Pick<Stable, 'name' | 'logo_url' | 'enabled_features'> | null
 }
 
 export async function getMyProfile(): Promise<Profile> {
@@ -14,7 +15,7 @@ export async function getMyProfile(): Promise<Profile> {
   if (!user) throw new Error('Not signed in.')
   const { data, error } = await supabase
     .from('profiles')
-    .select('*, stable:stables(name, logo_url)')
+    .select('*, stable:stables(name, logo_url, enabled_features)')
     .eq('id', user.id)
     .single()
   if (error) throw error
@@ -45,6 +46,7 @@ export async function createStable(input: {
   postal_code?: string | null
   phone?: string | null
   email?: string | null
+  stable_type?: StableType
 }): Promise<Stable> {
   const { data, error } = await supabase.rpc('create_stable', {
     p_name: input.name,
@@ -53,6 +55,7 @@ export async function createStable(input: {
     p_postal_code: input.postal_code ?? undefined,
     p_phone: input.phone ?? undefined,
     p_email: input.email ?? undefined,
+    p_stable_type: input.stable_type ?? undefined,
   })
   if (error) throw error
   return data
