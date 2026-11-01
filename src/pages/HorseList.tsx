@@ -5,7 +5,8 @@ import { EmptyState } from '../components/EmptyState'
 import { HorseCard } from '../components/HorseCard'
 import { Icon } from '../components/Icon'
 import { Pagination } from '../components/Pagination'
-import { listHorses, type HorseListItem } from '../features/horses/api'
+import { listHorses, updateHorse, type HorseListItem } from '../features/horses/api'
+import { useFeature } from '../lib/features'
 import { usePreferences } from '../lib/PreferencesContext'
 
 const PAGE_SIZE = 6
@@ -16,6 +17,7 @@ function capitalize(value: string): string {
 
 export default function HorseList() {
   const { t } = usePreferences()
+  const lessonBookingEnabled = useFeature('lesson_booking')
   const [horses, setHorses] = useState<HorseListItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -79,6 +81,15 @@ export default function HorseList() {
       cancelled = true
     }
   }, [])
+
+  async function handleToggleSchoolHorse(horseId: string, checked: boolean) {
+    await updateHorse(horseId, { is_school_horse: checked })
+    setHorses((prev) =>
+      prev.map((h) =>
+        h.id === horseId ? { ...h, is_school_horse: checked } : h,
+      ),
+    )
+  }
 
   return (
     <div className="page-shell">
@@ -185,7 +196,15 @@ export default function HorseList() {
       {!loading && !error && visibleHorses.length > 0 && viewMode === 'grid' && (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {visibleHorses.map((horse) => (
-            <HorseCard key={horse.id} horse={horse} />
+            <HorseCard
+              key={horse.id}
+              horse={horse}
+              onToggleSchoolHorse={
+                lessonBookingEnabled
+                  ? (checked) => handleToggleSchoolHorse(horse.id, checked)
+                  : undefined
+              }
+            />
           ))}
         </div>
       )}

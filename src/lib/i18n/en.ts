@@ -1143,6 +1143,15 @@ export const en = {
   lessons: {
     title: 'Lessons',
     subtitle: 'Schedule lesson slots and see who has booked in.',
+    navSchedule: 'Riding lessons',
+    navSchoolHorses: 'School horses',
+    schoolHorsesTitle: 'School horses',
+    schoolHorsesSubtitle:
+      'Horses tagged as school horses on the Horses page — they belong to the riding school rather than a boarder.',
+    schoolHorse: 'School horse',
+    noHorsesTitle: 'No school horses yet',
+    noHorsesMessage:
+      'Go to Horses and turn on "School horse" for one to see it here.',
     addLesson: 'Add lesson',
     loading: 'Loading lessons…',
     noLessonsTitle: 'No upcoming lessons',

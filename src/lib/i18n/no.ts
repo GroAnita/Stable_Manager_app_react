@@ -1141,6 +1141,15 @@ export const no: typeof en = {
   lessons: {
     title: 'Ridetimer',
     subtitle: 'Planlegg ridetimer og se hvem som har booket seg på.',
+    navSchedule: 'Ridetimer',
+    navSchoolHorses: 'Skolehester',
+    schoolHorsesTitle: 'Skolehester',
+    schoolHorsesSubtitle:
+      'Hester merket som skolehest på Hester-siden — de tilhører rideskolen i stedet for en pensjonær.',
+    schoolHorse: 'Skolehest',
+    noHorsesTitle: 'Ingen skolehester ennå',
+    noHorsesMessage:
+      'Gå til Hester og slå på «Skolehest» for en hest for å se den her.',
     addLesson: 'Legg til ridetime',
     loading: 'Laster ridetimer…',
     noLessonsTitle: 'Ingen kommende ridetimer',

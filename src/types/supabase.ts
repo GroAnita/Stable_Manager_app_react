@@ -861,6 +861,7 @@ export type Database = {
           id: string
           insurance_company: string | null
           insurance_number: string | null
+          is_school_horse: boolean
           medical_notes: string | null
           microchip_number: string | null
           name: string
@@ -894,6 +895,7 @@ export type Database = {
           id?: string
           insurance_company?: string | null
           insurance_number?: string | null
+          is_school_horse?: boolean
           medical_notes?: string | null
           microchip_number?: string | null
           name: string
@@ -927,6 +929,7 @@ export type Database = {
           id?: string
           insurance_company?: string | null
           insurance_number?: string | null
+          is_school_horse?: boolean
           medical_notes?: string | null
           microchip_number?: string | null
           name?: string
