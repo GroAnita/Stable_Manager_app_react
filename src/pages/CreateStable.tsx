@@ -121,14 +121,6 @@ export default function CreateStable() {
             />
           </label>
           <label>
-            <span className="field-label">{t('settings.city')}</span>
-            <input
-              className="field"
-              value={form.city}
-              onChange={(e) => updateField('city', e.target.value)}
-            />
-          </label>
-          <label>
             <span className="field-label">{t('settings.address')}</span>
             <input
               className="field"
@@ -142,6 +134,14 @@ export default function CreateStable() {
               className="field"
               value={form.postal_code}
               onChange={(e) => updateField('postal_code', e.target.value)}
+            />
+          </label>
+          <label>
+            <span className="field-label">{t('settings.city')}</span>
+            <input
+              className="field"
+              value={form.city}
+              onChange={(e) => updateField('city', e.target.value)}
             />
           </label>
           <button type="submit" disabled={saving} className="btn-primary">

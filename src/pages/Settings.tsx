@@ -378,15 +378,6 @@ export default function Settings() {
                       onChange={(e) => updateField('email', e.target.value)}
                     />
                   </label>
-                  <label>
-                    <span className="field-label">{t('settings.city')}</span>
-                    <input
-                      disabled={!canEdit}
-                      className="field"
-                      value={form.city}
-                      onChange={(e) => updateField('city', e.target.value)}
-                    />
-                  </label>
                   <label className="md:col-span-2">
                     <span className="field-label">
                       {t('settings.address')}
@@ -409,6 +400,15 @@ export default function Settings() {
                       onChange={(e) =>
                         updateField('postal_code', e.target.value)
                       }
+                    />
+                  </label>
+                  <label>
+                    <span className="field-label">{t('settings.city')}</span>
+                    <input
+                      disabled={!canEdit}
+                      className="field"
+                      value={form.city}
+                      onChange={(e) => updateField('city', e.target.value)}
                     />
                   </label>
                 </div>
