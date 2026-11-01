@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { CoursesPanel } from './lessons/CoursesPanel'
+import { LessonsCalendarPanel } from './lessons/LessonsCalendarPanel'
 import { SchedulePanel } from './lessons/SchedulePanel'
 import { SchoolHorsesPanel } from './lessons/SchoolHorsesPanel'
 import { usePreferences } from '../lib/PreferencesContext'
 
-type LessonsSection = 'schedule' | 'courses' | 'schoolHorses'
+type LessonsSection = 'calendar' | 'schedule' | 'courses' | 'schoolHorses'
 
 const SECTIONS: { key: LessonsSection; labelKey: string }[] = [
+  { key: 'calendar', labelKey: 'lessons.navCalendar' },
   { key: 'schedule', labelKey: 'lessons.navSchedule' },
   { key: 'courses', labelKey: 'lessons.navCourses' },
   { key: 'schoolHorses', labelKey: 'lessons.navSchoolHorses' },
@@ -14,7 +16,7 @@ const SECTIONS: { key: LessonsSection; labelKey: string }[] = [
 
 export default function Lessons() {
   const { t } = usePreferences()
-  const [section, setSection] = useState<LessonsSection>('schedule')
+  const [section, setSection] = useState<LessonsSection>('calendar')
 
   return (
     <div className="page-shell">
@@ -44,6 +46,7 @@ export default function Lessons() {
         </nav>
 
         <div className="min-w-0 flex-1">
+          {section === 'calendar' && <LessonsCalendarPanel />}
           {section === 'schedule' && <SchedulePanel />}
           {section === 'courses' && <CoursesPanel />}
           {section === 'schoolHorses' && <SchoolHorsesPanel />}

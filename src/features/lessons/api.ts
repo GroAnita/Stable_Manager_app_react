@@ -83,6 +83,20 @@ export async function listUpcomingStandaloneSessions(): Promise<
   return data
 }
 
+export async function listSessionsInRange(
+  fromIso: string,
+  toIso: string,
+): Promise<LessonSessionWithBookings[]> {
+  const { data, error } = await supabase
+    .from('lesson_sessions')
+    .select(SESSION_SELECT)
+    .gte('starts_at', fromIso)
+    .lte('starts_at', toIso)
+    .order('starts_at')
+  if (error) throw error
+  return data
+}
+
 export async function createStandaloneSession(
   input: Omit<LessonSessionInsert, 'course_id'>,
 ): Promise<LessonSession> {

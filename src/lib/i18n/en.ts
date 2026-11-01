@@ -1143,6 +1143,7 @@ export const en = {
   lessons: {
     title: 'Lessons',
     subtitle: 'Schedule lesson slots and courses, and see who has booked in.',
+    navCalendar: 'Calendar',
     navSchedule: 'Riding lessons',
     navCourses: 'Courses',
     navSchoolHorses: 'School horses',
@@ -1211,6 +1212,8 @@ export const en = {
     sessionsTitle: 'Sessions',
     noSessionsGeneratedMessage:
       'No sessions generated yet — use "Generate sessions" above.',
+    moreSessions: '+{count} more',
+    noSessionsThisDay: 'Nothing scheduled this day.',
   },
   myLessons: {
     title: 'Lessons',

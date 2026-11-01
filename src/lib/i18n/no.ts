@@ -1141,6 +1141,7 @@ export const no: typeof en = {
   lessons: {
     title: 'Ridetimer',
     subtitle: 'Planlegg ridetimer og kurs, og se hvem som har booket seg på.',
+    navCalendar: 'Kalender',
     navSchedule: 'Ridetimer',
     navCourses: 'Kurs',
     navSchoolHorses: 'Skolehester',
@@ -1209,6 +1210,8 @@ export const no: typeof en = {
     sessionsTitle: 'Ridetimer',
     noSessionsGeneratedMessage:
       'Ingen ridetimer generert ennå — bruk «Generer ridetimer» over.',
+    moreSessions: '+{count} til',
+    noSessionsThisDay: 'Ingenting planlagt denne dagen.',
   },
   myLessons: {
     title: 'Ridetimer',
