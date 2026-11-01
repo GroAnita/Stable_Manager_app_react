@@ -2,7 +2,9 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { EmptyState } from '../../components/EmptyState'
 import { Icon } from '../../components/Icon'
 import { Modal } from '../../components/Modal'
+import { listHorses, type HorseListItem } from '../../features/horses/api'
 import {
+  assignBookingHorse,
   createCourse,
   generateSessionsForCourse,
   listCourses,
@@ -403,11 +405,13 @@ function CourseDetailView({
   const { t, formatDate, formatTime } = usePreferences()
   const [enrolments, setEnrolments] = useState<CourseEnrolment[]>([])
   const [sessions, setSessions] = useState<LessonSessionWithBookings[]>([])
+  const [horses, setHorses] = useState<HorseListItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [generating, setGenerating] = useState(false)
   const [generateMessage, setGenerateMessage] = useState<string | null>(null)
   const [withdrawingId, setWithdrawingId] = useState<string | null>(null)
+  const [assigningBookingId, setAssigningBookingId] = useState<string | null>(null)
 
   const [editOpen, setEditOpen] = useState(false)
   const [editForm, setEditForm] = useState<CourseFormState>(() => toCourseForm(course))
@@ -416,16 +420,38 @@ function CourseDetailView({
 
   function load() {
     setLoading(true)
-    Promise.all([listEnrolmentsForCourse(course.id), listSessionsForCourse(course.id)])
-      .then(([courseEnrolments, courseSessions]) => {
+    Promise.all([
+      listEnrolmentsForCourse(course.id),
+      listSessionsForCourse(course.id),
+      listHorses(),
+    ])
+      .then(([courseEnrolments, courseSessions, stableHorses]) => {
         setEnrolments(courseEnrolments)
         setSessions(courseSessions)
+        setHorses(stableHorses)
       })
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false))
   }
 
   useEffect(load, [course.id])
+
+  async function handleAssignHorse(bookingId: string, horseId: string) {
+    setAssigningBookingId(bookingId)
+    try {
+      const updated = await assignBookingHorse(bookingId, horseId || null)
+      setSessions((prev) =>
+        prev.map((session) => ({
+          ...session,
+          bookings: session.bookings.map((b) => (b.id === bookingId ? updated : b)),
+        })),
+      )
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setAssigningBookingId(null)
+    }
+  }
 
   async function handleGenerateSessions() {
     setGenerating(true)
@@ -570,21 +596,55 @@ function CourseDetailView({
           <p className="mt-2 text-sm text-slate-500">{t('lessons.noSessionsGeneratedMessage')}</p>
         )}
         {sessions.length > 0 && (
-          <div className="mt-3 flex flex-col gap-2">
-            {sessions.map((session) => (
-              <div key={session.id} className="flex items-center justify-between text-sm">
-                <span className="text-slate-700">
-                  {formatDate(session.starts_at)} · {formatTime(session.starts_at)}–
-                  {formatTime(session.ends_at)}
-                </span>
-                <span className="text-slate-500">
-                  {t('lessons.spotsBooked', {
-                    booked: session.bookings.filter((b) => b.status === 'confirmed').length,
-                    capacity: session.capacity,
-                  })}
-                </span>
-              </div>
-            ))}
+          <div className="mt-3 flex flex-col gap-3">
+            {sessions.map((session) => {
+              const confirmedBookings = session.bookings.filter(
+                (b) => b.status === 'confirmed',
+              )
+              return (
+                <div key={session.id} className="rounded-2xl border border-slate-100 p-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium text-slate-700">
+                      {formatDate(session.starts_at)} · {formatTime(session.starts_at)}–
+                      {formatTime(session.ends_at)}
+                    </span>
+                    <span className="text-slate-500">
+                      {t('lessons.spotsBooked', {
+                        booked: confirmedBookings.length,
+                        capacity: session.capacity,
+                      })}
+                    </span>
+                  </div>
+                  {confirmedBookings.length > 0 && (
+                    <div className="mt-2 flex flex-col gap-2 border-t border-slate-100 pt-2">
+                      {confirmedBookings.map((booking) => (
+                        <div
+                          key={booking.id}
+                          className="flex items-center justify-between gap-2 text-sm"
+                        >
+                          <span className="text-slate-700">
+                            {booking.rider?.full_name ?? booking.owner?.full_name ?? '—'}
+                          </span>
+                          <select
+                            className="field"
+                            value={booking.horse_id ?? ''}
+                            disabled={assigningBookingId === booking.id}
+                            onChange={(e) => handleAssignHorse(booking.id, e.target.value)}
+                          >
+                            <option value="">{t('lessons.noHorseAssigned')}</option>
+                            {horses.map((horse) => (
+                              <option key={horse.id} value={horse.id}>
+                                {horse.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
       </div>

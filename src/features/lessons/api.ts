@@ -213,6 +213,43 @@ export async function listEnrolmentsForCourse(
   return data
 }
 
+/** Staff-only: reassign which horse a specific booking uses, independent
+ * of every other booking under the same enrolment — a term rider can
+ * ride a different horse each week. The DB rejects a horse that isn't
+ * even in this stable (see 20261101000005_booking_horse_reassignment_guard.sql);
+ * ordinary RLS still blocks non-staff from calling this at all. */
+export async function assignBookingHorse(
+  bookingId: string,
+  horseId: string | null,
+): Promise<LessonBooking> {
+  const { data, error } = await supabase
+    .from('lesson_bookings')
+    .update({ horse_id: horseId })
+    .eq('id', bookingId)
+    .select(BOOKING_SELECT)
+    .single()
+  if (error) throw error
+  return data
+}
+
+/** Every confirmed lesson booking a horse has ever had, for a
+ * usage/overuse stat on the Horses page — kept simple rather than a
+ * server-side date-ranged count, since per-horse lesson volume is
+ * small. */
+export async function listHorseLessonBookings(
+  horseId: string,
+): Promise<{ starts_at: string }[]> {
+  const { data, error } = await supabase
+    .from('lesson_bookings')
+    .select('session:lesson_sessions(starts_at)')
+    .eq('horse_id', horseId)
+    .eq('status', 'confirmed')
+  if (error) throw error
+  return data
+    .map((row) => row.session)
+    .filter((session): session is { starts_at: string } => session !== null)
+}
+
 // ---------------------------------------------------------------------------
 // Booking (term enrolment + drop-in), both funneled through RPCs so the
 // capacity/eligibility/timing rules live in one place.

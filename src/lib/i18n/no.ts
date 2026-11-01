@@ -363,6 +363,9 @@ export const no: typeof en = {
     passportNumber: 'Passnummer',
     microchipNumber: 'Mikrochip-nummer',
     insurance: 'Forsikring',
+    lessonUsage: 'Brukt i ridetimer',
+    lessonUsageToday: '{count} i dag',
+    lessonUsageWeek: '{count} denne uken',
     vaccinationStatus: 'Vaksinasjonsstatus',
     vaccinationStatusOk: 'Oppdatert',
     vaccinationStatusDueSoon: 'Forfaller snart',
@@ -1144,6 +1147,7 @@ export const no: typeof en = {
     navCalendar: 'Kalender',
     navSchedule: 'Ridetimer',
     navCourses: 'Kurs',
+    navRiders: 'Ryttere',
     navSchoolHorses: 'Skolehester',
     schoolHorsesTitle: 'Skolehester',
     schoolHorsesSubtitle:
@@ -1259,6 +1263,13 @@ export const no: typeof en = {
     noBookingsMessage: 'Book en ridetime eller meld deg på et kurs for å se den her.',
     myself: 'Meg selv',
     cancel: 'Avbestill',
+  },
+  ridersPanel: {
+    subtitle:
+      'Alle ryttere i stallen og hvilken hest de rir i dag — endre hest for en bestemt ridetime fra kursets egen side.',
+    noRidersTitle: 'Ingen ryttere ennå',
+    noRidersMessage: 'Ryttere dukker opp her når en pensjonær legger til et familiemedlem.',
+    noLessonToday: 'Ingen ridetime i dag',
   },
   notFound: {
     title: 'Siden finnes ikke',

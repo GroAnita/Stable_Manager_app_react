@@ -95,7 +95,7 @@ export default function MyHorse() {
             </div>
           </div>
 
-          <OverviewTab horse={horse} vaccinations={vaccinations} />
+          <OverviewTab horse={horse} vaccinations={vaccinations} lessonBookingDates={null} />
 
           <div>
             <h3 className="section-title">{t('myHorse.medicalRecords')}</h3>

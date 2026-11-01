@@ -18,6 +18,8 @@ import {
   type MedicalRecord,
   type Vaccination,
 } from '../features/horses/api'
+import { listHorseLessonBookings } from '../features/lessons/api'
+import { useFeature } from '../lib/features'
 import { usePreferences } from '../lib/PreferencesContext'
 import { AdditionalOwnersCard } from './horseDetail/AdditionalOwnersCard'
 import { DocumentsTab } from './horseDetail/DocumentsTab'
@@ -43,12 +45,14 @@ export default function HorseDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { t } = usePreferences()
+  const lessonBookingEnabled = useFeature('lesson_booking')
   const [horse, setHorse] = useState<HorseDetailData | null>(null)
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([])
   const [vaccinations, setVaccinations] = useState<Vaccination[]>([])
   const [feedingPlan, setFeedingPlan] = useState<FeedingPlan | null>(null)
   const [feedingTimes, setFeedingTimes] = useState<FeedingTime[]>([])
   const [schedule, setSchedule] = useState<HorseEvent[]>([])
+  const [lessonBookingDates, setLessonBookingDates] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [tab, setTab] = useState<Tab>('overview')
@@ -63,8 +67,9 @@ export default function HorseDetail() {
       getHorseFeedingPlan(id),
       getHorseFeedingTimes(id),
       getHorseSchedule(id),
+      listHorseLessonBookings(id),
     ])
-      .then(([horseData, medical, vaccinationRecords, feeding, times, events]) => {
+      .then(([horseData, medical, vaccinationRecords, feeding, times, events, lessonBookings]) => {
         if (cancelled) return
         setHorse(horseData)
         setMedicalRecords(medical)
@@ -72,6 +77,7 @@ export default function HorseDetail() {
         setFeedingPlan(feeding)
         setFeedingTimes(times)
         setSchedule(events)
+        setLessonBookingDates(lessonBookings.map((b) => b.starts_at))
       })
       .catch((err: Error) => {
         if (!cancelled) setError(err.message)
@@ -164,7 +170,11 @@ export default function HorseDetail() {
       <div className="panel p-6">
         {tab === 'overview' && (
           <div className="space-y-6">
-            <OverviewTab horse={horse} vaccinations={vaccinations} />
+            <OverviewTab
+              horse={horse}
+              vaccinations={vaccinations}
+              lessonBookingDates={lessonBookingEnabled ? lessonBookingDates : null}
+            />
             <AdditionalOwnersCard
               horseId={horse.id}
               primaryOwnerId={horse.owner_id}

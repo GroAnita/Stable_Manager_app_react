@@ -11,16 +11,42 @@ const VACCINATION_STATUS_LABEL_KEY: Record<StatusDotColor, string> = {
   grey: 'horseDetail.vaccinationStatusUnknown',
 }
 
+function startOfWeek(date: Date): Date {
+  const start = new Date(date)
+  const day = (start.getDay() + 6) % 7
+  start.setDate(start.getDate() - day)
+  start.setHours(0, 0, 0, 0)
+  return start
+}
+
 export function OverviewTab({
   horse,
   vaccinations,
+  lessonBookingDates,
 }: {
   horse: HorseDetail
   vaccinations: Vaccination[]
+  lessonBookingDates: string[] | null
 }) {
   const { t, formatDate } = usePreferences()
   const age = horse.birthday ? calculateAge(horse.birthday) : horse.age
   const vaccinationStatus = getVaccinationOverviewStatus(vaccinations)
+
+  let lessonsToday = 0
+  let lessonsThisWeek = 0
+  if (lessonBookingDates) {
+    const now = new Date()
+    const todayStart = new Date(now)
+    todayStart.setHours(0, 0, 0, 0)
+    const todayEnd = new Date(now)
+    todayEnd.setHours(23, 59, 59, 999)
+    const weekStart = startOfWeek(now)
+    for (const iso of lessonBookingDates) {
+      const date = new Date(iso)
+      if (date >= weekStart) lessonsThisWeek += 1
+      if (date >= todayStart && date <= todayEnd) lessonsToday += 1
+    }
+  }
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <div className="space-y-4">
@@ -96,6 +122,17 @@ export function OverviewTab({
         </div>
       </div>
       <div className="space-y-4">
+        {lessonBookingDates && (
+          <div className="rounded-2xl bg-slate-50 p-4">
+            <p className="text-sm text-slate-400">
+              {t('horseDetail.lessonUsage')}
+            </p>
+            <p className="mt-1 font-medium text-slate-900">
+              {t('horseDetail.lessonUsageToday', { count: lessonsToday })} ·{' '}
+              {t('horseDetail.lessonUsageWeek', { count: lessonsThisWeek })}
+            </p>
+          </div>
+        )}
         <div>
           <p className="text-sm text-slate-400">
             {t('horseDetail.vaccinationStatus')}

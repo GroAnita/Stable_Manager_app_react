@@ -362,6 +362,9 @@ export const en = {
     passportNumber: 'Passport number',
     microchipNumber: 'Microchip number',
     insurance: 'Insurance',
+    lessonUsage: 'Lesson usage',
+    lessonUsageToday: '{count} today',
+    lessonUsageWeek: '{count} this week',
     vaccinationStatus: 'Vaccination status',
     vaccinationStatusOk: 'Up to date',
     vaccinationStatusDueSoon: 'Due soon',
@@ -1146,6 +1149,7 @@ export const en = {
     navCalendar: 'Calendar',
     navSchedule: 'Riding lessons',
     navCourses: 'Courses',
+    navRiders: 'Riders',
     navSchoolHorses: 'School horses',
     schoolHorsesTitle: 'School horses',
     schoolHorsesSubtitle:
@@ -1261,6 +1265,13 @@ export const en = {
     noBookingsMessage: 'Book a lesson or enrol in a course to see it here.',
     myself: 'Myself',
     cancel: 'Cancel',
+  },
+  ridersPanel: {
+    subtitle:
+      "Every rider in the stable and which horse they're on today — change a horse for a specific lesson from that course's page.",
+    noRidersTitle: 'No riders yet',
+    noRidersMessage: 'Riders show up here once an owner adds a family member.',
+    noLessonToday: 'No lesson today',
   },
   notFound: {
     title: 'Page not found',

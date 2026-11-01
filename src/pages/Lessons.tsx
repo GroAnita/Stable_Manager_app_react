@@ -1,16 +1,18 @@
 import { useState } from 'react'
 import { CoursesPanel } from './lessons/CoursesPanel'
 import { LessonsCalendarPanel } from './lessons/LessonsCalendarPanel'
+import { RidersPanel } from './lessons/RidersPanel'
 import { SchedulePanel } from './lessons/SchedulePanel'
 import { SchoolHorsesPanel } from './lessons/SchoolHorsesPanel'
 import { usePreferences } from '../lib/PreferencesContext'
 
-type LessonsSection = 'calendar' | 'schedule' | 'courses' | 'schoolHorses'
+type LessonsSection = 'calendar' | 'schedule' | 'courses' | 'riders' | 'schoolHorses'
 
 const SECTIONS: { key: LessonsSection; labelKey: string }[] = [
   { key: 'calendar', labelKey: 'lessons.navCalendar' },
   { key: 'schedule', labelKey: 'lessons.navSchedule' },
   { key: 'courses', labelKey: 'lessons.navCourses' },
+  { key: 'riders', labelKey: 'lessons.navRiders' },
   { key: 'schoolHorses', labelKey: 'lessons.navSchoolHorses' },
 ]
 
@@ -49,6 +51,7 @@ export default function Lessons() {
           {section === 'calendar' && <LessonsCalendarPanel />}
           {section === 'schedule' && <SchedulePanel />}
           {section === 'courses' && <CoursesPanel />}
+          {section === 'riders' && <RidersPanel />}
           {section === 'schoolHorses' && <SchoolHorsesPanel />}
         </div>
       </div>
