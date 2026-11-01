@@ -1317,6 +1317,8 @@ export const en = {
   category: {
     boarding: 'Boarding',
     emptybox: 'Empty box fee',
+    ridinglessons: 'Riding lessons',
+    ridingcourses: 'Riding courses',
     hay: 'Hay',
     grain: 'Grain',
     supplements: 'Supplements',

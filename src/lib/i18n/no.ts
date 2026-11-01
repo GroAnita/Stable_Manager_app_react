@@ -1315,6 +1315,8 @@ export const no: typeof en = {
   category: {
     boarding: 'Oppstalling',
     emptybox: 'Tom boks leie',
+    ridinglessons: 'Ridetimer',
+    ridingcourses: 'Ridekurs',
     hay: 'Høy',
     grain: 'Kraftfôr',
     supplements: 'Tilskudd',

@@ -28,6 +28,8 @@ const UNIT_OPTIONS = [
 const CATEGORY_OPTIONS = [
   'Boarding',
   'EmptyBox',
+  'RidingLessons',
+  'RidingCourses',
   'Hay',
   'Grain',
   'Supplements',
