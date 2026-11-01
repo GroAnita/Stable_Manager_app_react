@@ -2,7 +2,7 @@ import { supabase } from '../../lib/supabaseClient'
 import type { Database } from '../../types/supabase'
 
 export type Staff = Database['public']['Tables']['staff']['Row']
-export type StaffRole = 'stable_owner' | 'stable_employee'
+export type StaffRole = 'stable_owner' | 'stable_employee' | 'riding_instructor'
 
 export async function listStaff(): Promise<Staff[]> {
   const { data, error } = await supabase

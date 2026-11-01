@@ -95,6 +95,13 @@ const OWNER_ALLOWED_PATHS = [
   '/notice-board',
 ]
 
+// A riding instructor is staff, but scoped to only the lessons area —
+// everything else in the app (horses, owners, payments, settings, …)
+// stays off-limits, mirroring how the owner role is restricted above.
+const instructorNavItems: NavItem[] = [lessonsItem]
+
+const INSTRUCTOR_ALLOWED_PATHS = ['/lessons']
+
 function SidebarLink({
   item,
   onClick,
@@ -128,6 +135,7 @@ export default function AppLayout() {
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const isOwner = profile?.role === 'horse_owner'
+  const isInstructor = profile?.role === 'riding_instructor'
   const lessonBookingEnabled = useFeature('lesson_booking')
 
   const visibleNavGroups = lessonBookingEnabled
@@ -166,6 +174,10 @@ export default function AppLayout() {
 
   if (isOwner && !ownerAllowedPaths.includes(location.pathname)) {
     return <Navigate to="/owner-dashboard" replace />
+  }
+
+  if (isInstructor && !INSTRUCTOR_ALLOWED_PATHS.includes(location.pathname)) {
+    return <Navigate to="/lessons" replace />
   }
 
   return (
@@ -223,6 +235,16 @@ export default function AppLayout() {
                 />
               ))}
             </div>
+          ) : isInstructor ? (
+            <div className="flex flex-col gap-1">
+              {instructorNavItems.map((item) => (
+                <SidebarLink
+                  key={item.to}
+                  item={item}
+                  onClick={() => setSidebarOpen(false)}
+                />
+              ))}
+            </div>
           ) : (
             <>
               <div className="flex flex-col gap-1">
@@ -249,10 +271,12 @@ export default function AppLayout() {
           )}
         </nav>
         <div className="border-t border-white/70 pt-4">
-          <SidebarLink
-            item={isOwner ? ownerProfileItem : settingsItem}
-            onClick={() => setSidebarOpen(false)}
-          />
+          {!isInstructor && (
+            <SidebarLink
+              item={isOwner ? ownerProfileItem : settingsItem}
+              onClick={() => setSidebarOpen(false)}
+            />
+          )}
           <p className="mt-3 mb-2 truncate px-1 text-xs text-ink/60">
             {session?.user.email}
           </p>

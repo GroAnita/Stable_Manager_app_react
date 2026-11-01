@@ -216,6 +216,9 @@ export function StaffAccessPanel({
                     <option value="stable_employee">
                       {t('settings.staffRoleEmployee')}
                     </option>
+                    <option value="riding_instructor">
+                      {t('settings.staffRoleInstructor')}
+                    </option>
                   </select>
                   <button
                     type="button"
@@ -337,7 +340,13 @@ export function StaffAccessPanel({
                 <option value="stable_owner">
                   {t('settings.staffRoleAdmin')}
                 </option>
+                <option value="riding_instructor">
+                  {t('settings.staffRoleInstructor')}
+                </option>
               </select>
+              <p className="mt-1 text-xs text-slate-400">
+                {t('settings.staffRoleInstructorHint')}
+              </p>
             </label>
             <button type="submit" disabled={addSaving} className="btn-primary">
               {addSaving ? t('common.saving') : t('settings.staffAddButton')}

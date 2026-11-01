@@ -58,6 +58,7 @@ export const no: typeof en = {
     stable_owner: 'Admin',
     stable_employee: 'Ansatt',
     horse_owner: 'Eier',
+    riding_instructor: 'Rideinstruktør',
   },
   auth: {
     welcomeBack: 'Velkommen tilbake',
@@ -1075,6 +1076,9 @@ export const no: typeof en = {
     staffRole: 'Rolle',
     staffRoleAdmin: 'Admin',
     staffRoleEmployee: 'Ansatt',
+    staffRoleInstructor: 'Rideinstruktør',
+    staffRoleInstructorHint:
+      'Får bare tilgang til Ridetimer-fanen — kalender, ridetimer, kurs, ryttere og skolehester. Resten av appen (hester, pensjonærer, betalinger, innstillinger osv.) er ikke synlig for dem.',
     staffStatusActive: 'Aktiv',
     staffStatusPending: 'Venter',
     staffInviteReady: 'Invitasjonslenke — del denne med {name}:',

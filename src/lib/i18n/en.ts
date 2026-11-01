@@ -56,6 +56,7 @@ export const en = {
     stable_owner: 'Admin',
     stable_employee: 'Staff',
     horse_owner: 'Owner',
+    riding_instructor: 'Riding instructor',
   },
   auth: {
     welcomeBack: 'Welcome back',
@@ -1076,6 +1077,9 @@ export const en = {
     staffRole: 'Role',
     staffRoleAdmin: 'Admin',
     staffRoleEmployee: 'Staff',
+    staffRoleInstructor: 'Riding instructor',
+    staffRoleInstructorHint:
+      "Only gets the Lessons tab — calendar, riding lessons, courses, riders, and school horses. Nothing else in the app (horses, owners, payments, settings, etc.) is visible to them.",
     staffStatusActive: 'Active',
     staffStatusPending: 'Pending',
     staffInviteReady: 'Invite link — share it with {name}:',

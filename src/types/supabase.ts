@@ -2801,7 +2801,11 @@ export type Database = {
       stable_type: "boarding" | "riding_school" | "sales" | "private"
       stall_status: "available" | "occupied" | "reserved" | "maintenance"
       task_priority: "low" | "medium" | "high"
-      user_role: "stable_owner" | "stable_employee" | "horse_owner"
+      user_role:
+        | "stable_owner"
+        | "stable_employee"
+        | "horse_owner"
+        | "riding_instructor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2967,7 +2971,12 @@ export const Constants = {
       stable_type: ["boarding", "riding_school", "sales", "private"],
       stall_status: ["available", "occupied", "reserved", "maintenance"],
       task_priority: ["low", "medium", "high"],
-      user_role: ["stable_owner", "stable_employee", "horse_owner"],
+      user_role: [
+        "stable_owner",
+        "stable_employee",
+        "horse_owner",
+        "riding_instructor",
+      ],
     },
   },
 } as const
