@@ -1174,6 +1174,9 @@ export const no: typeof en = {
     noCoursesTitle: 'Ingen kurs ennå',
     noCoursesMessage: 'Legg til et kurs for å starte en termin med faste ridetimer.',
     addCourseModalTitle: 'Legg til kurs',
+    editCourseModalTitle: 'Rediger kurs',
+    editCourseHint:
+      'Hvis du endrer ukedag, tid eller terminperiode, påvirkes ikke allerede genererte ridetimer — bruk «Generer ridetimer» på nytt etterpå for å legge til nye.',
     level: 'Nivå',
     weekdayLabel: 'Ukedag',
     weekday: {

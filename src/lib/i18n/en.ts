@@ -1176,6 +1176,9 @@ export const en = {
     noCoursesTitle: 'No courses yet',
     noCoursesMessage: 'Add a course to start a term with recurring sessions.',
     addCourseModalTitle: 'Add course',
+    editCourseModalTitle: 'Edit course',
+    editCourseHint:
+      "Changing the weekday, time, or term dates won't change sessions already generated — use \"Generate sessions\" again afterwards to add any new ones.",
     level: 'Level',
     weekdayLabel: 'Weekday',
     weekday: {

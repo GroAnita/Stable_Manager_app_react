@@ -8,6 +8,7 @@ import {
   listCourses,
   listEnrolmentsForCourse,
   listSessionsForCourse,
+  updateCourse,
   withdrawFromCourse,
   type Course,
   type CourseBookingMode,
@@ -54,6 +55,205 @@ function emptyForm(): CourseFormState {
   }
 }
 
+function toCourseForm(course: Course): CourseFormState {
+  return {
+    title: course.title,
+    level: course.level ?? '',
+    instructor_name: course.instructor_name ?? '',
+    location: course.location ?? '',
+    capacity: String(course.capacity),
+    price: course.price != null ? String(course.price) : '',
+    weekday: String(course.weekday),
+    start_time: course.start_time.slice(0, 5),
+    end_time: course.end_time.slice(0, 5),
+    term_start_date: course.term_start_date,
+    term_end_date: course.term_end_date,
+    booking_mode: course.booking_mode,
+    spare_release_days_before: String(course.spare_release_days_before),
+  }
+}
+
+function formToCourseInput(form: CourseFormState) {
+  return {
+    title: form.title,
+    level: form.level || null,
+    instructor_name: form.instructor_name || null,
+    location: form.location || null,
+    capacity: Number(form.capacity) || 1,
+    price: form.price ? Number(form.price) : null,
+    weekday: Number(form.weekday),
+    start_time: form.start_time,
+    end_time: form.end_time,
+    term_start_date: form.term_start_date,
+    term_end_date: form.term_end_date,
+    booking_mode: form.booking_mode,
+    spare_release_days_before: Number(form.spare_release_days_before) || 0,
+  }
+}
+
+function CourseFormFields({
+  form,
+  onChange,
+}: {
+  form: CourseFormState
+  onChange: <K extends keyof CourseFormState>(key: K, value: CourseFormState[K]) => void
+}) {
+  const { t } = usePreferences()
+  return (
+    <>
+      <label>
+        <span className="field-label">{t('lessons.lessonTitle')}</span>
+        <input
+          required
+          className="field"
+          value={form.title}
+          onChange={(e) => onChange('title', e.target.value)}
+        />
+      </label>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label>
+          <span className="field-label">{t('lessons.level')}</span>
+          <input
+            className="field"
+            value={form.level}
+            onChange={(e) => onChange('level', e.target.value)}
+          />
+        </label>
+        <label>
+          <span className="field-label">{t('lessons.instructor')}</span>
+          <input
+            className="field"
+            value={form.instructor_name}
+            onChange={(e) => onChange('instructor_name', e.target.value)}
+          />
+        </label>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label>
+          <span className="field-label">{t('lessons.weekdayLabel')}</span>
+          <select
+            className="field"
+            value={form.weekday}
+            onChange={(e) => onChange('weekday', e.target.value)}
+          >
+            {WEEKDAYS.map((day) => (
+              <option key={day} value={day}>
+                {t(`lessons.weekday.${day}`)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span className="field-label">{t('lessons.capacity')}</span>
+          <input
+            required
+            type="number"
+            min={1}
+            className="field"
+            value={form.capacity}
+            onChange={(e) => onChange('capacity', e.target.value)}
+          />
+        </label>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label>
+          <span className="field-label">{t('lessons.startsAt')}</span>
+          <input
+            required
+            type="time"
+            className="field"
+            value={form.start_time}
+            onChange={(e) => onChange('start_time', e.target.value)}
+          />
+        </label>
+        <label>
+          <span className="field-label">{t('lessons.endsAt')}</span>
+          <input
+            required
+            type="time"
+            className="field"
+            value={form.end_time}
+            onChange={(e) => onChange('end_time', e.target.value)}
+          />
+        </label>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label>
+          <span className="field-label">{t('lessons.termStart')}</span>
+          <input
+            required
+            type="date"
+            className="field"
+            value={form.term_start_date}
+            onChange={(e) => onChange('term_start_date', e.target.value)}
+          />
+        </label>
+        <label>
+          <span className="field-label">{t('lessons.termEnd')}</span>
+          <input
+            required
+            type="date"
+            className="field"
+            value={form.term_end_date}
+            onChange={(e) => onChange('term_end_date', e.target.value)}
+          />
+        </label>
+      </div>
+      <label>
+        <span className="field-label">{t('lessons.bookingModeLabel')}</span>
+        <select
+          className="field"
+          value={form.booking_mode}
+          onChange={(e) => onChange('booking_mode', e.target.value as CourseBookingMode)}
+        >
+          {BOOKING_MODES.map((mode) => (
+            <option key={mode} value={mode}>
+              {t(`lessons.bookingMode.${mode}`)}
+            </option>
+          ))}
+        </select>
+        <p className="mt-1 text-xs text-slate-400">{t('lessons.bookingModeHint')}</p>
+      </label>
+      {form.booking_mode === 'mixed' && (
+        <label>
+          <span className="field-label">{t('lessons.spareReleaseDays')}</span>
+          <input
+            type="number"
+            min={0}
+            className="field"
+            value={form.spare_release_days_before}
+            onChange={(e) => onChange('spare_release_days_before', e.target.value)}
+          />
+          <p className="mt-1 text-xs text-slate-400">
+            {t('lessons.spareReleaseDaysHint')}
+          </p>
+        </label>
+      )}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label>
+          <span className="field-label">{t('lessons.location')}</span>
+          <input
+            className="field"
+            value={form.location}
+            onChange={(e) => onChange('location', e.target.value)}
+          />
+        </label>
+        <label>
+          <span className="field-label">{t('lessons.price')}</span>
+          <input
+            type="number"
+            min={0}
+            step="0.01"
+            className="field"
+            value={form.price}
+            onChange={(e) => onChange('price', e.target.value)}
+          />
+        </label>
+      </div>
+    </>
+  )
+}
+
 export function CoursesPanel() {
   const { t, formatDate } = usePreferences()
   const [courses, setCourses] = useState<Course[]>([])
@@ -82,13 +282,6 @@ export function CoursesPanel() {
     setAddOpen(true)
   }
 
-  function updateAddField<K extends keyof CourseFormState>(
-    key: K,
-    value: CourseFormState[K],
-  ) {
-    setAddForm((prev) => ({ ...prev, [key]: value }))
-  }
-
   async function handleAddSubmit(event: FormEvent) {
     event.preventDefault()
     setAddSaving(true)
@@ -98,19 +291,7 @@ export function CoursesPanel() {
       if (!stableId) throw new Error(t('lessons.noStableFound'))
       const created = await createCourse({
         stable_id: stableId,
-        title: addForm.title,
-        level: addForm.level || null,
-        instructor_name: addForm.instructor_name || null,
-        location: addForm.location || null,
-        capacity: Number(addForm.capacity) || 1,
-        price: addForm.price ? Number(addForm.price) : null,
-        weekday: Number(addForm.weekday),
-        start_time: addForm.start_time,
-        end_time: addForm.end_time,
-        term_start_date: addForm.term_start_date,
-        term_end_date: addForm.term_end_date,
-        booking_mode: addForm.booking_mode,
-        spare_release_days_before: Number(addForm.spare_release_days_before) || 0,
+        ...formToCourseInput(addForm),
       })
       setCourses((prev) => [created, ...prev])
       setAddOpen(false)
@@ -122,10 +303,20 @@ export function CoursesPanel() {
     }
   }
 
+  function handleCourseUpdated(updated: Course) {
+    setCourses((prev) => prev.map((c) => (c.id === updated.id ? updated : c)))
+  }
+
   const selected = courses.find((c) => c.id === selectedId) ?? null
 
   if (selected) {
-    return <CourseDetailView course={selected} onBack={() => setSelectedId(null)} />
+    return (
+      <CourseDetailView
+        course={selected}
+        onBack={() => setSelectedId(null)}
+        onCourseUpdated={handleCourseUpdated}
+      />
+    )
   }
 
   return (
@@ -187,161 +378,10 @@ export function CoursesPanel() {
               {addError}
             </p>
           )}
-          <label>
-            <span className="field-label">{t('lessons.lessonTitle')}</span>
-            <input
-              required
-              className="field"
-              value={addForm.title}
-              onChange={(e) => updateAddField('title', e.target.value)}
-            />
-          </label>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label>
-              <span className="field-label">{t('lessons.level')}</span>
-              <input
-                className="field"
-                value={addForm.level}
-                onChange={(e) => updateAddField('level', e.target.value)}
-              />
-            </label>
-            <label>
-              <span className="field-label">{t('lessons.instructor')}</span>
-              <input
-                className="field"
-                value={addForm.instructor_name}
-                onChange={(e) => updateAddField('instructor_name', e.target.value)}
-              />
-            </label>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label>
-              <span className="field-label">{t('lessons.weekdayLabel')}</span>
-              <select
-                className="field"
-                value={addForm.weekday}
-                onChange={(e) => updateAddField('weekday', e.target.value)}
-              >
-                {WEEKDAYS.map((day) => (
-                  <option key={day} value={day}>
-                    {t(`lessons.weekday.${day}`)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <span className="field-label">{t('lessons.capacity')}</span>
-              <input
-                required
-                type="number"
-                min={1}
-                className="field"
-                value={addForm.capacity}
-                onChange={(e) => updateAddField('capacity', e.target.value)}
-              />
-            </label>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label>
-              <span className="field-label">{t('lessons.startsAt')}</span>
-              <input
-                required
-                type="time"
-                className="field"
-                value={addForm.start_time}
-                onChange={(e) => updateAddField('start_time', e.target.value)}
-              />
-            </label>
-            <label>
-              <span className="field-label">{t('lessons.endsAt')}</span>
-              <input
-                required
-                type="time"
-                className="field"
-                value={addForm.end_time}
-                onChange={(e) => updateAddField('end_time', e.target.value)}
-              />
-            </label>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label>
-              <span className="field-label">{t('lessons.termStart')}</span>
-              <input
-                required
-                type="date"
-                className="field"
-                value={addForm.term_start_date}
-                onChange={(e) => updateAddField('term_start_date', e.target.value)}
-              />
-            </label>
-            <label>
-              <span className="field-label">{t('lessons.termEnd')}</span>
-              <input
-                required
-                type="date"
-                className="field"
-                value={addForm.term_end_date}
-                onChange={(e) => updateAddField('term_end_date', e.target.value)}
-              />
-            </label>
-          </div>
-          <label>
-            <span className="field-label">{t('lessons.bookingModeLabel')}</span>
-            <select
-              className="field"
-              value={addForm.booking_mode}
-              onChange={(e) =>
-                updateAddField('booking_mode', e.target.value as CourseBookingMode)
-              }
-            >
-              {BOOKING_MODES.map((mode) => (
-                <option key={mode} value={mode}>
-                  {t(`lessons.bookingMode.${mode}`)}
-                </option>
-              ))}
-            </select>
-            <p className="mt-1 text-xs text-slate-400">
-              {t('lessons.bookingModeHint')}
-            </p>
-          </label>
-          {addForm.booking_mode === 'mixed' && (
-            <label>
-              <span className="field-label">{t('lessons.spareReleaseDays')}</span>
-              <input
-                type="number"
-                min={0}
-                className="field"
-                value={addForm.spare_release_days_before}
-                onChange={(e) =>
-                  updateAddField('spare_release_days_before', e.target.value)
-                }
-              />
-              <p className="mt-1 text-xs text-slate-400">
-                {t('lessons.spareReleaseDaysHint')}
-              </p>
-            </label>
-          )}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label>
-              <span className="field-label">{t('lessons.location')}</span>
-              <input
-                className="field"
-                value={addForm.location}
-                onChange={(e) => updateAddField('location', e.target.value)}
-              />
-            </label>
-            <label>
-              <span className="field-label">{t('lessons.price')}</span>
-              <input
-                type="number"
-                min={0}
-                step="0.01"
-                className="field"
-                value={addForm.price}
-                onChange={(e) => updateAddField('price', e.target.value)}
-              />
-            </label>
-          </div>
+          <CourseFormFields
+            form={addForm}
+            onChange={(key, value) => setAddForm((prev) => ({ ...prev, [key]: value }))}
+          />
           <button type="submit" disabled={addSaving} className="btn-primary">
             {addSaving ? t('common.saving') : t('lessons.save')}
           </button>
@@ -351,7 +391,15 @@ export function CoursesPanel() {
   )
 }
 
-function CourseDetailView({ course, onBack }: { course: Course; onBack: () => void }) {
+function CourseDetailView({
+  course,
+  onBack,
+  onCourseUpdated,
+}: {
+  course: Course
+  onBack: () => void
+  onCourseUpdated: (course: Course) => void
+}) {
   const { t, formatDate, formatTime } = usePreferences()
   const [enrolments, setEnrolments] = useState<CourseEnrolment[]>([])
   const [sessions, setSessions] = useState<LessonSessionWithBookings[]>([])
@@ -360,6 +408,11 @@ function CourseDetailView({ course, onBack }: { course: Course; onBack: () => vo
   const [generating, setGenerating] = useState(false)
   const [generateMessage, setGenerateMessage] = useState<string | null>(null)
   const [withdrawingId, setWithdrawingId] = useState<string | null>(null)
+
+  const [editOpen, setEditOpen] = useState(false)
+  const [editForm, setEditForm] = useState<CourseFormState>(() => toCourseForm(course))
+  const [editSaving, setEditSaving] = useState(false)
+  const [editError, setEditError] = useState<string | null>(null)
 
   function load() {
     setLoading(true)
@@ -402,6 +455,27 @@ function CourseDetailView({ course, onBack }: { course: Course; onBack: () => vo
     }
   }
 
+  function openEdit() {
+    setEditForm(toCourseForm(course))
+    setEditError(null)
+    setEditOpen(true)
+  }
+
+  async function handleEditSubmit(event: FormEvent) {
+    event.preventDefault()
+    setEditSaving(true)
+    setEditError(null)
+    try {
+      const updated = await updateCourse(course.id, formToCourseInput(editForm))
+      onCourseUpdated(updated)
+      setEditOpen(false)
+    } catch (err) {
+      setEditError((err as Error).message)
+    } finally {
+      setEditSaving(false)
+    }
+  }
+
   const activeEnrolments = enrolments.filter((e) => e.status === 'active')
 
   return (
@@ -438,14 +512,20 @@ function CourseDetailView({ course, onBack }: { course: Course; onBack: () => vo
               {formatDate(course.term_start_date)} – {formatDate(course.term_end_date)}
             </p>
           </div>
-          <button
-            type="button"
-            className="btn-ghost"
-            disabled={generating}
-            onClick={handleGenerateSessions}
-          >
-            {generating ? t('common.saving') : t('lessons.generateSessions')}
-          </button>
+          <div className="flex items-center gap-2">
+            <button type="button" className="btn-ghost" onClick={openEdit}>
+              <Icon name="edit" className="h-4 w-4" />
+              {t('common.edit')}
+            </button>
+            <button
+              type="button"
+              className="btn-ghost"
+              disabled={generating}
+              onClick={handleGenerateSessions}
+            >
+              {generating ? t('common.saving') : t('lessons.generateSessions')}
+            </button>
+          </div>
         </div>
         {generateMessage && (
           <p role="status" className="mt-3 text-sm text-emerald-700">
@@ -508,6 +588,28 @@ function CourseDetailView({ course, onBack }: { course: Course; onBack: () => vo
           </div>
         )}
       </div>
+
+      <Modal
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        title={t('lessons.editCourseModalTitle')}
+      >
+        <form onSubmit={handleEditSubmit} className="grid gap-4">
+          {editError && (
+            <p role="alert" className="text-sm text-red-600">
+              {editError}
+            </p>
+          )}
+          <p className="text-xs text-slate-400">{t('lessons.editCourseHint')}</p>
+          <CourseFormFields
+            form={editForm}
+            onChange={(key, value) => setEditForm((prev) => ({ ...prev, [key]: value }))}
+          />
+          <button type="submit" disabled={editSaving} className="btn-primary">
+            {editSaving ? t('common.saving') : t('common.save')}
+          </button>
+        </form>
+      </Modal>
     </div>
   )
 }

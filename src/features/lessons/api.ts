@@ -7,6 +7,7 @@ export type LessonSessionInsert =
 
 export type Course = Database['public']['Tables']['courses']['Row']
 export type CourseInsert = Database['public']['Tables']['courses']['Insert']
+export type CourseUpdate = Database['public']['Tables']['courses']['Update']
 export type CourseBookingMode = Course['booking_mode']
 
 export type Enrolment = Database['public']['Tables']['enrolments']['Row'] & {
@@ -133,6 +134,17 @@ export async function createCourse(input: CourseInsert): Promise<Course> {
   const { data, error } = await supabase
     .from('courses')
     .insert(input)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function updateCourse(id: string, input: CourseUpdate): Promise<Course> {
+  const { data, error } = await supabase
+    .from('courses')
+    .update(input)
+    .eq('id', id)
     .select()
     .single()
   if (error) throw error
