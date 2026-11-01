@@ -1141,6 +1141,15 @@ export const no: typeof en = {
     failedToLoad: 'Kunne ikke laste oppgaver: {error}',
     noStableFound: 'Fant ingen stall for denne brukeren. Vennligst logg inn.',
   },
+  lessonsCalendar: {
+    blocked: 'Blokkert',
+    addNorwegianHolidays: 'Legg til norske helligdager for {year}',
+    holidaysAdded: 'La til norske helligdager for {year}.',
+    blockLabel: 'Grunn',
+    blockLabelPlaceholder: 'f.eks. Første juledag',
+    blockDate: 'Blokker denne datoen',
+    unblock: 'Opphev blokkering',
+  },
   lessons: {
     title: 'Ridetimer',
     subtitle: 'Planlegg ridetimer og kurs, og se hvem som har booket seg på.',

@@ -62,6 +62,38 @@ export type Database = {
           },
         ]
       }
+      blocked_dates: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          label: string | null
+          stable_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          label?: string | null
+          stable_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          label?: string | null
+          stable_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blocked_dates_stable_id_fkey"
+            columns: ["stable_id"]
+            isOneToOne: false
+            referencedRelation: "stables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       calendar_events: {
         Row: {
           created_at: string

@@ -42,6 +42,9 @@ export type CourseEnrolment = Database['public']['Tables']['enrolments']['Row'] 
   rider: Pick<Database['public']['Tables']['riders']['Row'], 'id' | 'full_name'> | null
 }
 
+export type BlockedDate = Database['public']['Tables']['blocked_dates']['Row']
+export type BlockedDateInsert = Database['public']['Tables']['blocked_dates']['Insert']
+
 const BOOKING_SELECT =
   'id, session_id, owner_id, rider_id, horse_id, enrolment_id, status, cancelled_at, created_at, owner:owners(id, full_name), rider:riders(id, full_name), horse:horses(id, name)'
 
@@ -51,6 +54,14 @@ function startOfTodayIso(): string {
   const date = new Date()
   date.setHours(0, 0, 0, 0)
   return date.toISOString()
+}
+
+// Local (not UTC) Y-M-D — a date near midnight can land on a different
+// UTC day than the stable's local calendar day, which would silently
+// mis-match against blocked_dates.
+export function toLocalIsoDate(date: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 }
 
 // ---------------------------------------------------------------------------
@@ -154,9 +165,13 @@ export async function updateCourse(id: string, input: CourseUpdate): Promise<Cou
 /** Every date between the course's term dates landing on its weekday, at
  * its local start/end time — computed here (not server-side) so the
  * instant is correct for the browser's time zone, the same way the
- * existing ad-hoc "add lesson" form already works. */
+ * existing ad-hoc "add lesson" form already works. Dates in
+ * excludeDates (local Y-M-D, e.g. public holidays) are skipped
+ * entirely rather than generated and then cancelled — a course that
+ * spans more holidays just ends up with fewer sessions than another. */
 export function computeCourseSessionDates(
   course: Pick<Course, 'term_start_date' | 'term_end_date' | 'weekday' | 'start_time' | 'end_time'>,
+  excludeDates?: Set<string>,
 ): { starts_at: string; ends_at: string }[] {
   const sessions: { starts_at: string; ends_at: string }[] = []
   const [startHour, startMinute] = course.start_time.split(':').map(Number)
@@ -168,11 +183,13 @@ export function computeCourseSessionDates(
     current.setDate(current.getDate() + 1)
   }
   while (current <= end) {
-    const startsAt = new Date(current)
-    startsAt.setHours(startHour, startMinute, 0, 0)
-    const endsAt = new Date(current)
-    endsAt.setHours(endHour, endMinute, 0, 0)
-    sessions.push({ starts_at: startsAt.toISOString(), ends_at: endsAt.toISOString() })
+    if (!excludeDates?.has(toLocalIsoDate(current))) {
+      const startsAt = new Date(current)
+      startsAt.setHours(startHour, startMinute, 0, 0)
+      const endsAt = new Date(current)
+      endsAt.setHours(endHour, endMinute, 0, 0)
+      sessions.push({ starts_at: startsAt.toISOString(), ends_at: endsAt.toISOString() })
+    }
     current.setDate(current.getDate() + 7)
   }
   return sessions
@@ -181,12 +198,111 @@ export function computeCourseSessionDates(
 export async function generateSessionsForCourse(
   course: Course,
 ): Promise<LessonSession[]> {
+  const blocked = await listBlockedDates()
+  const blockedDates = new Set(blocked.map((b) => b.date))
   const { data, error } = await supabase.rpc('generate_course_sessions', {
     p_course_id: course.id,
-    p_sessions: computeCourseSessionDates(course),
+    p_sessions: computeCourseSessionDates(course, blockedDates),
   })
   if (error) throw error
   return data
+}
+
+// ---------------------------------------------------------------------------
+// Blocked dates (holidays/closures) — stable-wide, skipped when
+// generating a course's sessions.
+
+export async function listBlockedDates(): Promise<BlockedDate[]> {
+  const { data, error } = await supabase
+    .from('blocked_dates')
+    .select('*')
+    .order('date')
+  if (error) throw error
+  return data
+}
+
+export async function addBlockedDate(input: BlockedDateInsert): Promise<BlockedDate> {
+  const { data, error } = await supabase
+    .from('blocked_dates')
+    .insert(input)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function deleteBlockedDate(id: string): Promise<void> {
+  const { error } = await supabase.from('blocked_dates').delete().eq('id', id)
+  if (error) throw error
+}
+
+/** Bulk-add, silently skipping any date already blocked for this
+ * stable (the unique constraint backs this up server-side too). */
+export async function addBlockedDates(
+  stableId: string,
+  dates: { date: string; label: string }[],
+): Promise<void> {
+  const { error } = await supabase.from('blocked_dates').upsert(
+    dates.map((d) => ({ stable_id: stableId, date: d.date, label: d.label })),
+    { onConflict: 'stable_id,date', ignoreDuplicates: true },
+  )
+  if (error) throw error
+}
+
+const NORWEGIAN_FIXED_HOLIDAYS: { month: number; day: number; label: string }[] = [
+  { month: 1, day: 1, label: 'Nyttårsdag' },
+  { month: 5, day: 1, label: 'Arbeidernes dag' },
+  { month: 5, day: 17, label: 'Grunnlovsdag' },
+  { month: 12, day: 25, label: 'Første juledag' },
+  { month: 12, day: 26, label: 'Andre juledag' },
+]
+
+const NORWEGIAN_EASTER_OFFSET_HOLIDAYS: { offset: number; label: string }[] = [
+  { offset: -3, label: 'Skjærtorsdag' },
+  { offset: -2, label: 'Langfredag' },
+  { offset: 0, label: '1. påskedag' },
+  { offset: 1, label: '2. påskedag' },
+  { offset: 39, label: 'Kristi himmelfartsdag' },
+  { offset: 49, label: '1. pinsedag' },
+]
+
+/** Anonymous Gregorian algorithm for the date of Easter Sunday. */
+function computeEasterSunday(year: number): Date {
+  const a = year % 19
+  const b = Math.floor(year / 100)
+  const c = year % 100
+  const d = Math.floor(b / 4)
+  const e = b % 4
+  const f = Math.floor((b + 8) / 25)
+  const g = Math.floor((b - f + 1) / 3)
+  const h = (19 * a + b - d - g + 15) % 30
+  const i = Math.floor(c / 4)
+  const k = c % 4
+  const l = (32 + 2 * e + 2 * i - h - k) % 7
+  const m = Math.floor((a + 11 * h + 22 * l) / 451)
+  const month = Math.floor((h + l - 7 * m + 114) / 31)
+  const day = ((h + l - 7 * m + 114) % 31) + 1
+  return new Date(year, month - 1, day)
+}
+
+/** Norway's official non-working public holidays for a given year
+ * ("røde dager"), as local Y-M-D dates with their Norwegian names. */
+export function computeNorwegianPublicHolidays(
+  year: number,
+): { date: string; label: string }[] {
+  const holidays = NORWEGIAN_FIXED_HOLIDAYS.map(({ month, day, label }) => ({
+    date: toLocalIsoDate(new Date(year, month - 1, day)),
+    label,
+  }))
+
+  const easter = computeEasterSunday(year)
+  for (const { offset, label } of NORWEGIAN_EASTER_OFFSET_HOLIDAYS) {
+    const date = new Date(easter)
+    date.setDate(date.getDate() + offset)
+    holidays.push({ date: toLocalIsoDate(date), label })
+  }
+
+  return holidays.sort((a, b) => a.date.localeCompare(b.date))
 }
 
 export async function listSessionsForCourse(

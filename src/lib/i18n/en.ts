@@ -1143,6 +1143,15 @@ export const en = {
     failedToLoad: 'Failed to load tasks: {error}',
     noStableFound: 'No stable found for the current user. Please sign in.',
   },
+  lessonsCalendar: {
+    blocked: 'Blocked',
+    addNorwegianHolidays: 'Add Norwegian holidays for {year}',
+    holidaysAdded: "Added {year}'s Norwegian public holidays.",
+    blockLabel: 'Reason',
+    blockLabelPlaceholder: 'e.g. Christmas Day',
+    blockDate: 'Block this date',
+    unblock: 'Unblock',
+  },
   lessons: {
     title: 'Lessons',
     subtitle: 'Schedule lesson slots and courses, and see who has booked in.',
