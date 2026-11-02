@@ -27,13 +27,6 @@ import type { HorseOption, OwnerOption, StallOption } from '../lib/options'
 import { getCurrentStableId } from '../lib/stableContext'
 
 type ContractStatus = 'active' | 'ending_soon' | 'expired' | 'cancelled'
-type IncludedService = 'full' | 'weekFull' | 'normal'
-
-const SERVICE_OPTIONS: { value: IncludedService; key: string }[] = [
-  { value: 'full', key: 'contractForm.serviceFull' },
-  { value: 'weekFull', key: 'contractForm.serviceWeekFull' },
-  { value: 'normal', key: 'contractForm.serviceNormal' },
-]
 
 type FormState = {
   horse_id: string
@@ -49,7 +42,6 @@ type FormState = {
   included_hay_kg: string
   bedding_price_list_item_id: string
   bedding_quantity: string
-  included_services: IncludedService | ''
   additional_services: string
   notes: string
   contract_terms: string
@@ -69,7 +61,6 @@ const emptyForm: FormState = {
   included_hay_kg: '',
   bedding_price_list_item_id: '',
   bedding_quantity: '',
-  included_services: '',
   additional_services: '',
   notes: '',
   contract_terms: '',
@@ -92,7 +83,6 @@ export default function ContractForm() {
   const [loading, setLoading] = useState(isEdit)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [serviceError, setServiceError] = useState(false)
 
   useEffect(() => {
     listHorseOptions()
@@ -156,8 +146,6 @@ export default function ContractForm() {
           bedding_quantity: contract.bedding_quantity
             ? contract.bedding_quantity.toString()
             : '',
-          included_services:
-            (contract.included_services as IncludedService | null) ?? '',
           additional_services: contract.additional_services ?? '',
           notes: contract.notes ?? '',
           contract_terms: contract.contract_terms ?? '',
@@ -174,7 +162,6 @@ export default function ContractForm() {
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
-    if (key === 'included_services') setServiceError(false)
   }
 
   function selectBoardingItem(itemId: string) {
@@ -217,10 +204,6 @@ export default function ContractForm() {
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
-    if (!form.included_services) {
-      setServiceError(true)
-      return
-    }
     setSaving(true)
     setError(null)
     try {
@@ -242,7 +225,6 @@ export default function ContractForm() {
         bedding_quantity: form.bedding_quantity
           ? Number(form.bedding_quantity)
           : 0,
-        included_services: form.included_services,
         additional_services: form.additional_services || null,
         notes: form.notes || null,
         contract_terms: form.contract_terms || null,
@@ -541,35 +523,6 @@ export default function ContractForm() {
           />
         </label>
         <div />
-
-        <div className="md:col-span-2 xl:col-span-3">
-          <span className="field-label">
-            {t('contractForm.includedServices')}
-          </span>
-          <div className="mt-2 flex flex-col gap-2">
-            {SERVICE_OPTIONS.map((option) => (
-              <label
-                key={option.value}
-                className="flex items-center gap-2 text-sm text-slate-700"
-              >
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-slate-300"
-                  checked={form.included_services === option.value}
-                  onChange={() =>
-                    updateField('included_services', option.value)
-                  }
-                />
-                {t(option.key)}
-              </label>
-            ))}
-          </div>
-          {serviceError && (
-            <p className="mt-1 text-xs text-rose-500">
-              {t('contractForm.includedServicesError')}
-            </p>
-          )}
-        </div>
 
         <label className="md:col-span-2 xl:col-span-3">
           <span className="field-label">

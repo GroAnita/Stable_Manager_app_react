@@ -14,12 +14,6 @@ import {
 } from '../lib/billing'
 import { usePreferences } from '../lib/PreferencesContext'
 
-const SERVICE_LABEL_KEYS: Record<string, string> = {
-  full: 'contractForm.serviceFull',
-  weekFull: 'contractForm.serviceWeekFull',
-  normal: 'contractForm.serviceNormal',
-}
-
 export function ContractFields({ contract }: { contract: ContractDetail }) {
   const { t, formatCurrency, formatDate } = usePreferences()
   const [emptyBoxRate, setEmptyBoxRate] = useState<number | null>(null)
@@ -60,9 +54,6 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
   const beddingValue = horseIsAway ? 0 : rawBeddingValue
   const rent = horseIsAway ? (emptyBoxRate ?? 0) : contract.monthly_rent
   const total = Math.round((rent + hayValue + beddingValue) * 100) / 100
-  const serviceKey = contract.included_services
-    ? SERVICE_LABEL_KEYS[contract.included_services]
-    : null
 
   return (
     <div className="space-y-6">
@@ -175,14 +166,6 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
               : t('contractView.notSet')}
           </p>
         </div>
-        {serviceKey && (
-          <div>
-            <span className="field-label">
-              {t('contractForm.includedServices')}
-            </span>
-            <p className="text-slate-900">{t(serviceKey)}</p>
-          </div>
-        )}
       </div>
 
       <div className="rounded-2xl bg-slate-50 p-4">
