@@ -64,6 +64,12 @@ const myLessonsItem: NavItem = {
   icon: 'award',
 }
 
+const coRidersItem: NavItem = {
+  key: 'coRiders',
+  to: '/co-riders',
+  icon: 'users',
+}
+
 const settingsItem: NavItem = {
   key: 'settings',
   to: '/settings',
@@ -137,8 +143,9 @@ export default function AppLayout() {
   const isOwner = profile?.role === 'horse_owner'
   const isInstructor = profile?.role === 'riding_instructor'
   const lessonBookingEnabled = useFeature('lesson_booking')
+  const coRiderEnabled = useFeature('co_rider')
 
-  const visibleNavGroups = lessonBookingEnabled
+  const baseNavGroups = lessonBookingEnabled
     ? [
         ...navGroups.slice(0, 1),
         {
@@ -148,6 +155,13 @@ export default function AppLayout() {
         ...navGroups.slice(1),
       ]
     : navGroups
+
+  const visibleNavGroups = coRiderEnabled
+    ? [
+        ...baseNavGroups,
+        { labelKey: 'nav.groupCoRiders', items: [coRidersItem] },
+      ]
+    : baseNavGroups
 
   const visibleOwnerNavItems = lessonBookingEnabled
     ? [...ownerNavItems, myLessonsItem]

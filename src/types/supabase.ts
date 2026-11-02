@@ -158,6 +158,123 @@ export type Database = {
           },
         ]
       }
+      co_rider_agreements: {
+        Row: {
+          billing_frequency:
+            | Database["public"]["Enums"]["co_rider_billing_frequency"]
+            | null
+          co_rider_id: string
+          created_at: string
+          end_date: string | null
+          fee_amount: number | null
+          horse_id: string
+          id: string
+          notes: string | null
+          stable_duties: string | null
+          stable_id: string
+          start_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          billing_frequency?:
+            | Database["public"]["Enums"]["co_rider_billing_frequency"]
+            | null
+          co_rider_id: string
+          created_at?: string
+          end_date?: string | null
+          fee_amount?: number | null
+          horse_id: string
+          id?: string
+          notes?: string | null
+          stable_duties?: string | null
+          stable_id: string
+          start_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          billing_frequency?:
+            | Database["public"]["Enums"]["co_rider_billing_frequency"]
+            | null
+          co_rider_id?: string
+          created_at?: string
+          end_date?: string | null
+          fee_amount?: number | null
+          horse_id?: string
+          id?: string
+          notes?: string | null
+          stable_duties?: string | null
+          stable_id?: string
+          start_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "co_rider_agreements_co_rider_id_fkey"
+            columns: ["co_rider_id"]
+            isOneToOne: false
+            referencedRelation: "co_riders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "co_rider_agreements_horse_id_fkey"
+            columns: ["horse_id"]
+            isOneToOne: false
+            referencedRelation: "horses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "co_rider_agreements_stable_id_fkey"
+            columns: ["stable_id"]
+            isOneToOne: false
+            referencedRelation: "stables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      co_riders: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          notes: string | null
+          phone: string | null
+          stable_id: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          stable_id: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          stable_id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "co_riders_stable_id_fkey"
+            columns: ["stable_id"]
+            isOneToOne: false
+            referencedRelation: "stables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contracts: {
         Row: {
           additional_services: string | null
@@ -1278,6 +1395,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "lesson_bookings_lesson_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_sessions"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "lesson_bookings_owner_id_fkey"
             columns: ["owner_id"]
             isOneToOne: false
@@ -1289,13 +1413,6 @@ export type Database = {
             columns: ["rider_id"]
             isOneToOne: false
             referencedRelation: "riders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "lesson_bookings_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "lesson_sessions"
             referencedColumns: ["id"]
           },
         ]
@@ -2774,6 +2891,7 @@ export type Database = {
         | "training"
         | "stable_event"
         | "arena_booking"
+      co_rider_billing_frequency: "per_session" | "monthly"
       contract_status: "active" | "ending_soon" | "expired" | "cancelled"
       course_booking_mode: "term_only" | "dropin_only" | "mixed"
       course_status: "draft" | "active" | "completed" | "cancelled"
@@ -2942,6 +3060,7 @@ export const Constants = {
         "stable_event",
         "arena_booking",
       ],
+      co_rider_billing_frequency: ["per_session", "monthly"],
       contract_status: ["active", "ending_soon", "expired", "cancelled"],
       course_booking_mode: ["term_only", "dropin_only", "mixed"],
       course_status: ["draft", "active", "completed", "cancelled"],

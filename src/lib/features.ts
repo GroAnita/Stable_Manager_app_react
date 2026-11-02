@@ -11,7 +11,11 @@ export const STABLE_TYPES: StableType[] = [
 // Keys an optional module checks to decide whether it's visible for a
 // stable. New module keys get added here as those modules are built —
 // enabling a key that no screen reads yet is harmless, just inert.
-export type FeatureKey = 'lesson_booking' | 'instructor_scheduling' | 'sales_listings'
+export type FeatureKey =
+  | 'lesson_booking'
+  | 'instructor_scheduling'
+  | 'sales_listings'
+  | 'co_rider'
 
 export const ALL_FEATURES: { key: FeatureKey; labelKey: string }[] = [
   { key: 'lesson_booking', labelKey: 'settings.featureLessonBooking' },
@@ -20,6 +24,7 @@ export const ALL_FEATURES: { key: FeatureKey; labelKey: string }[] = [
     labelKey: 'settings.featureInstructorScheduling',
   },
   { key: 'sales_listings', labelKey: 'settings.featureSalesListings' },
+  { key: 'co_rider', labelKey: 'settings.featureCoRider' },
 ]
 
 // What create_stable() seeds enabled_features with for each stable_type

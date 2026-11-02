@@ -14,6 +14,9 @@ const HorseForm = lazy(() => import('./pages/HorseForm'))
 const OwnerList = lazy(() => import('./pages/OwnerList'))
 const OwnerDetail = lazy(() => import('./pages/OwnerDetail'))
 const OwnerForm = lazy(() => import('./pages/OwnerForm'))
+const CoRiderList = lazy(() => import('./pages/CoRiderList'))
+const CoRiderDetail = lazy(() => import('./pages/CoRiderDetail'))
+const CoRiderForm = lazy(() => import('./pages/CoRiderForm'))
 const StallView = lazy(() => import('./pages/StallView'))
 const PaddockView = lazy(() => import('./pages/PaddockView'))
 const ContractList = lazy(() => import('./pages/ContractList'))
@@ -89,6 +92,10 @@ export const router = createBrowserRouter([
       { path: 'owners/new', element: <OwnerForm /> },
       { path: 'owners/:id/edit', element: <OwnerForm /> },
       { path: 'owners/:id', element: <OwnerDetail /> },
+      { path: 'co-riders', element: <CoRiderList /> },
+      { path: 'co-riders/new', element: <CoRiderForm /> },
+      { path: 'co-riders/:id/edit', element: <CoRiderForm /> },
+      { path: 'co-riders/:id', element: <CoRiderDetail /> },
       { path: 'stalls', element: <StallView /> },
       { path: 'paddocks', element: <PaddockView /> },
       { path: 'contracts', element: <ContractList /> },
