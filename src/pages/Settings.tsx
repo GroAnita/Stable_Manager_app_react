@@ -78,6 +78,13 @@ function isSettingsSection(value: string | null): value is SettingsSection {
   return SETTINGS_SECTIONS.includes(value as SettingsSection)
 }
 
+const EMPLOYEE_ALLOWED_SECTIONS: SettingsSection[] = [
+  'fireSafety',
+  'account',
+  'languageAppearance',
+  'support',
+]
+
 type SettingsNavItem = {
   key: SettingsSection
   labelKey: string
@@ -199,6 +206,22 @@ export default function Settings() {
   }, [])
 
   const canEdit = profile?.role === 'stable_owner'
+  const isEmployee = profile?.role === 'stable_employee'
+
+  const visibleSettingsNav = isEmployee
+    ? SETTINGS_NAV.map((group) => ({
+        ...group,
+        items: group.items.filter((item) =>
+          EMPLOYEE_ALLOWED_SECTIONS.includes(item.key),
+        ),
+      })).filter((group) => group.items.length > 0)
+    : SETTINGS_NAV
+
+  useEffect(() => {
+    if (!loading && isEmployee && !EMPLOYEE_ALLOWED_SECTIONS.includes(section)) {
+      setSection('fireSafety')
+    }
+  }, [loading, isEmployee, section])
 
   async function handleLogoChange(file: File | undefined) {
     if (!file || !stable) return
@@ -264,7 +287,7 @@ export default function Settings() {
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
         <nav className="flex shrink-0 flex-col gap-4 lg:w-64">
-          {SETTINGS_NAV.map((group) => (
+          {visibleSettingsNav.map((group) => (
             <div key={group.groupKey}>
               <p className="px-3 text-xs font-semibold tracking-wide text-slate-400 uppercase">
                 {t(group.groupKey)}
@@ -296,7 +319,7 @@ export default function Settings() {
         </nav>
 
         <div className="min-w-0 flex-1 space-y-6">
-          {section === 'stableInfo' &&
+          {!isEmployee && section === 'stableInfo' &&
             (stable && form ? (
               <form onSubmit={handleSubmit} className="panel p-6">
                 <h2 className="section-title">
@@ -452,7 +475,7 @@ export default function Settings() {
               </div>
             ))}
 
-          {section === 'features' && stable && (
+          {!isEmployee && section === 'features' && stable && (
             <FeaturesPanel
               stable={stable}
               canEdit={canEdit}
@@ -462,27 +485,27 @@ export default function Settings() {
           {section === 'fireSafety' && stable && (
             <FireSafetyPanel stable={stable} canEdit={canEdit} />
           )}
-          {section === 'subscription' && stable && (
+          {!isEmployee && section === 'subscription' && stable && (
             <SubscriptionPanel
               stable={stable}
               canEdit={canEdit}
               onChange={setStable}
             />
           )}
-          {section === 'billing' && stable && (
+          {!isEmployee && section === 'billing' && stable && (
             <BillingPanel stable={stable} canEdit={canEdit} onChange={setStable} />
           )}
-          {section === 'integrations' && (
+          {!isEmployee && section === 'integrations' && (
             <ComingSoonPanel labelKey="settings.navIntegrations" />
           )}
 
-          {section === 'staffAccess' && canEdit && profile?.stable_id && session && (
+          {!isEmployee && section === 'staffAccess' && canEdit && profile?.stable_id && session && (
             <StaffAccessPanel
               stableId={profile.stable_id}
               createdBy={session.user.id}
             />
           )}
-          {section === 'staffAccess' && !canEdit && (
+          {!isEmployee && section === 'staffAccess' && !canEdit && (
             <div className="panel p-6 text-sm text-slate-500">
               {t('settings.onlyOwnerCanEdit')}
             </div>
