@@ -164,7 +164,7 @@ function ComingSoonPanel({ labelKey }: { labelKey: string }) {
 }
 
 export default function Settings() {
-  const { session } = useAuth()
+  const { session, refreshProfile } = useAuth()
   const { t, language, setLanguage, currency, setCurrency, theme, setTheme } =
     usePreferences()
   const [searchParams] = useSearchParams()
@@ -223,6 +223,11 @@ export default function Settings() {
     }
   }, [loading, isEmployee, section])
 
+  function handleStableChange(updated: Stable) {
+    setStable(updated)
+    void refreshProfile()
+  }
+
   async function handleLogoChange(file: File | undefined) {
     if (!file || !stable) return
     setLogoUploading(true)
@@ -230,7 +235,7 @@ export default function Settings() {
     try {
       const logoUrl = await uploadStableLogo({ stableId: stable.id, file })
       const updated = await updateStable(stable.id, { logo_url: logoUrl })
-      setStable(updated)
+      handleStableChange(updated)
     } catch (err) {
       setLogoError((err as Error).message)
     } finally {
@@ -258,7 +263,7 @@ export default function Settings() {
         postal_code: form.postal_code || null,
         default_contract_terms: form.default_contract_terms || null,
       })
-      setStable(updated)
+      handleStableChange(updated)
       setSaved(true)
     } catch (err) {
       setError((err as Error).message)
@@ -479,7 +484,7 @@ export default function Settings() {
             <FeaturesPanel
               stable={stable}
               canEdit={canEdit}
-              onUpdate={setStable}
+              onUpdate={handleStableChange}
             />
           )}
           {section === 'fireSafety' && stable && (
@@ -489,11 +494,15 @@ export default function Settings() {
             <SubscriptionPanel
               stable={stable}
               canEdit={canEdit}
-              onChange={setStable}
+              onChange={handleStableChange}
             />
           )}
           {!isEmployee && section === 'billing' && stable && (
-            <BillingPanel stable={stable} canEdit={canEdit} onChange={setStable} />
+            <BillingPanel
+              stable={stable}
+              canEdit={canEdit}
+              onChange={handleStableChange}
+            />
           )}
           {!isEmployee && section === 'integrations' && (
             <ComingSoonPanel labelKey="settings.navIntegrations" />
