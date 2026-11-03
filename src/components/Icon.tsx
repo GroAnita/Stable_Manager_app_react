@@ -37,6 +37,8 @@ export type IconName =
   | 'sliders'
   | 'award'
   | 'sparkles'
+  | 'messageCircle'
+  | 'thumbsUp'
 
 const strokeIcons: Record<IconName, ReactNode> = {
   home: (
@@ -278,6 +280,15 @@ const strokeIcons: Record<IconName, ReactNode> = {
       <path d="M20.5 4.5h-3" />
       <path d="M5 17v2.5" />
       <path d="M6.25 18.25h-2.5" />
+    </>
+  ),
+  messageCircle: (
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+  ),
+  thumbsUp: (
+    <>
+      <path d="M7 10v12" />
+      <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z" />
     </>
   ),
 }

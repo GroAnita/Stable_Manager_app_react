@@ -107,7 +107,7 @@ export const no: typeof en = {
       'Hesteprofiler, fôringsplaner og vaksinasjonsoversikt',
     marketingFeatureBilling:
       'Kontrakter, fakturaer og betalinger, generert automatisk',
-    marketingFeatureBoard: 'En delt oppslagstavle så ingenting går glipp av',
+    marketingFeatureBoard: 'En delt oppslagstavle så ingen går glipp av noe',
     marketingFeatureRoles:
       'Egne visninger for ansatte og hesteeiere — alle ser bare det de trenger',
   },
@@ -292,6 +292,13 @@ export const no: typeof en = {
     showMore: 'Vis mer',
     deleteTitle: 'Slett kunngjøring',
     deleteMessage: 'Kunngjøringen fjernes for alle. Dette kan ikke angres.',
+    acknowledge: 'Bekreft lest',
+    acknowledged: 'Lest',
+    acknowledgedBy: 'Sett av {names}',
+    comments: 'Kommentarer',
+    noComments: 'Ingen kommentarer ennå.',
+    commentPlaceholder: 'Skriv en kommentar…',
+    commentSubmit: 'Send',
   },
   dashboard: {
     title: 'Oversikt',
@@ -1013,6 +1020,10 @@ export const no: typeof en = {
     title: 'Nyheter',
     titleWithCount: 'Nyheter, {count} uleste',
     goThere: 'Ta meg dit',
+    announcementComments: {
+      title: 'Kommenter og bekreft kunngjøringer',
+      body: 'Alle kan nå kommentere på en kunngjøring og trykke «Bekreft lest» for å si ifra at de har sett den. Åpne en kunngjøring for å se tråden.',
+    },
     vatExempt: {
       title: 'Merk varer i prislisten som avgiftsfrie',
       body: 'Boksleie og rideundervisning kan være avgiftsfrie i Norge. Kryss av «Avgiftsfri» på en vare i prislisten for å merke den riktig på kontrakter og fakturaer.',

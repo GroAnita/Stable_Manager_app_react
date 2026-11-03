@@ -11,6 +11,13 @@ export type WhatsNewEntry = {
 
 export const WHATS_NEW_ENTRIES: WhatsNewEntry[] = [
   {
+    id: 'announcement-comments',
+    date: '2026-11-03',
+    titleKey: 'whatsNew.announcementComments.title',
+    bodyKey: 'whatsNew.announcementComments.body',
+    linkTo: '/notice-board',
+  },
+  {
     id: 'vat-exempt-price-list',
     date: '2026-11-03',
     titleKey: 'whatsNew.vatExempt.title',

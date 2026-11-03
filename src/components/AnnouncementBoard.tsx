@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import {
+  countOf,
   createAnnouncement,
   deleteAnnouncement,
   listAnnouncements,
-  type Announcement,
+  listMyAcknowledgedAnnouncementIds,
+  toggleAnnouncementAcknowledgment,
+  type AnnouncementWithCounts,
 } from '../features/announcements/api'
 import { usePreferences } from '../lib/PreferencesContext'
+import { AnnouncementDetail } from './AnnouncementDetail'
 import { ConfirmDialog } from './ConfirmDialog'
 import { EmojiPicker } from './EmojiPicker'
 import { Icon } from './Icon'
@@ -48,9 +52,11 @@ export function AnnouncementBoard({
   limit?: number
 }) {
   const { t, formatDate } = usePreferences()
-  const [announcements, setAnnouncements] = useState<Announcement[] | null>(
-    null,
-  )
+  const [announcements, setAnnouncements] = useState<
+    AnnouncementWithCounts[] | null
+  >(null)
+  const [ackedIds, setAckedIds] = useState<Set<string>>(new Set())
+  const [viewingId, setViewingId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [title, setTitle] = useState('')
@@ -78,12 +84,32 @@ export function AnnouncementBoard({
   }
 
   function load() {
-    listAnnouncements()
-      .then(setAnnouncements)
+    Promise.all([listAnnouncements(), listMyAcknowledgedAnnouncementIds()])
+      .then(([announcementsData, ackedData]) => {
+        setAnnouncements(announcementsData)
+        setAckedIds(new Set(ackedData))
+      })
       .catch((err: Error) => setError(err.message))
   }
 
   useEffect(load, [])
+
+  async function handleToggleAcknowledge(item: AnnouncementWithCounts) {
+    const wasAcknowledged = ackedIds.has(item.id)
+    try {
+      await toggleAnnouncementAcknowledgment(
+        item.id,
+        item.stable_id,
+        wasAcknowledged,
+      )
+      load()
+    } catch (err) {
+      setError((err as Error).message)
+    }
+  }
+
+  const viewingAnnouncement =
+    announcements?.find((item) => item.id === viewingId) ?? null
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
@@ -235,6 +261,28 @@ export function AnnouncementBoard({
                   <p className="mt-1 text-sm whitespace-pre-wrap text-slate-600">
                     {item.body}
                   </p>
+                  <div className="mt-2 flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleAcknowledge(item)}
+                      className={`flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium ${
+                        ackedIds.has(item.id)
+                          ? 'text-forest'
+                          : 'text-slate-500 hover:text-forest'
+                      }`}
+                    >
+                      <Icon name="thumbsUp" className="h-3.5 w-3.5" />
+                      {countOf(item.acknowledgments)}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setViewingId(item.id)}
+                      className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium text-slate-500 hover:text-forest"
+                    >
+                      <Icon name="messageCircle" className="h-3.5 w-3.5" />
+                      {countOf(item.comments)}
+                    </button>
+                  </div>
                 </div>
               )
             },
@@ -257,6 +305,17 @@ export function AnnouncementBoard({
         message={t('announcements.deleteMessage')}
         onConfirm={handleDelete}
         onCancel={() => setPendingDeleteId(null)}
+      />
+
+      <AnnouncementDetail
+        announcement={viewingAnnouncement}
+        acknowledged={viewingId !== null && ackedIds.has(viewingId)}
+        canManage={canManage}
+        onClose={() => setViewingId(null)}
+        onToggleAcknowledge={() => {
+          if (viewingAnnouncement) handleToggleAcknowledge(viewingAnnouncement)
+        }}
+        onCommentsChanged={load}
       />
     </div>
   )

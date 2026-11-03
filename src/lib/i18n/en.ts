@@ -291,6 +291,13 @@ export const en = {
     deleteTitle: 'Delete announcement',
     deleteMessage:
       'This announcement will be removed for everyone. This cannot be undone.',
+    acknowledge: 'Acknowledge',
+    acknowledged: 'Acknowledged',
+    acknowledgedBy: 'Seen by {names}',
+    comments: 'Comments',
+    noComments: 'No comments yet.',
+    commentPlaceholder: 'Write a comment…',
+    commentSubmit: 'Post',
   },
   dashboard: {
     title: 'Dashboard',
@@ -1013,6 +1020,10 @@ export const en = {
     title: "What's new",
     titleWithCount: "What's new, {count} unread",
     goThere: 'Take me there',
+    announcementComments: {
+      title: 'Comment and acknowledge notices',
+      body: 'Anyone can now comment on a stable announcement and tap "Acknowledge" to let staff know they\'ve seen it. Open a notice to see the thread.',
+    },
     vatExempt: {
       title: 'Mark price list items as VAT-exempt',
       body: 'Box/stall rent and riding lessons can be VAT-exempt in Norway. Tick "VAT-exempt" on a price list item to label it correctly on contracts and invoices.',
