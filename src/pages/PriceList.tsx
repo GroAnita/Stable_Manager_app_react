@@ -10,6 +10,7 @@ import {
   type PriceListItem,
 } from '../features/priceList/api'
 import { usePreferences } from '../lib/PreferencesContext'
+import { unitLabel } from '../lib/reports'
 import { getCurrentStableId } from '../lib/stableContext'
 
 const UNIT_OPTIONS = [
@@ -123,7 +124,7 @@ function ItemFields({
           <option value="">{t('priceList.noUnit')}</option>
           {UNIT_OPTIONS.map((value) => (
             <option key={value} value={value}>
-              {value}
+              {unitLabel(t, value)}
             </option>
           ))}
         </select>
@@ -351,7 +352,7 @@ export default function PriceList() {
                 <tr key={item.id}>
                   <td>{item.item}</td>
                   <td>{categoryLabel(t, item.category)}</td>
-                  <td>{item.unit ?? '—'}</td>
+                  <td>{unitLabel(t, item.unit)}</td>
                   <td>{formatCurrency(item.price)}</td>
                   <td>
                     {item.vat_exempt ? (

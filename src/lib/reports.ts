@@ -29,6 +29,16 @@ export function categoryLabel(
   return translated === key ? value : translated
 }
 
+export function unitLabel(
+  t: (key: string) => string,
+  value: string | null,
+): string {
+  if (!value) return '—'
+  const key = `unit.${value.toLowerCase()}`
+  const translated = t(key)
+  return translated === key ? value : translated
+}
+
 export type UsageLine = { item: PriceListItem; quantity: number }
 
 // Estimated from current active contracts' allocations, same approximation

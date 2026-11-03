@@ -24,6 +24,7 @@ import {
   listStallOptions,
 } from '../lib/options'
 import type { HorseOption, OwnerOption, StallOption } from '../lib/options'
+import { unitLabel } from '../lib/reports'
 import { getCurrentStableId } from '../lib/stableContext'
 
 type ContractStatus = 'active' | 'ending_soon' | 'expired' | 'cancelled'
@@ -366,7 +367,7 @@ export default function ContractForm() {
               {boardingItems.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.item}
-                  {item.unit ? ` (${item.unit})` : ''}
+                  {item.unit ? ` (${unitLabel(t, item.unit)})` : ''}
                 </option>
               ))}
             </select>
@@ -463,7 +464,7 @@ export default function ContractForm() {
               {hayItems.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.item}
-                  {item.unit ? ` (${item.unit})` : ''}
+                  {item.unit ? ` (${unitLabel(t, item.unit)})` : ''}
                 </option>
               ))}
             </select>
@@ -515,7 +516,7 @@ export default function ContractForm() {
               {beddingItems.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.item}
-                  {item.unit ? ` (${item.unit})` : ''}
+                  {item.unit ? ` (${unitLabel(t, item.unit)})` : ''}
                 </option>
               ))}
             </select>

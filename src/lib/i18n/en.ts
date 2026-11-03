@@ -1440,6 +1440,18 @@ export const en = {
     insurance: 'Insurance',
     other: 'Other',
   },
+  unit: {
+    'per month': 'per month',
+    'per week': 'per week',
+    'per day': 'per day',
+    'per visit': 'per visit',
+    'one-time': 'one-time',
+    kg: 'Kg',
+    litre: 'Litre',
+    bag: 'Bag',
+    box: 'Box',
+    other: 'Other',
+  },
   documentType: {
     passport: 'Passport',
     insurance: 'Insurance',

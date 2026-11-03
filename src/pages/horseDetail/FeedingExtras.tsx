@@ -16,6 +16,7 @@ import {
 } from '../../features/priceList/api'
 import { amountIncVat, billingCycleDueDate } from '../../lib/billing'
 import { usePreferences } from '../../lib/PreferencesContext'
+import { unitLabel } from '../../lib/reports'
 
 const FEED_CATEGORIES = ['Hay', 'Grain', 'Supplements']
 
@@ -185,7 +186,7 @@ export function FeedingExtras({
                 </p>
                 <p className="mt-1 text-xs text-slate-500">
                   {entry.quantity}
-                  {entry.unit ? ` ${entry.unit}` : ''} ·{' '}
+                  {entry.unit ? ` ${unitLabel(t, entry.unit)}` : ''} ·{' '}
                   {formatCurrency(entry.amount)} · {formatDate(entry.date)}
                 </p>
               </div>
@@ -249,7 +250,7 @@ export function FeedingExtras({
                           {formatCurrency(
                             amountIncVat(item.price, 1, item.vat_exempt),
                           )}
-                          {item.unit ? ` / ${item.unit}` : ''})
+                          {item.unit ? ` / ${unitLabel(t, item.unit)}` : ''})
                         </option>
                       ))}
                     </optgroup>

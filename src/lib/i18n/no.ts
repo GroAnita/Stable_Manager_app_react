@@ -1438,6 +1438,18 @@ export const no: typeof en = {
     insurance: 'Forsikring',
     other: 'Annet',
   },
+  unit: {
+    'per month': 'per måned',
+    'per week': 'per uke',
+    'per day': 'per dag',
+    'per visit': 'per besøk',
+    'one-time': 'engangs',
+    kg: 'Kg',
+    litre: 'Liter',
+    bag: 'Sekk',
+    box: 'Eske',
+    other: 'Annet',
+  },
   documentType: {
     passport: 'Pass',
     insurance: 'Forsikring',
