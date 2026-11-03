@@ -609,6 +609,12 @@ export const no: typeof en = {
       'Lag en lenke du kan sende til eieren, slik at de kan lage sin egen pålogging og se hestene sine.',
     portalInviteReady: 'Del denne lenken med eieren:',
     generateInvite: 'Lag invitasjonslenke',
+    sendInviteEmailHint:
+      'Vi sender {email} en e-post med en lenke for å opprette sin egen pålogging og se hestene sine.',
+    sendInviteEmail: 'Send invitasjon på e-post',
+    inviteEmailSent:
+      'Invitasjon sendt til {email}. De vil motta en e-post med en lenke for å sette opp kontoen sin.',
+    orShareLinkManually: 'Eller lag en lenke å dele manuelt',
   },
   ownerForm: {
     newOwner: 'Ny eier',

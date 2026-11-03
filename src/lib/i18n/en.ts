@@ -608,6 +608,12 @@ export const en = {
       'Generate a link to send this owner so they can create their own login and see their horses.',
     portalInviteReady: 'Share this link with the owner:',
     generateInvite: 'Generate invite link',
+    sendInviteEmailHint:
+      "We'll email {email} a link to set up their own login and see their horses.",
+    sendInviteEmail: 'Send invite by email',
+    inviteEmailSent:
+      "Invite sent to {email}. They'll get an email with a link to set up their account.",
+    orShareLinkManually: 'Or generate a link to share manually',
   },
   ownerForm: {
     newOwner: 'New owner',

@@ -10,7 +10,11 @@ import {
   type Owner,
   type OwnerHorse,
 } from '../features/owners/api'
-import { createOwnerInvite, inviteUrl } from '../features/invites/api'
+import {
+  createOwnerInvite,
+  inviteUrl,
+  sendOwnerInviteEmail,
+} from '../features/invites/api'
 import { useAuth } from '../lib/AuthContext'
 import { usePreferences } from '../lib/PreferencesContext'
 
@@ -26,6 +30,10 @@ export default function OwnerDetail() {
   const [invite, setInvite] = useState<string | null>(null)
   const [inviteSaving, setInviteSaving] = useState(false)
   const [inviteError, setInviteError] = useState<string | null>(null)
+  const [showManualLink, setShowManualLink] = useState(false)
+  const [emailSending, setEmailSending] = useState(false)
+  const [emailError, setEmailError] = useState<string | null>(null)
+  const [emailSentTo, setEmailSentTo] = useState<string | null>(null)
 
   useEffect(() => {
     if (!id) return
@@ -73,6 +81,24 @@ export default function OwnerDetail() {
       setInviteError((err as Error).message)
     } finally {
       setInviteSaving(false)
+    }
+  }
+
+  async function handleSendInviteEmail() {
+    if (!owner || !owner.email) return
+    setEmailSending(true)
+    setEmailError(null)
+    try {
+      await sendOwnerInviteEmail({
+        ownerId: owner.id,
+        email: owner.email,
+        fullName: owner.full_name,
+      })
+      setEmailSentTo(owner.email)
+    } catch (err) {
+      setEmailError((err as Error).message)
+    } finally {
+      setEmailSending(false)
     }
   }
 
@@ -153,6 +179,10 @@ export default function OwnerDetail() {
               <p className="mt-3 text-sm text-slate-500">
                 {t('ownerDetail.portalLinked')}
               </p>
+            ) : emailSentTo ? (
+              <p className="mt-3 text-sm text-emerald-700">
+                {t('ownerDetail.inviteEmailSent', { email: emailSentTo })}
+              </p>
             ) : invite ? (
               <div className="mt-3 space-y-2">
                 <p className="text-sm text-slate-500">
@@ -165,6 +195,36 @@ export default function OwnerDetail() {
                   onFocus={(e) => e.target.select()}
                 />
               </div>
+            ) : owner.email && !showManualLink ? (
+              <>
+                <p className="mt-2 text-sm text-slate-500">
+                  {t('ownerDetail.sendInviteEmailHint', { email: owner.email })}
+                </p>
+                {emailError && (
+                  <p role="alert" className="mt-2 text-sm text-red-600">
+                    {emailError}
+                  </p>
+                )}
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    disabled={emailSending}
+                    onClick={handleSendInviteEmail}
+                    className="btn-primary"
+                  >
+                    {emailSending
+                      ? t('common.saving')
+                      : t('ownerDetail.sendInviteEmail')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowManualLink(true)}
+                    className="text-sm font-medium text-slate-500 hover:text-forest"
+                  >
+                    {t('ownerDetail.orShareLinkManually')}
+                  </button>
+                </div>
+              </>
             ) : (
               <>
                 <p className="mt-2 text-sm text-slate-500">

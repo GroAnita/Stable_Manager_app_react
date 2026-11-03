@@ -69,3 +69,39 @@ export async function acceptInvite(token: string): Promise<void> {
 export function inviteUrl(token: string): string {
   return `${webOrigin()}/invite/${token}`
 }
+
+// Calls the invite-owner Edge Function, which creates the horse owner's
+// login via Supabase's own admin invite API (sending a real email) and
+// links it to their owner record server-side — the recipient lands
+// already-configured for this stable, no separate "accept" step needed.
+export async function sendOwnerInviteEmail(params: {
+  ownerId: string
+  email: string
+  fullName: string
+}): Promise<void> {
+  const { data, error } = await supabase.functions.invoke<{
+    success?: boolean
+    error?: string
+  }>('invite-owner', {
+    body: {
+      ownerId: params.ownerId,
+      email: params.email,
+      fullName: params.fullName,
+      redirectTo: `${webOrigin()}/reset-password`,
+    },
+  })
+  if (error) {
+    const context = (error as { context?: Response }).context
+    let detailedMessage: string | null = null
+    if (context) {
+      try {
+        const body = await context.clone().json()
+        if (typeof body?.error === 'string') detailedMessage = body.error
+      } catch {
+        // response body wasn't JSON — fall back to the generic error below
+      }
+    }
+    throw detailedMessage ? new Error(detailedMessage) : error
+  }
+  if (data?.error) throw new Error(data.error)
+}
