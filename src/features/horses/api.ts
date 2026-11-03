@@ -177,15 +177,55 @@ export async function listSchoolHorses(): Promise<SchoolHorseOption[]> {
   return data
 }
 
+const MY_HORSE_SELECT =
+  '*, owner:owners!horses_owner_id_fkey(id, full_name, phone), stall:stalls(id, stall_number, size, notes), paddock:paddocks(id, name, size, notes), turnout_shelter:turnout_shelters(id, name, size, notes)'
+
+// Scoped explicitly to owner_id / horse_additional_owners rather than
+// relying on RLS alone: other SELECT policies on horses (e.g. active
+// feeding-rota participants seeing the whole stable's horses, needed for
+// that feature) are intentionally broader, so an unfiltered query here
+// would leak every horse in the stable to any owner those policies apply
+// to — not just the ones actually assigned to them.
 export async function listMyHorses(): Promise<HorseDetail[]> {
-  const { data, error } = await supabase
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const { data: owner, error: ownerError } = await supabase
+    .from('owners')
+    .select('id')
+    .eq('user_id', user.id)
+    .maybeSingle()
+  if (ownerError) throw ownerError
+  if (!owner) return []
+
+  const { data: owned, error: ownedError } = await supabase
     .from('horses')
-    .select(
-      '*, owner:owners!horses_owner_id_fkey(id, full_name, phone), stall:stalls(id, stall_number, size, notes), paddock:paddocks(id, name, size, notes), turnout_shelter:turnout_shelters(id, name, size, notes)',
-    )
-    .order('name')
-  if (error) throw error
-  return data
+    .select(MY_HORSE_SELECT)
+    .eq('owner_id', owner.id)
+  if (ownedError) throw ownedError
+
+  const { data: additionalLinks, error: additionalError } = await supabase
+    .from('horse_additional_owners')
+    .select('horse_id')
+    .eq('owner_id', owner.id)
+  if (additionalError) throw additionalError
+
+  const additionalIds = additionalLinks.map((link) => link.horse_id)
+  let additionalHorses: HorseDetail[] = []
+  if (additionalIds.length > 0) {
+    const { data, error } = await supabase
+      .from('horses')
+      .select(MY_HORSE_SELECT)
+      .in('id', additionalIds)
+    if (error) throw error
+    additionalHorses = data
+  }
+
+  const byId = new Map<string, HorseDetail>()
+  for (const horse of [...owned, ...additionalHorses]) byId.set(horse.id, horse)
+  return Array.from(byId.values()).sort((a, b) => a.name.localeCompare(b.name))
 }
 
 export async function getHorse(id: string): Promise<HorseDetail> {
