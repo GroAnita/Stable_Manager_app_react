@@ -4,6 +4,7 @@ import { RouterProvider } from 'react-router-dom'
 import { App as CapacitorApp } from '@capacitor/app'
 import { Browser } from '@capacitor/browser'
 import { Capacitor } from '@capacitor/core'
+import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import './index.css'
 import { ConsentBanner } from './components/ConsentBanner'
@@ -33,6 +34,7 @@ createRoot(document.getElementById('root')!).render(
       </AuthProvider>
       <ConsentBanner />
       <SpeedInsights />
+      <Analytics />
     </PreferencesProvider>
   </StrictMode>,
 )
