@@ -2083,6 +2083,7 @@ export type Database = {
           plan: Database["public"]["Enums"]["stable_plan"]
           postal_code: string | null
           stable_type: Database["public"]["Enums"]["stable_type"]
+          stripe_customer_id: string | null
           updated_at: string
           vat_registered: boolean
         }
@@ -2106,6 +2107,7 @@ export type Database = {
           plan?: Database["public"]["Enums"]["stable_plan"]
           postal_code?: string | null
           stable_type?: Database["public"]["Enums"]["stable_type"]
+          stripe_customer_id?: string | null
           updated_at?: string
           vat_registered?: boolean
         }
@@ -2129,6 +2131,7 @@ export type Database = {
           plan?: Database["public"]["Enums"]["stable_plan"]
           postal_code?: string | null
           stable_type?: Database["public"]["Enums"]["stable_type"]
+          stripe_customer_id?: string | null
           updated_at?: string
           vat_registered?: boolean
         }
@@ -2741,6 +2744,7 @@ export type Database = {
           plan: Database["public"]["Enums"]["stable_plan"]
           postal_code: string | null
           stable_type: Database["public"]["Enums"]["stable_type"]
+          stripe_customer_id: string | null
           updated_at: string
           vat_registered: boolean
         }
