@@ -22,6 +22,7 @@ export const no: typeof en = {
     markPaid: 'Merk som betalt',
     saved: 'Lagret.',
     vatExempt: 'Avgiftsfri',
+    saveAndAddAnother: 'Lagre og legg til en ny',
   },
   nav: {
     mainNavigation: 'Hovednavigasjon',
@@ -557,6 +558,7 @@ export const no: typeof en = {
     away: 'Bortreist (midlertidig ute av stallen, f.eks. på sommerbeite)',
     loading: 'Laster hest…',
     noStableFound: 'Fant ingen stall for denne brukeren. Vennligst logg inn.',
+    addedAnother: '{name} lagt til. Legg til en ny hest under.',
   },
   ownerList: {
     title: 'Eiere',
@@ -609,6 +611,7 @@ export const no: typeof en = {
     notes: 'Notater',
     loading: 'Laster eier…',
     noStableFound: 'Fant ingen stall for denne brukeren. Vennligst logg inn.',
+    addedAnother: '{name} lagt til. Legg til en ny eier under.',
   },
   coRiderList: {
     title: 'Forryttere',
@@ -660,6 +663,7 @@ export const no: typeof en = {
     notes: 'Notater',
     loading: 'Laster forrytter…',
     noStableFound: 'Fant ingen stall for denne brukeren. Vennligst logg inn.',
+    addedAnother: '{name} lagt til. Legg til en ny forrytter under.',
   },
   contractList: {
     title: 'Kontrakter',

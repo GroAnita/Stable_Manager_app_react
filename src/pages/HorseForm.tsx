@@ -83,6 +83,7 @@ export default function HorseForm() {
   const [loading, setLoading] = useState(isEdit)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   useEffect(() => {
     listOwnerOptions()
@@ -141,10 +142,14 @@ export default function HorseForm() {
     setForm((prev) => ({ ...prev, [key]: value }))
   }
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const submitter = (event.nativeEvent as SubmitEvent)
+      .submitter as HTMLButtonElement | null
+    const addAnother = submitter?.value === 'addAnother'
     setSaving(true)
     setError(null)
+    setSuccessMessage(null)
     try {
       const payload = {
         name: form.name,
@@ -178,7 +183,14 @@ export default function HorseForm() {
         if (!stableId) throw new Error(t('horseForm.noStableFound'))
         const insertPayload: HorseInsert = { ...payload, stable_id: stableId }
         const created = await createHorse(insertPayload)
-        navigate(`/horses/${created.id}`)
+        if (addAnother) {
+          setForm(emptyForm)
+          setSuccessMessage(
+            t('horseForm.addedAnother', { name: created.name }),
+          )
+        } else {
+          navigate(`/horses/${created.id}`)
+        }
       }
     } catch (err) {
       setError((err as Error).message)
@@ -199,6 +211,9 @@ export default function HorseForm() {
         <p role="alert" className="text-sm text-red-600">
           {error}
         </p>
+      )}
+      {successMessage && (
+        <p className="text-sm text-forest">{successMessage}</p>
       )}
       <form
         onSubmit={handleSubmit}
@@ -433,10 +448,27 @@ export default function HorseForm() {
           label={t('horseForm.away')}
         />
 
-        <div className="sm:col-span-2">
-          <button type="submit" disabled={saving} className="btn-primary">
+        <div className="flex flex-wrap gap-3 sm:col-span-2">
+          <button
+            type="submit"
+            name="intent"
+            value="save"
+            disabled={saving}
+            className="btn-primary"
+          >
             {saving ? t('common.saving') : t('common.save')}
           </button>
+          {!isEdit && (
+            <button
+              type="submit"
+              name="intent"
+              value="addAnother"
+              disabled={saving}
+              className="btn-ghost"
+            >
+              {t('common.saveAndAddAnother')}
+            </button>
+          )}
         </div>
       </form>
     </div>

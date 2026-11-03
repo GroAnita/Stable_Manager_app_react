@@ -33,6 +33,7 @@ export default function CoRiderForm() {
   const [loading, setLoading] = useState(isEdit)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   useEffect(() => {
     if (!id) return
@@ -60,10 +61,14 @@ export default function CoRiderForm() {
     setForm((prev) => ({ ...prev, [key]: value }))
   }
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const submitter = (event.nativeEvent as SubmitEvent)
+      .submitter as HTMLButtonElement | null
+    const addAnother = submitter?.value === 'addAnother'
     setSaving(true)
     setError(null)
+    setSuccessMessage(null)
     try {
       const payload = {
         full_name: form.full_name,
@@ -83,7 +88,14 @@ export default function CoRiderForm() {
           stable_id: stableId,
         }
         const created = await createCoRider(insertPayload)
-        navigate(`/co-riders/${created.id}`)
+        if (addAnother) {
+          setForm(emptyForm)
+          setSuccessMessage(
+            t('coRiderForm.addedAnother', { name: created.full_name }),
+          )
+        } else {
+          navigate(`/co-riders/${created.id}`)
+        }
       }
     } catch (err) {
       setError((err as Error).message)
@@ -104,6 +116,9 @@ export default function CoRiderForm() {
         <p role="alert" className="text-sm text-red-600">
           {error}
         </p>
+      )}
+      {successMessage && (
+        <p className="text-sm text-forest">{successMessage}</p>
       )}
       <form
         onSubmit={handleSubmit}
@@ -145,10 +160,27 @@ export default function CoRiderForm() {
           />
         </label>
 
-        <div className="sm:col-span-2">
-          <button type="submit" disabled={saving} className="btn-primary">
+        <div className="flex flex-wrap gap-3 sm:col-span-2">
+          <button
+            type="submit"
+            name="intent"
+            value="save"
+            disabled={saving}
+            className="btn-primary"
+          >
             {saving ? t('common.saving') : t('common.save')}
           </button>
+          {!isEdit && (
+            <button
+              type="submit"
+              name="intent"
+              value="addAnother"
+              disabled={saving}
+              className="btn-ghost"
+            >
+              {t('common.saveAndAddAnother')}
+            </button>
+          )}
         </div>
       </form>
     </div>

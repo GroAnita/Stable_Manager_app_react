@@ -20,6 +20,7 @@ export const en = {
     markPaid: 'Mark paid',
     saved: 'Saved.',
     vatExempt: 'VAT-exempt',
+    saveAndAddAnother: 'Save & add another',
   },
   nav: {
     mainNavigation: 'Main navigation',
@@ -556,6 +557,7 @@ export const en = {
     away: 'Away (temporarily out of the stable, e.g. on summer grass)',
     loading: 'Loading horse…',
     noStableFound: 'No stable found for the current user. Please sign in.',
+    addedAnother: '{name} added. Add another horse below.',
   },
   ownerList: {
     title: 'Owners',
@@ -608,6 +610,7 @@ export const en = {
     notes: 'Notes',
     loading: 'Loading owner…',
     noStableFound: 'No stable found for the current user. Please sign in.',
+    addedAnother: '{name} added. Add another owner below.',
   },
   coRiderList: {
     title: 'Co-riders',
@@ -659,6 +662,7 @@ export const en = {
     notes: 'Notes',
     loading: 'Loading co-rider…',
     noStableFound: 'No stable found for the current user. Please sign in.',
+    addedAnother: '{name} added. Add another co-rider below.',
   },
   contractList: {
     title: 'Contracts',
