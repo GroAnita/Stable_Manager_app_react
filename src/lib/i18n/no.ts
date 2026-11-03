@@ -1,6 +1,12 @@
 import type { en } from './en'
 
 export const no: typeof en = {
+  routeError: {
+    title: 'Noe gikk galt',
+    message:
+      'Siden kunne ikke lastes — dette ordner seg vanligvis av seg selv med en omlasting.',
+    reload: 'Last siden på nytt',
+  },
   common: {
     appName: 'ND-Stalldrift',
     save: 'Lagre',

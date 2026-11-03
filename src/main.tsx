@@ -16,6 +16,18 @@ import { supabase } from './lib/supabaseClient'
 
 initClarity()
 
+// A deploy can ship new, differently-hashed JS chunks while a tab is still
+// open on the old build. Navigating to a lazy-loaded route then tries to
+// fetch a chunk that no longer exists, which Vite surfaces as this event —
+// reload once to pick up the current build instead of showing an error.
+const RELOAD_FLAG = 'stalldrift-chunk-reload'
+window.addEventListener('vite:preloadError', () => {
+  if (sessionStorage.getItem(RELOAD_FLAG)) return
+  sessionStorage.setItem(RELOAD_FLAG, '1')
+  window.location.reload()
+})
+window.addEventListener('load', () => sessionStorage.removeItem(RELOAD_FLAG))
+
 if (Capacitor.isNativePlatform()) {
   CapacitorApp.addListener('appUrlOpen', ({ url }) => {
     if (!url.startsWith('no.nestundigital.stalldrift://auth-callback')) return

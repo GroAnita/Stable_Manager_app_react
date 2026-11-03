@@ -1,4 +1,10 @@
 export const en = {
+  routeError: {
+    title: 'Something went wrong',
+    message:
+      "That page couldn't load — this usually fixes itself with a reload.",
+    reload: 'Reload page',
+  },
   common: {
     appName: 'ND-Stalldrift',
     save: 'Save',

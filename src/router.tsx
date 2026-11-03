@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import AppLayout from './layouts/AppLayout'
 import { RequireAuth } from './lib/RequireAuth'
+import RouteError from './pages/RouteError'
 
 const Auth = lazy(() => import('./pages/Auth'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword'))
@@ -47,6 +48,7 @@ export const router = createBrowserRouter([
         <Auth />
       </Suspense>
     ),
+    errorElement: <RouteError />,
   },
   {
     path: '/reset-password',
@@ -55,6 +57,7 @@ export const router = createBrowserRouter([
         <ResetPassword />
       </Suspense>
     ),
+    errorElement: <RouteError />,
   },
   {
     path: '/invite/:token',
@@ -63,6 +66,7 @@ export const router = createBrowserRouter([
         <AcceptInvite />
       </Suspense>
     ),
+    errorElement: <RouteError />,
   },
   {
     path: '/onboarding',
@@ -73,6 +77,7 @@ export const router = createBrowserRouter([
         </Suspense>
       </RequireAuth>
     ),
+    errorElement: <RouteError />,
   },
   {
     path: '/',
@@ -81,6 +86,7 @@ export const router = createBrowserRouter([
         <AppLayout />
       </RequireAuth>
     ),
+    errorElement: <RouteError />,
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: 'dashboard', element: <Dashboard /> },
