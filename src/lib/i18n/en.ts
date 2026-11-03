@@ -1192,6 +1192,8 @@ export const en = {
     eventType: 'Type',
     horse: 'Horse',
     noHorse: 'No horse (stable event)',
+    noHorsesAvailable: 'No horses yet.',
+    horsesSelected: '{count} horses selected',
     save: 'Save event',
     deleteConfirm: 'Delete this event?',
     loading: 'Loading calendar…',

@@ -1191,6 +1191,8 @@ export const no: typeof en = {
     eventType: 'Type',
     horse: 'Hest',
     noHorse: 'Ingen hest (stallhendelse)',
+    noHorsesAvailable: 'Ingen hester ennå.',
+    horsesSelected: '{count} hester valgt',
     save: 'Lagre hendelse',
     deleteConfirm: 'Slette denne hendelsen?',
     loading: 'Laster kalender…',

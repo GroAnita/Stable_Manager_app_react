@@ -100,6 +100,7 @@ type EventFormState = {
   title: string
   event_type: EventType
   horse_id: string
+  horse_ids: string[]
   start_time: string
   end_time: string
   description: string
@@ -110,6 +111,7 @@ function emptyForm(defaultStart: string): EventFormState {
     title: '',
     event_type: 'vet',
     horse_id: '',
+    horse_ids: [],
     start_time: defaultStart,
     end_time: '',
     description: '',
@@ -121,16 +123,94 @@ function toForm(event: CalendarEvent): EventFormState {
     title: event.title,
     event_type: event.event_type,
     horse_id: event.horse?.id ?? '',
+    horse_ids: event.horse ? [event.horse.id] : [],
     start_time: toDatetimeLocal(event.start_time),
     end_time: toDatetimeLocal(event.end_time),
     description: event.description ?? '',
   }
 }
 
+// Lets an "add event" form attach the same event to several horses at
+// once (e.g. one farrier visit covering five horses) without needing a
+// dropdown per horse — each ticked horse becomes its own calendar_events
+// row behind the scenes, since that table is one-event-per-horse.
+function HorseMultiSelect({
+  horses,
+  selected,
+  onChange,
+}: {
+  horses: HorseOption[]
+  selected: string[]
+  onChange: (ids: string[]) => void
+}) {
+  const { t } = usePreferences()
+  const [open, setOpen] = useState(false)
+
+  function toggle(id: string) {
+    onChange(
+      selected.includes(id)
+        ? selected.filter((v) => v !== id)
+        : [...selected, id],
+    )
+  }
+
+  const summary =
+    selected.length === 0
+      ? t('calendarView.noHorse')
+      : selected.length === 1
+        ? horses.find((h) => h.id === selected[0])?.name ??
+          t('calendarView.horsesSelected', { count: 1 })
+        : t('calendarView.horsesSelected', { count: selected.length })
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        className="field flex w-full items-center justify-between text-left"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        <span className={selected.length ? '' : 'text-slate-400'}>
+          {summary}
+        </span>
+        <span aria-hidden="true" className="text-slate-400">
+          ▾
+        </span>
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-y-auto rounded-xl border border-slate-200 bg-card p-2 shadow-card">
+            {horses.length === 0 ? (
+              <p className="px-2 py-1 text-sm text-slate-400">
+                {t('calendarView.noHorsesAvailable')}
+              </p>
+            ) : (
+              horses.map((horse) => (
+                <label
+                  key={horse.id}
+                  className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-forest/5"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selected.includes(horse.id)}
+                    onChange={() => toggle(horse.id)}
+                  />
+                  {horse.name}
+                </label>
+              ))
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
 function EventFields({
   form,
   horses,
   onChange,
+  horseSelection = 'single',
 }: {
   form: EventFormState
   horses: HorseOption[]
@@ -138,6 +218,7 @@ function EventFields({
     key: K,
     value: EventFormState[K],
   ) => void
+  horseSelection?: 'single' | 'multiple'
 }) {
   const { t } = usePreferences()
   return (
@@ -165,21 +246,32 @@ function EventFields({
           ))}
         </select>
       </label>
-      <label>
-        <span className="field-label">{t('calendarView.horse')}</span>
-        <select
-          className="field"
-          value={form.horse_id}
-          onChange={(e) => onChange('horse_id', e.target.value)}
-        >
-          <option value="">{t('calendarView.noHorse')}</option>
-          {horses.map((horse) => (
-            <option key={horse.id} value={horse.id}>
-              {horse.name}
-            </option>
-          ))}
-        </select>
-      </label>
+      {horseSelection === 'multiple' ? (
+        <div>
+          <span className="field-label">{t('calendarView.horse')}</span>
+          <HorseMultiSelect
+            horses={horses}
+            selected={form.horse_ids}
+            onChange={(ids) => onChange('horse_ids', ids)}
+          />
+        </div>
+      ) : (
+        <label>
+          <span className="field-label">{t('calendarView.horse')}</span>
+          <select
+            className="field"
+            value={form.horse_id}
+            onChange={(e) => onChange('horse_id', e.target.value)}
+          >
+            <option value="">{t('calendarView.noHorse')}</option>
+            {horses.map((horse) => (
+              <option key={horse.id} value={horse.id}>
+                {horse.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       <label>
         <span className="field-label">{t('horseDetail.startTime')}</span>
         <input
@@ -378,20 +470,33 @@ export default function CalendarView() {
     try {
       const stableId = await getCurrentStableId()
       if (!stableId) throw new Error(t('calendarView.noStableFound'))
-      const created = await createHorseEvent({
-        stable_id: stableId,
-        horse_id: addForm.horse_id || null,
-        title: addForm.title,
-        event_type: addForm.event_type,
-        start_time: startTime,
-        end_time: fromDatetimeLocal(addForm.end_time),
-        description: addForm.description || null,
-      })
-      const horse = findHorseFor(addForm)
-      setEvents((prev) =>
-        [...prev, { ...created, horse }].sort((a, b) =>
-          a.start_time.localeCompare(b.start_time),
+      // One calendar_events row per selected horse (the table is
+      // one-event-per-horse); no horses selected means a single
+      // stable-wide event, as before.
+      const horseIds: (string | null)[] = addForm.horse_ids.length
+        ? addForm.horse_ids
+        : [null]
+      const createdEvents = await Promise.all(
+        horseIds.map((horseId) =>
+          createHorseEvent({
+            stable_id: stableId,
+            horse_id: horseId,
+            title: addForm.title,
+            event_type: addForm.event_type,
+            start_time: startTime,
+            end_time: fromDatetimeLocal(addForm.end_time),
+            description: addForm.description || null,
+          }),
         ),
+      )
+      setEvents((prev) =>
+        [
+          ...prev,
+          ...createdEvents.map((created, index) => ({
+            ...created,
+            horse: horses.find((h) => h.id === horseIds[index]) ?? null,
+          })),
+        ].sort((a, b) => a.start_time.localeCompare(b.start_time)),
       )
       setAddOpen(false)
     } catch (err) {
@@ -952,6 +1057,7 @@ export default function CalendarView() {
             form={addForm}
             horses={horses}
             onChange={updateAddField}
+            horseSelection="multiple"
           />
           <button type="submit" disabled={addSaving} className="btn-primary">
             {addSaving ? t('common.saving') : t('calendarView.save')}
