@@ -21,6 +21,7 @@
     "@capacitor/share": "^8.0.3",
     "@supabase/supabase-js": "^2.109.0",
     "@tailwindcss/vite": "^4.3.3",
+    "@vercel/speed-insights": "^2.0.0",
     "flag-icons": "^7.5.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
