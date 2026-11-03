@@ -35,6 +35,7 @@ function totalMonthlyPrice(contract: ContractListItem): number {
           contract.hay_item.price,
           contract.included_hay_kg,
           cycleDays,
+          contract.hay_item.vat_exempt,
         )
       : 0
   const bedding =
@@ -42,6 +43,7 @@ function totalMonthlyPrice(contract: ContractListItem): number {
       ? beddingAmountIncVat(
           contract.bedding_item.price,
           contract.bedding_quantity,
+          contract.bedding_item.vat_exempt,
         )
       : 0
   return Math.round((Number(contract.monthly_rent) + hay + bedding) * 100) / 100

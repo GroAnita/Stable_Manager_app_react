@@ -132,7 +132,11 @@ export function FeedingExtras({
     (item) => item.id === extraForm.priceListItemId,
   )
   const estimatedExtraAmount = selectedExtraItem
-    ? amountIncVat(selectedExtraItem.price, Number(extraForm.quantity) || 0)
+    ? amountIncVat(
+        selectedExtraItem.price,
+        Number(extraForm.quantity) || 0,
+        selectedExtraItem.vat_exempt,
+      )
     : 0
   const estimatedExtraDueDate = billingCycleDueDate(
     extraForm.date || todayIso(),
@@ -241,7 +245,10 @@ export function FeedingExtras({
                     <optgroup key={category} label={category}>
                       {categoryItems.map((item) => (
                         <option key={item.id} value={item.id}>
-                          {item.item} ({formatCurrency(amountIncVat(item.price, 1))}
+                          {item.item} (
+                          {formatCurrency(
+                            amountIncVat(item.price, 1, item.vat_exempt),
+                          )}
                           {item.unit ? ` / ${item.unit}` : ''})
                         </option>
                       ))}
@@ -275,7 +282,11 @@ export function FeedingExtras({
               />
             </label>
             <p className="text-sm text-slate-500">
-              {t('horseDetail.extraEstimatedCharge')}{' '}
+              {t(
+                selectedExtraItem?.vat_exempt
+                  ? 'horseDetail.extraEstimatedChargeExempt'
+                  : 'horseDetail.extraEstimatedCharge',
+              )}{' '}
               <span className="font-medium text-slate-800">
                 {formatCurrency(estimatedExtraAmount)}
               </span>

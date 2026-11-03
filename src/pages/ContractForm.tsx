@@ -176,6 +176,9 @@ export default function ContractForm() {
   const horseIsAway = horses.find((h) => h.id === form.horse_id)?.away ?? false
 
   const cycleDays = currentBillingCycleDays()
+  const selectedBoardingItem = boardingItems.find(
+    (item) => item.id === form.boarding_price_list_item_id,
+  )
   const selectedHayItem = hayItems.find(
     (item) => item.id === form.hay_price_list_item_id,
   )
@@ -185,13 +188,22 @@ export default function ContractForm() {
   const hayValue = useMemo(() => {
     const kgPerDay = Number(form.included_hay_kg) || 0
     return selectedHayItem
-      ? hayValueIncVat(selectedHayItem.price, kgPerDay, cycleDays)
+      ? hayValueIncVat(
+          selectedHayItem.price,
+          kgPerDay,
+          cycleDays,
+          selectedHayItem.vat_exempt,
+        )
       : 0
   }, [selectedHayItem, form.included_hay_kg, cycleDays])
   const beddingAmount = useMemo(() => {
     const qty = Number(form.bedding_quantity) || 0
     return selectedBeddingItem
-      ? beddingAmountIncVat(selectedBeddingItem.price, qty)
+      ? beddingAmountIncVat(
+          selectedBeddingItem.price,
+          qty,
+          selectedBeddingItem.vat_exempt,
+        )
       : 0
   }, [selectedBeddingItem, form.bedding_quantity])
   const effectiveHayValue = horseIsAway ? 0 : hayValue
@@ -363,6 +375,13 @@ export default function ContractForm() {
               {t('contractForm.noBoardingItems')}
             </p>
           )}
+          {selectedBoardingItem && (
+            <span className="mt-1 block text-xs text-slate-400">
+              {selectedBoardingItem.vat_exempt
+                ? t('contractForm.boardingVatExempt')
+                : t('contractForm.boardingVatIncluded')}
+            </span>
+          )}
         </div>
         <label>
           <span className="field-label">{t('contractForm.monthlyRent')}</span>
@@ -455,10 +474,15 @@ export default function ContractForm() {
           )}
           {hayValue > 0 && (
             <span className="mt-1 block text-xs text-slate-400">
-              {t('contractForm.incVatOverDays', {
-                amount: formatCurrency(hayValue),
-                days: cycleDays,
-              })}
+              {t(
+                selectedHayItem?.vat_exempt
+                  ? 'contractForm.exemptOverDays'
+                  : 'contractForm.incVatOverDays',
+                {
+                  amount: formatCurrency(hayValue),
+                  days: cycleDays,
+                },
+              )}
             </span>
           )}
         </div>
@@ -502,9 +526,12 @@ export default function ContractForm() {
           )}
           {beddingAmount > 0 && (
             <span className="mt-1 block text-xs text-slate-400">
-              {t('contractForm.incVat', {
-                amount: formatCurrency(beddingAmount),
-              })}
+              {t(
+                selectedBeddingItem?.vat_exempt
+                  ? 'contractForm.exempt'
+                  : 'contractForm.incVat',
+                { amount: formatCurrency(beddingAmount) },
+              )}
             </span>
           )}
         </div>

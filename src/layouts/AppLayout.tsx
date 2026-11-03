@@ -12,6 +12,7 @@ import { EmergencyCallButton } from '../components/EmergencyCallButton'
 import { Icon, type IconName } from '../components/Icon'
 import { NotificationBell } from '../components/NotificationBell'
 import { OnboardingChecklist } from '../components/OnboardingChecklist'
+import { WhatsNewBell } from '../components/WhatsNewBell'
 import { signOut } from '../lib/authService'
 import { useAuth } from '../lib/AuthContext'
 import { useFeature } from '../lib/features'
@@ -341,6 +342,7 @@ export default function AppLayout() {
             </div>
             <div className="order-3 flex items-center gap-2 lg:ml-auto">
               <EmergencyCallButton />
+              <WhatsNewBell />
               <NotificationBell />
               <button
                 type="button"

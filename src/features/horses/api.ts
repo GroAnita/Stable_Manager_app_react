@@ -389,7 +389,7 @@ export async function logFeedingExtra(params: {
 
   const { data: item, error: itemError } = await supabase
     .from('price_list_items')
-    .select('id, item, category, unit, price')
+    .select('id, item, category, unit, price, vat_exempt')
     .eq('id', priceListItemId)
     .single()
   if (itemError) throw itemError
@@ -397,7 +397,7 @@ export async function logFeedingExtra(params: {
   const contract = await getActiveContractForHorse(horseId)
   if (!contract) throw new Error(t('horseDetail.extraNoActiveContract'))
 
-  const amount = amountIncVat(item.price ?? 0, quantity)
+  const amount = amountIncVat(item.price ?? 0, quantity, item.vat_exempt)
   const dueDate = billingCycleDueDate(date)
   const invoiceLine = t('horseDetail.extraInvoiceLine', {
     item: item.item,
@@ -428,29 +428,35 @@ export async function logFeedingExtra(params: {
     const baseRent = alreadyPaid ? 0 : (contract.monthly_rent ?? 0)
 
     let hayCharge = 0
+    let hayVatExempt = false
     if (!alreadyPaid && contract.hay_price_list_item_id) {
       const { data: hayItem } = await supabase
         .from('price_list_items')
-        .select('price')
+        .select('price, vat_exempt')
         .eq('id', contract.hay_price_list_item_id)
         .maybeSingle()
+      hayVatExempt = hayItem?.vat_exempt ?? false
       hayCharge = hayValueIncVat(
         hayItem?.price ?? 0,
         contract.included_hay_kg ?? 0,
         daysInBillingCycleFor(dueDate),
+        hayVatExempt,
       )
     }
 
     let beddingCharge = 0
+    let beddingVatExempt = false
     if (!alreadyPaid && contract.bedding_price_list_item_id) {
       const { data: beddingItem } = await supabase
         .from('price_list_items')
-        .select('price')
+        .select('price, vat_exempt')
         .eq('id', contract.bedding_price_list_item_id)
         .maybeSingle()
+      beddingVatExempt = beddingItem?.vat_exempt ?? false
       beddingCharge = beddingAmountIncVat(
         beddingItem?.price ?? 0,
         contract.bedding_quantity ?? 0,
+        beddingVatExempt,
       )
     }
 
@@ -462,13 +468,21 @@ export async function logFeedingExtra(params: {
       )
     if (hayCharge)
       boardLines.push(
-        t('horseDetail.extraMonthlyHayLine', { amount: formatCurrency(hayCharge) }),
+        t(
+          hayVatExempt
+            ? 'horseDetail.extraMonthlyHayLineExempt'
+            : 'horseDetail.extraMonthlyHayLine',
+          { amount: formatCurrency(hayCharge) },
+        ),
       )
     if (beddingCharge)
       boardLines.push(
-        t('horseDetail.extraMonthlyBeddingLine', {
-          amount: formatCurrency(beddingCharge),
-        }),
+        t(
+          beddingVatExempt
+            ? 'horseDetail.extraMonthlyBeddingLineExempt'
+            : 'horseDetail.extraMonthlyBeddingLine',
+          { amount: formatCurrency(beddingCharge) },
+        ),
       )
 
     const created = await createPayment({

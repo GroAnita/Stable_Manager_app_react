@@ -7,7 +7,7 @@ export type ContractUpdate = Database['public']['Tables']['contracts']['Update']
 
 export type PriceListItemOption = Pick<
   Database['public']['Tables']['price_list_items']['Row'],
-  'id' | 'item' | 'unit' | 'price'
+  'id' | 'item' | 'unit' | 'price' | 'vat_exempt'
 >
 
 export type ContractListItem = Pick<
@@ -30,11 +30,11 @@ export type ContractListItem = Pick<
   > | null
   hay_item: Pick<
     Database['public']['Tables']['price_list_items']['Row'],
-    'price'
+    'price' | 'vat_exempt'
   > | null
   bedding_item: Pick<
     Database['public']['Tables']['price_list_items']['Row'],
-    'price'
+    'price' | 'vat_exempt'
   > | null
 }
 
@@ -66,8 +66,8 @@ export async function listContracts(): Promise<ContractListItem[]> {
       `id, monthly_rent, included_hay_kg, bedding_quantity, start_date, end_date, status,
        horse:horses(id, name, away),
        owner:owners(id, full_name),
-       hay_item:price_list_items!contracts_hay_price_list_item_id_fkey(price),
-       bedding_item:price_list_items!contracts_bedding_price_list_item_id_fkey(price)`,
+       hay_item:price_list_items!contracts_hay_price_list_item_id_fkey(price, vat_exempt),
+       bedding_item:price_list_items!contracts_bedding_price_list_item_id_fkey(price, vat_exempt)`,
     )
     .order('end_date')
   if (error) throw error
@@ -134,9 +134,9 @@ export async function getContractDetail(id: string): Promise<ContractDetail> {
        horse:horses(id, name, away, breed, color, gender, microchip_number),
        owner:owners(id, full_name, phone, email, address, postal_code, city),
        stall:stalls(id, stall_number),
-       boarding_item:price_list_items!contracts_boarding_price_list_item_id_fkey(id, item, unit, price),
-       hay_item:price_list_items!contracts_hay_price_list_item_id_fkey(id, item, unit, price),
-       bedding_item:price_list_items!contracts_bedding_price_list_item_id_fkey(id, item, unit, price),
+       boarding_item:price_list_items!contracts_boarding_price_list_item_id_fkey(id, item, unit, price, vat_exempt),
+       hay_item:price_list_items!contracts_hay_price_list_item_id_fkey(id, item, unit, price, vat_exempt),
+       bedding_item:price_list_items!contracts_bedding_price_list_item_id_fkey(id, item, unit, price, vat_exempt),
        stable:stables(name, address, city, postal_code, phone, email, org_number, default_contract_terms)`,
     )
     .eq('id', id)
@@ -177,7 +177,7 @@ export async function deleteContract(id: string): Promise<void> {
 export async function listBoardingItems(): Promise<PriceListItemOption[]> {
   const { data, error } = await supabase
     .from('price_list_items')
-    .select('id, item, unit, price')
+    .select('id, item, unit, price, vat_exempt')
     .eq('category', 'Boarding')
     .order('item')
   if (error) throw error
@@ -202,7 +202,7 @@ export async function getEmptyBoxRate(
 export async function listHayItems(): Promise<PriceListItemOption[]> {
   const { data, error } = await supabase
     .from('price_list_items')
-    .select('id, item, unit, price')
+    .select('id, item, unit, price, vat_exempt')
     .eq('category', 'Hay')
     .order('item')
   if (error) throw error
@@ -212,7 +212,7 @@ export async function listHayItems(): Promise<PriceListItemOption[]> {
 export async function listBeddingItems(): Promise<PriceListItemOption[]> {
   const { data, error } = await supabase
     .from('price_list_items')
-    .select('id, item, unit, price')
+    .select('id, item, unit, price, vat_exempt')
     .eq('category', 'Bedding')
     .order('item')
   if (error) throw error

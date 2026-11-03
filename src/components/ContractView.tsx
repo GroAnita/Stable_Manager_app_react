@@ -41,6 +41,7 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
           contract.hay_item.price,
           contract.included_hay_kg,
           cycleDays,
+          contract.hay_item.vat_exempt,
         )
       : 0
   const rawBeddingValue =
@@ -48,6 +49,7 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
       ? beddingAmountIncVat(
           contract.bedding_item.price,
           contract.bedding_quantity,
+          contract.bedding_item.vat_exempt,
         )
       : 0
   const hayValue = horseIsAway ? 0 : rawHayValue
@@ -180,6 +182,9 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
                 <span className="text-slate-400">
                   {' '}
                   — {contract.boarding_item.item}
+                  {contract.boarding_item.vat_exempt
+                    ? ` (${t('common.vatExempt')})`
+                    : ''}
                 </span>
               )}
             </span>
@@ -201,6 +206,9 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
                   <span className="text-slate-400">
                     {' '}
                     — {contract.hay_item.item}
+                    {contract.hay_item.vat_exempt
+                      ? ` (${t('common.vatExempt')})`
+                      : ''}
                   </span>
                 )}
               </span>
@@ -217,6 +225,9 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
                   <span className="text-slate-400">
                     {' '}
                     — {contract.bedding_item.item}
+                    {contract.bedding_item.vat_exempt
+                      ? ` (${t('common.vatExempt')})`
+                      : ''}
                   </span>
                 )}
               </span>

@@ -19,6 +19,7 @@ export const en = {
     settled: 'Settled',
     markPaid: 'Mark paid',
     saved: 'Saved.',
+    vatExempt: 'VAT-exempt',
   },
   nav: {
     mainNavigation: 'Main navigation',
@@ -432,6 +433,7 @@ export const en = {
     extraQuantity: 'Quantity',
     extraDate: 'Date',
     extraEstimatedCharge: 'Estimated charge (incl. 25% VAT):',
+    extraEstimatedChargeExempt: 'Estimated charge (VAT-exempt):',
     extraBilledOn:
       'Billed on the invoice due {date} (stable fees run the 26th to the 25th).',
     extraSubmit: 'Log extra & bill it',
@@ -448,7 +450,9 @@ export const en = {
     extraInvoiceLine: 'Extra: {item} × {quantity}{unit} — {amount} ({date})',
     extraMonthlyBoardLine: 'Monthly board — {amount}',
     extraMonthlyHayLine: 'Hay (incl. 25% VAT) — {amount}',
+    extraMonthlyHayLineExempt: 'Hay (VAT-exempt) — {amount}',
     extraMonthlyBeddingLine: 'Bedding (incl. 25% VAT) — {amount}',
+    extraMonthlyBeddingLineExempt: 'Bedding (VAT-exempt) — {amount}',
     extraLogError: 'Could not log this extra: {error}',
     docPassport: 'Passport',
     docInsurance: 'Insurance',
@@ -694,6 +698,8 @@ export const en = {
     boardingItem: 'Boarding plan',
     selectBoardingItem: 'Select boarding plan',
     noBoardingItems: 'No boarding items in the price list.',
+    boardingVatIncluded: 'Includes 25% VAT',
+    boardingVatExempt: 'VAT-exempt — box rental',
     emptyBoxToggle: 'This horse is marked away',
     emptyBoxHint:
       'Hay, bedding and the boarding plan are frozen while away — this contract bills the fixed empty box fee of {amount} instead.',
@@ -730,6 +736,8 @@ export const en = {
     summaryTotal: 'Total',
     incVatOverDays: '{amount} inc. VAT over {days} days',
     incVat: '{amount} inc. VAT',
+    exemptOverDays: '{amount} VAT-exempt over {days} days',
+    exempt: '{amount} VAT-exempt',
     loading: 'Loading contract…',
     noStableFound: 'No stable found for the current user. Please sign in.',
   },
@@ -984,6 +992,9 @@ export const en = {
     noUnit: 'No unit',
     price: 'Price',
     priceIncVat: 'Price inc. VAT',
+    vatExempt: 'VAT-exempt',
+    vatExemptHint:
+      'Tick only for a line billed separately as pure box/stall rent or riding lessons — those can be VAT-exempt in Norway. Feed, bedding, and care stay taxable even for an exempt stable. Leave off if unsure.',
     notes: 'Notes',
     actions: 'Actions',
     noItems: 'No items',
@@ -993,6 +1004,19 @@ export const en = {
     confirmDelete: 'Remove "{name}" from the price list?',
     loading: 'Loading price list…',
     noStableFound: 'No stable found for the current user. Please sign in.',
+  },
+  whatsNew: {
+    title: "What's new",
+    titleWithCount: "What's new, {count} unread",
+    goThere: 'Take me there',
+    vatExempt: {
+      title: 'Mark price list items as VAT-exempt',
+      body: 'Box/stall rent and riding lessons can be VAT-exempt in Norway. Tick "VAT-exempt" on a price list item to label it correctly on contracts and invoices.',
+    },
+    coRider: {
+      title: 'Co-riders (forrytter)',
+      body: 'Turn on the Co-riders feature under Settings → Features to track riders who share a horse, their fee, and stable duties.',
+    },
   },
   inventory: {
     title: 'Inventory',

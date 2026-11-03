@@ -46,6 +46,7 @@ type FormState = {
   unit: string
   price: string
   notes: string
+  vat_exempt: boolean
 }
 
 const emptyForm: FormState = {
@@ -54,6 +55,7 @@ const emptyForm: FormState = {
   unit: '',
   price: '',
   notes: '',
+  vat_exempt: false,
 }
 
 function toFormState(item: PriceListItem): FormState {
@@ -63,6 +65,7 @@ function toFormState(item: PriceListItem): FormState {
     unit: item.unit ?? '',
     price: item.price.toString(),
     notes: item.notes ?? '',
+    vat_exempt: item.vat_exempt,
   }
 }
 
@@ -145,6 +148,22 @@ function ItemFields({
           onChange={(e) => onChange('notes', e.target.value)}
         />
       </label>
+      <label className="flex items-start gap-2">
+        <input
+          type="checkbox"
+          className="mt-1"
+          checked={form.vat_exempt}
+          onChange={(e) => onChange('vat_exempt', e.target.checked)}
+        />
+        <span>
+          <span className="block text-sm font-medium text-slate-700">
+            {t('priceList.vatExempt')}
+          </span>
+          <span className="block text-xs text-slate-400">
+            {t('priceList.vatExemptHint')}
+          </span>
+        </span>
+      </label>
     </div>
   )
 }
@@ -206,6 +225,7 @@ export default function PriceList() {
         unit: addForm.unit || null,
         price: Number(addForm.price) || 0,
         notes: addForm.notes || null,
+        vat_exempt: addForm.vat_exempt,
         stable_id: stableId,
       })
       setAddOpen(false)
@@ -241,6 +261,7 @@ export default function PriceList() {
         unit: editForm.unit || null,
         price: Number(editForm.price) || 0,
         notes: editForm.notes || null,
+        vat_exempt: editForm.vat_exempt,
       })
       setEditing(null)
       refetch()
@@ -332,7 +353,15 @@ export default function PriceList() {
                   <td>{categoryLabel(t, item.category)}</td>
                   <td>{item.unit ?? '—'}</td>
                   <td>{formatCurrency(item.price)}</td>
-                  <td>{formatCurrency(item.price * 1.25)}</td>
+                  <td>
+                    {item.vat_exempt ? (
+                      <span className="text-emerald-600">
+                        {t('common.vatExempt')}
+                      </span>
+                    ) : (
+                      formatCurrency(item.price * 1.25)
+                    )}
+                  </td>
                   <td>{item.notes ?? '—'}</td>
                   <td>
                     <button

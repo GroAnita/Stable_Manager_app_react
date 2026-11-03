@@ -21,19 +21,30 @@ export function hayValueIncVat(
   pricePerKgPerDay: number,
   kgPerDay: number,
   cycleDays: number,
+  vatExempt = false,
 ) {
+  const multiplier = vatExempt ? 1 : VAT_MULTIPLIER
   return (
-    Math.round(pricePerKgPerDay * kgPerDay * cycleDays * VAT_MULTIPLIER * 100) /
-    100
+    Math.round(pricePerKgPerDay * kgPerDay * cycleDays * multiplier * 100) / 100
   )
 }
 
-export function beddingAmountIncVat(unitPrice: number, quantity: number) {
-  return Math.round(unitPrice * quantity * VAT_MULTIPLIER * 100) / 100
+export function beddingAmountIncVat(
+  unitPrice: number,
+  quantity: number,
+  vatExempt = false,
+) {
+  const multiplier = vatExempt ? 1 : VAT_MULTIPLIER
+  return Math.round(unitPrice * quantity * multiplier * 100) / 100
 }
 
-export function amountIncVat(unitPrice: number, quantity: number) {
-  return Math.round(unitPrice * quantity * VAT_MULTIPLIER * 100) / 100
+export function amountIncVat(
+  unitPrice: number,
+  quantity: number,
+  vatExempt = false,
+) {
+  const multiplier = vatExempt ? 1 : VAT_MULTIPLIER
+  return Math.round(unitPrice * quantity * multiplier * 100) / 100
 }
 
 function toIsoDate(date: Date): string {

@@ -1831,6 +1831,7 @@ export type Database = {
           stable_id: string
           unit: string | null
           updated_at: string
+          vat_exempt: boolean
         }
         Insert: {
           category?: string | null
@@ -1842,6 +1843,7 @@ export type Database = {
           stable_id: string
           unit?: string | null
           updated_at?: string
+          vat_exempt?: boolean
         }
         Update: {
           category?: string | null
@@ -1853,6 +1855,7 @@ export type Database = {
           stable_id?: string
           unit?: string | null
           updated_at?: string
+          vat_exempt?: boolean
         }
         Relationships: [
           {

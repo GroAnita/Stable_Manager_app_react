@@ -21,6 +21,7 @@ export const no: typeof en = {
     settled: 'Betalt',
     markPaid: 'Merk som betalt',
     saved: 'Lagret.',
+    vatExempt: 'Avgiftsfri',
   },
   nav: {
     mainNavigation: 'Hovednavigasjon',
@@ -433,6 +434,7 @@ export const no: typeof en = {
     extraQuantity: 'Antall',
     extraDate: 'Dato',
     extraEstimatedCharge: 'Estimert kostnad (inkl. 25% MVA):',
+    extraEstimatedChargeExempt: 'Estimert kostnad (avgiftsfritt):',
     extraBilledOn:
       'Faktureres på fakturaen som forfaller {date} (stallavgifter løper fra 26. til 25.).',
     extraSubmit: 'Registrer og fakturer',
@@ -449,7 +451,9 @@ export const no: typeof en = {
     extraInvoiceLine: 'Ekstra: {item} × {quantity}{unit} — {amount} ({date})',
     extraMonthlyBoardLine: 'Månedlig fôringsavgift — {amount}',
     extraMonthlyHayLine: 'Høy (inkl. 25% MVA) — {amount}',
+    extraMonthlyHayLineExempt: 'Høy (avgiftsfritt) — {amount}',
     extraMonthlyBeddingLine: 'Flis/strø (inkl. 25% MVA) — {amount}',
+    extraMonthlyBeddingLineExempt: 'Flis/strø (avgiftsfritt) — {amount}',
     extraLogError: 'Kunne ikke registrere denne ekstrakostnaden: {error}',
     docPassport: 'Pass',
     docInsurance: 'Forsikring',
@@ -695,6 +699,8 @@ export const no: typeof en = {
     boardingItem: 'Oppstallingsplan',
     selectBoardingItem: 'Velg oppstallingsplan',
     noBoardingItems: 'Ingen oppstallingsvarer i prislisten.',
+    boardingVatIncluded: 'Inkluderer 25 % mva',
+    boardingVatExempt: 'Avgiftsfri — utleie av boks',
     emptyBoxToggle: 'Denne hesten er merket som bortreist',
     emptyBoxHint:
       'Høy, flis og oppstallingsplan er frosset mens hesten er bortreist — denne kontrakten fakturerer den faste tom boks leien på {amount} i stedet.',
@@ -731,6 +737,8 @@ export const no: typeof en = {
     summaryTotal: 'Totalt',
     incVatOverDays: '{amount} inkl. mva over {days} dager',
     incVat: '{amount} inkl. mva',
+    exemptOverDays: '{amount} avgiftsfritt over {days} dager',
+    exempt: '{amount} avgiftsfritt',
     loading: 'Laster kontrakt…',
     noStableFound: 'Fant ingen stall for denne brukeren. Vennligst logg inn.',
   },
@@ -984,6 +992,9 @@ export const no: typeof en = {
     noUnit: 'Ingen enhet',
     price: 'Pris',
     priceIncVat: 'Pris inkl. mva',
+    vatExempt: 'Avgiftsfri (mva-unntatt)',
+    vatExemptHint:
+      'Kryss kun av for en linje som faktureres separat som ren boksleie eller rideundervisning — disse kan være avgiftsfrie i Norge. Fôr, flis/strø og stell er avgiftspliktig selv for en avgiftsfri stall. La stå av hvis du er usikker.',
     notes: 'Notater',
     actions: 'Handlinger',
     noItems: 'Ingen varer',
@@ -993,6 +1004,19 @@ export const no: typeof en = {
     confirmDelete: 'Fjerne «{name}» fra prislisten?',
     loading: 'Laster prisliste…',
     noStableFound: 'Fant ingen stall for denne brukeren. Vennligst logg inn.',
+  },
+  whatsNew: {
+    title: 'Nyheter',
+    titleWithCount: 'Nyheter, {count} uleste',
+    goThere: 'Ta meg dit',
+    vatExempt: {
+      title: 'Merk varer i prislisten som avgiftsfrie',
+      body: 'Boksleie og rideundervisning kan være avgiftsfrie i Norge. Kryss av «Avgiftsfri» på en vare i prislisten for å merke den riktig på kontrakter og fakturaer.',
+    },
+    coRider: {
+      title: 'Forryttere',
+      body: 'Slå på funksjonen Forryttere under Innstillinger → Funksjoner for å holde oversikt over ryttere som deler en hest, deres avgift og stallansvar.',
+    },
   },
   inventory: {
     title: 'Lager',

@@ -36,6 +36,7 @@ export type IconName =
   | 'mail'
   | 'sliders'
   | 'award'
+  | 'sparkles'
 
 const strokeIcons: Record<IconName, ReactNode> = {
   home: (
@@ -268,6 +269,15 @@ const strokeIcons: Record<IconName, ReactNode> = {
     <>
       <circle cx="12" cy="8" r="7" />
       <polyline points="8.21,13.89 7,23 12,20 17,23 15.79,13.88" />
+    </>
+  ),
+  sparkles: (
+    <>
+      <path d="M12 3l1.6 4.9L18.5 9.5 13.6 11.1 12 16l-1.6-4.9L5.5 9.5l4.9-1.6z" />
+      <path d="M19 3v3" />
+      <path d="M20.5 4.5h-3" />
+      <path d="M5 17v2.5" />
+      <path d="M6.25 18.25h-2.5" />
     </>
   ),
 }
