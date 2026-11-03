@@ -72,6 +72,9 @@ export default function PaddockView() {
   const [addOpen, setAddOpen] = useState(false)
   const [addForm, setAddForm] = useState<FormState>(emptyForm)
   const [addSaving, setAddSaving] = useState(false)
+  const [addSuccessMessage, setAddSuccessMessage] = useState<string | null>(
+    null,
+  )
 
   const [selected, setSelected] = useState<PaddockWithHorses | null>(null)
   const [editForm, setEditForm] = useState<FormState>(emptyForm)
@@ -100,9 +103,13 @@ export default function PaddockView() {
     setAddForm((prev) => ({ ...prev, [key]: value }))
   }
 
-  async function handleAddSubmit(event: FormEvent) {
+  async function handleAddSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const submitter = (event.nativeEvent as SubmitEvent)
+      .submitter as HTMLButtonElement | null
+    const addAnother = submitter?.value === 'addAnother'
     setAddSaving(true)
+    setAddSuccessMessage(null)
     try {
       const stableId = await getCurrentStableId()
       if (!stableId) throw new Error(t('paddockView.noStableFound'))
@@ -112,8 +119,12 @@ export default function PaddockView() {
         notes: addForm.notes || null,
         stable_id: stableId,
       })
-      setAddOpen(false)
       setAddForm(emptyForm)
+      if (addAnother) {
+        setAddSuccessMessage(t('paddockView.addedAnother'))
+      } else {
+        setAddOpen(false)
+      }
       loadPaddocks()
     } catch (err) {
       setError((err as Error).message)
@@ -190,7 +201,10 @@ export default function PaddockView() {
         <button
           type="button"
           className="btn-primary"
-          onClick={() => setAddOpen(true)}
+          onClick={() => {
+            setAddSuccessMessage(null)
+            setAddOpen(true)
+          }}
         >
           <Icon name="plus" className="h-4 w-4" />
           {t('paddockView.addPaddock')}
@@ -252,11 +266,31 @@ export default function PaddockView() {
         onClose={() => setAddOpen(false)}
         title={t('paddockView.addPaddock')}
       >
+        {addSuccessMessage && (
+          <p className="mb-3 text-sm text-forest">{addSuccessMessage}</p>
+        )}
         <form onSubmit={handleAddSubmit} className="grid gap-4">
           <PaddockFields form={addForm} onChange={updateAddField} />
-          <button type="submit" disabled={addSaving} className="btn-primary">
-            {addSaving ? t('common.saving') : t('paddockView.addPaddock')}
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="submit"
+              name="intent"
+              value="save"
+              disabled={addSaving}
+              className="btn-primary"
+            >
+              {addSaving ? t('common.saving') : t('paddockView.addPaddock')}
+            </button>
+            <button
+              type="submit"
+              name="intent"
+              value="addAnother"
+              disabled={addSaving}
+              className="btn-ghost"
+            >
+              {t('common.saveAndAddAnother')}
+            </button>
+          </div>
         </form>
       </Modal>
 

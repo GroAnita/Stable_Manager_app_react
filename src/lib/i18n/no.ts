@@ -945,6 +945,7 @@ export const no: typeof en = {
     noStalls: 'Ingen bokser funnet.',
     loading: 'Laster bokser…',
     noStableFound: 'Fant ingen stall for denne brukeren. Vennligst logg inn.',
+    addedAnother: 'Boks lagt til. Legg til en ny under.',
   },
   paddockView: {
     title: 'Paddocker',
@@ -967,6 +968,7 @@ export const no: typeof en = {
     noPaddocks: 'Ingen paddocker funnet.',
     loading: 'Laster paddocker…',
     noStableFound: 'Fant ingen stall for denne brukeren. Vennligst logg inn.',
+    addedAnother: 'Paddock lagt til. Legg til en ny under.',
   },
   turnoutShelterView: {
     title: 'Utegang',
@@ -1244,6 +1246,7 @@ export const no: typeof en = {
     loading: 'Laster oppgaver…',
     failedToLoad: 'Kunne ikke laste oppgaver: {error}',
     noStableFound: 'Fant ingen stall for denne brukeren. Vennligst logg inn.',
+    addedAnother: 'Oppgave lagt til. Legg til en ny under.',
   },
   lessonsCalendar: {
     blocked: 'Blokkert',

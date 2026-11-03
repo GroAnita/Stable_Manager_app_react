@@ -163,6 +163,9 @@ export default function TaskList() {
   const [addForm, setAddForm] = useState<TaskFormState>(emptyForm)
   const [addSaving, setAddSaving] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
+  const [addSuccessMessage, setAddSuccessMessage] = useState<string | null>(
+    null,
+  )
 
   const [editing, setEditing] = useState<TaskListItem | null>(null)
   const [editForm, setEditForm] = useState<TaskFormState>(emptyForm)
@@ -206,6 +209,7 @@ export default function TaskList() {
   function openAdd() {
     setAddForm(emptyForm())
     setAddError(null)
+    setAddSuccessMessage(null)
     setAddOpen(true)
   }
 
@@ -216,10 +220,14 @@ export default function TaskList() {
     setAddForm((prev) => ({ ...prev, [key]: value }))
   }
 
-  async function handleAddSubmit(event: FormEvent) {
+  async function handleAddSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const submitter = (event.nativeEvent as SubmitEvent)
+      .submitter as HTMLButtonElement | null
+    const addAnother = submitter?.value === 'addAnother'
     setAddSaving(true)
     setAddError(null)
+    setAddSuccessMessage(null)
     try {
       const stableId = await getCurrentStableId()
       if (!stableId) throw new Error(t('taskList.noStableFound'))
@@ -235,7 +243,12 @@ export default function TaskList() {
       const horse = horses.find((h) => h.id === created.horse_id) ?? null
       const assignee = staff.find((s) => s.id === created.assigned_to) ?? null
       setTasks((prev) => [...prev, { ...created, horse, assignee }])
-      setAddOpen(false)
+      if (addAnother) {
+        setAddForm(emptyForm())
+        setAddSuccessMessage(t('taskList.addedAnother'))
+      } else {
+        setAddOpen(false)
+      }
     } catch (err) {
       setAddError((err as Error).message)
     } finally {
@@ -444,15 +457,35 @@ export default function TaskList() {
               {addError}
             </p>
           )}
+          {addSuccessMessage && (
+            <p className="text-sm text-forest">{addSuccessMessage}</p>
+          )}
           <TaskFields
             form={addForm}
             staff={staff}
             horses={horses}
             onChange={updateAddField}
           />
-          <button type="submit" disabled={addSaving} className="btn-primary">
-            {addSaving ? t('common.saving') : t('taskList.save')}
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="submit"
+              name="intent"
+              value="save"
+              disabled={addSaving}
+              className="btn-primary"
+            >
+              {addSaving ? t('common.saving') : t('taskList.save')}
+            </button>
+            <button
+              type="submit"
+              name="intent"
+              value="addAnother"
+              disabled={addSaving}
+              className="btn-ghost"
+            >
+              {t('common.saveAndAddAnother')}
+            </button>
+          </div>
         </form>
       </Modal>
 

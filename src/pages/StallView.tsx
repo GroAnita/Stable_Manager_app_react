@@ -109,6 +109,9 @@ export default function StallView() {
   const [addOpen, setAddOpen] = useState(false)
   const [addForm, setAddForm] = useState<FormState>(emptyForm)
   const [addSaving, setAddSaving] = useState(false)
+  const [addSuccessMessage, setAddSuccessMessage] = useState<string | null>(
+    null,
+  )
 
   const [selected, setSelected] = useState<StallWithHorses | null>(null)
   const [editForm, setEditForm] = useState<FormState>(emptyForm)
@@ -143,15 +146,23 @@ export default function StallView() {
     setAddForm((prev) => ({ ...prev, [key]: value }))
   }
 
-  async function handleAddSubmit(event: FormEvent) {
+  async function handleAddSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const submitter = (event.nativeEvent as SubmitEvent)
+      .submitter as HTMLButtonElement | null
+    const addAnother = submitter?.value === 'addAnother'
     setAddSaving(true)
+    setAddSuccessMessage(null)
     try {
       const stableId = await getCurrentStableId()
       if (!stableId) throw new Error(t('stallView.noStableFound'))
       await createStall({ ...addForm, stable_id: stableId })
-      setAddOpen(false)
       setAddForm(emptyForm)
+      if (addAnother) {
+        setAddSuccessMessage(t('stallView.addedAnother'))
+      } else {
+        setAddOpen(false)
+      }
       loadStalls()
     } catch (err) {
       setError((err as Error).message)
@@ -227,7 +238,10 @@ export default function StallView() {
         <button
           type="button"
           className="btn-primary"
-          onClick={() => setAddOpen(true)}
+          onClick={() => {
+            setAddSuccessMessage(null)
+            setAddOpen(true)
+          }}
         >
           <Icon name="plus" className="h-4 w-4" />
           {t('stallView.addStall')}
@@ -304,11 +318,31 @@ export default function StallView() {
         onClose={() => setAddOpen(false)}
         title={t('stallView.addStall')}
       >
+        {addSuccessMessage && (
+          <p className="mb-3 text-sm text-forest">{addSuccessMessage}</p>
+        )}
         <form onSubmit={handleAddSubmit} className="grid gap-4">
           <StallFields form={addForm} onChange={updateAddField} />
-          <button type="submit" disabled={addSaving} className="btn-primary">
-            {addSaving ? t('common.saving') : t('stallView.addStall')}
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="submit"
+              name="intent"
+              value="save"
+              disabled={addSaving}
+              className="btn-primary"
+            >
+              {addSaving ? t('common.saving') : t('stallView.addStall')}
+            </button>
+            <button
+              type="submit"
+              name="intent"
+              value="addAnother"
+              disabled={addSaving}
+              className="btn-ghost"
+            >
+              {t('common.saveAndAddAnother')}
+            </button>
+          </div>
         </form>
       </Modal>
 

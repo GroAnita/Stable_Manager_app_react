@@ -944,6 +944,7 @@ export const en = {
     noStalls: 'No stalls found.',
     loading: 'Loading stalls…',
     noStableFound: 'No stable found for the current user. Please sign in.',
+    addedAnother: 'Stall added. Add another below.',
   },
   paddockView: {
     title: 'Paddocks',
@@ -966,6 +967,7 @@ export const en = {
     noPaddocks: 'No paddocks found.',
     loading: 'Loading paddocks…',
     noStableFound: 'No stable found for the current user. Please sign in.',
+    addedAnother: 'Paddock added. Add another below.',
   },
   turnoutShelterView: {
     title: '24/7 turnout',
@@ -1246,6 +1248,7 @@ export const en = {
     loading: 'Loading tasks…',
     failedToLoad: 'Failed to load tasks: {error}',
     noStableFound: 'No stable found for the current user. Please sign in.',
+    addedAnother: 'Task added. Add another below.',
   },
   lessonsCalendar: {
     blocked: 'Blocked',
