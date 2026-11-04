@@ -10,11 +10,13 @@ import './index.css'
 import { ConsentBanner } from './components/ConsentBanner'
 import { AuthProvider } from './lib/AuthContext'
 import { initClarity } from './lib/clarity'
+import { disableNumberInputStepping } from './lib/numberInputs'
 import { PreferencesProvider } from './lib/PreferencesContext'
 import { router } from './router'
 import { supabase } from './lib/supabaseClient'
 
 initClarity()
+disableNumberInputStepping()
 
 // A deploy can ship new, differently-hashed JS chunks while a tab is still
 // open on the old build. Navigating to a lazy-loaded route then tries to

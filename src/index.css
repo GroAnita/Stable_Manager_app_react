@@ -156,6 +156,15 @@
   textarea:focus {
     @apply border-forest ring-2 ring-forest/20 outline-none;
   }
+  /* Number fields are typed into, so hide the up/down arrows. */
+  input[type='number'] {
+    appearance: textfield;
+  }
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
 }
 
 @utility panel {
