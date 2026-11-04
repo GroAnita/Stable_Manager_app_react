@@ -1191,6 +1191,23 @@ export const no: typeof en = {
     stableHorseCount: 'Stallen har {count} hester',
     navStaffAccess: 'Ansatte og tilgang',
     navBilling: 'Fakturering',
+    navPayments: 'Betalinger',
+    paymentsTitle: 'Betalinger',
+    paymentsTestMode: 'Testmodus',
+    paymentsLoading: 'Sjekker betalingsstatus…',
+    paymentsIntro:
+      'La oppstallører betale fakturaene sine med kort. Pengene går rett til stallens egen Stripe-konto.',
+    paymentsFeeNote:
+      'Stripes gebyrer trekkes fra utbetalingene til stallen. Stripe sjekker opplysningene om bedriften din, og du logger inn hos Stripe med egen konto for å se betalinger, utbetalinger og tvister.',
+    paymentsActivate: 'Aktiver betalinger',
+    paymentsContinue: 'Fortsett oppsettet hos Stripe',
+    paymentsOpening: 'Åpner Stripe…',
+    paymentsIncomplete:
+      'Oppsettet hos Stripe er ikke ferdig, eller Stripe sjekker fortsatt opplysningene dine.',
+    paymentsActive: 'Betalinger er aktive',
+    paymentsPayoutsPending:
+      'Utbetalinger er ikke klare ennå. Sjekk kontoen din hos Stripe.',
+    paymentsOpenDashboard: 'Åpne Stripe',
     navIntegrations: 'Integrasjoner',
     navAccount: 'Min konto og tofaktor',
     navLanguageAppearance: 'Språk og utseende',

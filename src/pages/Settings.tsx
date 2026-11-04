@@ -19,9 +19,11 @@ import {
   type Theme,
 } from '../lib/PreferencesContext'
 import { SUPPORT_EMAIL, supportMailto } from '../lib/support'
+import { isPaymentsAddonEnabled } from '../features/payments/connect'
 import { BillingPanel } from './settings/BillingPanel'
 import { FeaturesPanel } from './settings/FeaturesPanel'
 import { FireSafetyPanel } from './settings/FireSafetyPanel'
+import { PaymentsPanel } from './settings/PaymentsPanel'
 import { StableRoutinePanel } from './settings/StableRoutinePanel'
 import { StaffAccessPanel } from './settings/StaffAccessPanel'
 import { SubscriptionPanel } from './settings/SubscriptionPanel'
@@ -58,6 +60,7 @@ type SettingsSection =
   | 'subscription'
   | 'staffAccess'
   | 'billing'
+  | 'payments'
   | 'integrations'
   | 'account'
   | 'languageAppearance'
@@ -71,6 +74,7 @@ const SETTINGS_SECTIONS: SettingsSection[] = [
   'subscription',
   'staffAccess',
   'billing',
+  'payments',
   'integrations',
   'account',
   'languageAppearance',
@@ -138,6 +142,7 @@ const SETTINGS_NAV: { groupKey: string; items: SettingsNavItem[] }[] = [
     groupKey: 'settings.navGroupFinance',
     items: [
       { key: 'billing', labelKey: 'settings.navBilling', icon: 'fileText' },
+      { key: 'payments', labelKey: 'settings.navPayments', icon: 'dollar' },
       {
         key: 'integrations',
         labelKey: 'settings.navIntegrations',
@@ -190,6 +195,7 @@ export default function Settings() {
   const [saved, setSaved] = useState(false)
   const [logoUploading, setLogoUploading] = useState(false)
   const [logoError, setLogoError] = useState<string | null>(null)
+  const [paymentsAddonEnabled, setPaymentsAddonEnabled] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -198,12 +204,18 @@ export default function Settings() {
         if (cancelled) return
         setProfile(profileData)
         if (!profileData.stable_id) return null
-        return getStable(profileData.stable_id)
+        return Promise.all([
+          getStable(profileData.stable_id),
+          // Payments stays hidden if this check fails, so it can't block Settings.
+          isPaymentsAddonEnabled(profileData.stable_id).catch(() => false),
+        ])
       })
-      .then((stableData) => {
-        if (cancelled || !stableData) return
+      .then((result) => {
+        if (cancelled || !result) return
+        const [stableData, addonEnabled] = result
         setStable(stableData)
         setForm(toFormState(stableData))
+        setPaymentsAddonEnabled(addonEnabled)
       })
       .catch((err: Error) => setError(err.message))
       .finally(() => {
@@ -217,20 +229,27 @@ export default function Settings() {
   const canEdit = profile?.role === 'stable_owner'
   const isEmployee = profile?.role === 'stable_employee'
 
-  const visibleSettingsNav = isEmployee
-    ? SETTINGS_NAV.map((group) => ({
-        ...group,
-        items: group.items.filter((item) =>
-          EMPLOYEE_ALLOWED_SECTIONS.includes(item.key),
-        ),
-      })).filter((group) => group.items.length > 0)
-    : SETTINGS_NAV
+  const canUsePayments = canEdit && paymentsAddonEnabled
+
+  const visibleSettingsNav = SETTINGS_NAV.map((group) => ({
+    ...group,
+    items: group.items.filter((item) => {
+      if (item.key === 'payments' && !canUsePayments) return false
+      return !isEmployee || EMPLOYEE_ALLOWED_SECTIONS.includes(item.key)
+    }),
+  })).filter((group) => group.items.length > 0)
 
   useEffect(() => {
     if (!loading && isEmployee && !EMPLOYEE_ALLOWED_SECTIONS.includes(section)) {
       setSection('fireSafety')
     }
   }, [loading, isEmployee, section])
+
+  useEffect(() => {
+    if (!loading && section === 'payments' && !canUsePayments) {
+      setSection('stableInfo')
+    }
+  }, [loading, section, canUsePayments])
 
   function handleStableChange(updated: Stable) {
     setStable(updated)
@@ -514,6 +533,7 @@ export default function Settings() {
               onChange={handleStableChange}
             />
           )}
+          {section === 'payments' && canUsePayments && <PaymentsPanel />}
           {!isEmployee && section === 'integrations' && (
             <ComingSoonPanel labelKey="settings.navIntegrations" />
           )}

@@ -1,3 +1,4 @@
+import { supabaseFunctionError } from '../../lib/supabaseFunctionError'
 import { webOrigin } from '../../lib/platform'
 import { supabase } from '../../lib/supabaseClient'
 import type { Database } from '../../types/supabase'
@@ -90,18 +91,6 @@ export async function sendOwnerInviteEmail(params: {
       redirectTo: `${webOrigin()}/reset-password`,
     },
   })
-  if (error) {
-    const context = (error as { context?: Response }).context
-    let detailedMessage: string | null = null
-    if (context) {
-      try {
-        const body = await context.clone().json()
-        if (typeof body?.error === 'string') detailedMessage = body.error
-      } catch {
-        // response body wasn't JSON — fall back to the generic error below
-      }
-    }
-    throw detailedMessage ? new Error(detailedMessage) : error
-  }
+  if (error) throw await supabaseFunctionError(error)
   if (data?.error) throw new Error(data.error)
 }

@@ -2180,6 +2180,44 @@ export type Database = {
           },
         ]
       }
+      stable_payment_accounts: {
+        Row: {
+          addon_enabled: boolean
+          charges_enabled: boolean
+          created_at: string
+          payouts_enabled: boolean
+          stable_id: string
+          stripe_account_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          addon_enabled?: boolean
+          charges_enabled?: boolean
+          created_at?: string
+          payouts_enabled?: boolean
+          stable_id: string
+          stripe_account_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          addon_enabled?: boolean
+          charges_enabled?: boolean
+          created_at?: string
+          payouts_enabled?: boolean
+          stable_id?: string
+          stripe_account_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stable_payment_accounts_stable_id_fkey"
+            columns: ["stable_id"]
+            isOneToOne: true
+            referencedRelation: "stables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stables: {
         Row: {
           address: string | null

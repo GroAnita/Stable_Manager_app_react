@@ -1191,6 +1191,23 @@ export const en = {
     stableHorseCount: 'The stable has {count} horses',
     navStaffAccess: 'Staff & access',
     navBilling: 'Invoicing',
+    navPayments: 'Payments',
+    paymentsTitle: 'Payments',
+    paymentsTestMode: 'Test mode',
+    paymentsLoading: 'Checking payment status…',
+    paymentsIntro:
+      'Let boarders pay their invoices by card. The money goes straight to the stable\'s own Stripe account.',
+    paymentsFeeNote:
+      'Stripe\'s fees are deducted from the stable\'s payouts. Stripe verifies your business details, and you log in to Stripe with your own account to see payments, payouts and disputes.',
+    paymentsActivate: 'Activate payments',
+    paymentsContinue: 'Continue setup with Stripe',
+    paymentsOpening: 'Opening Stripe…',
+    paymentsIncomplete:
+      'Setup with Stripe isn\'t finished, or Stripe is still checking your details.',
+    paymentsActive: 'Payments are active',
+    paymentsPayoutsPending:
+      'Payouts aren\'t ready yet. Check your account with Stripe.',
+    paymentsOpenDashboard: 'Open Stripe',
     navIntegrations: 'Integrations',
     navAccount: 'My account & two-factor',
     navLanguageAppearance: 'Language & appearance',
