@@ -22,6 +22,7 @@ import { SUPPORT_EMAIL, supportMailto } from '../lib/support'
 import { BillingPanel } from './settings/BillingPanel'
 import { FeaturesPanel } from './settings/FeaturesPanel'
 import { FireSafetyPanel } from './settings/FireSafetyPanel'
+import { StableRoutinePanel } from './settings/StableRoutinePanel'
 import { StaffAccessPanel } from './settings/StaffAccessPanel'
 import { SubscriptionPanel } from './settings/SubscriptionPanel'
 
@@ -53,6 +54,7 @@ type SettingsSection =
   | 'stableInfo'
   | 'features'
   | 'fireSafety'
+  | 'stableRoutine'
   | 'subscription'
   | 'staffAccess'
   | 'billing'
@@ -65,6 +67,7 @@ const SETTINGS_SECTIONS: SettingsSection[] = [
   'stableInfo',
   'features',
   'fireSafety',
+  'stableRoutine',
   'subscription',
   'staffAccess',
   'billing',
@@ -80,6 +83,7 @@ function isSettingsSection(value: string | null): value is SettingsSection {
 
 const EMPLOYEE_ALLOWED_SECTIONS: SettingsSection[] = [
   'fireSafety',
+  'stableRoutine',
   'account',
   'languageAppearance',
   'support',
@@ -106,6 +110,11 @@ const SETTINGS_NAV: { groupKey: string; items: SettingsNavItem[] }[] = [
         key: 'fireSafety',
         labelKey: 'settings.navFireSafety',
         icon: 'flame',
+      },
+      {
+        key: 'stableRoutine',
+        labelKey: 'settings.navStableRoutine',
+        icon: 'clock',
       },
       {
         key: 'subscription',
@@ -490,6 +499,7 @@ export default function Settings() {
           {section === 'fireSafety' && stable && (
             <FireSafetyPanel stable={stable} canEdit={canEdit} />
           )}
+          {section === 'stableRoutine' && <StableRoutinePanel />}
           {!isEmployee && section === 'subscription' && stable && (
             <SubscriptionPanel
               stable={stable}

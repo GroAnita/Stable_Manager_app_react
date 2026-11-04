@@ -1088,6 +1088,7 @@ export type Database = {
         Row: {
           created_at: string
           feed: string | null
+          feeding_shift_type_id: string | null
           hay: string | null
           horse_id: string
           id: string
@@ -1100,6 +1101,7 @@ export type Database = {
         Insert: {
           created_at?: string
           feed?: string | null
+          feeding_shift_type_id?: string | null
           hay?: string | null
           horse_id: string
           id?: string
@@ -1112,6 +1114,7 @@ export type Database = {
         Update: {
           created_at?: string
           feed?: string | null
+          feeding_shift_type_id?: string | null
           hay?: string | null
           horse_id?: string
           id?: string
@@ -1122,6 +1125,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "feeding_times_feeding_shift_type_id_fkey"
+            columns: ["feeding_shift_type_id"]
+            isOneToOne: false
+            referencedRelation: "feeding_shift_types"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "feeding_times_horse_id_fkey"
             columns: ["horse_id"]

@@ -1,6 +1,8 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 import { Icon } from '../../components/Icon'
 import { Modal } from '../../components/Modal'
+import { listShiftTypes, type ShiftType } from '../../features/feedingRota/api'
 import {
   createFeedingTime,
   deleteFeedingTime,
@@ -13,21 +15,26 @@ import { usePreferences } from '../../lib/PreferencesContext'
 import { FeedingExtras } from './FeedingExtras'
 
 type FeedingTimeFormState = {
-  label: string
-  time_of_day: string
+  feeding_shift_type_id: string
   hay: string
   feed: string
   supplements: string
 }
 
 function emptyTimeForm(): FeedingTimeFormState {
-  return { label: '', time_of_day: '', hay: '', feed: '', supplements: '' }
+  return { feeding_shift_type_id: '', hay: '', feed: '', supplements: '' }
 }
 
-function toTimeForm(entry: FeedingTime): FeedingTimeFormState {
+// An entry edited before the stable routine existed has no
+// feeding_shift_type_id — best-effort match it to a shift type by label so
+// editing it doesn't start from a blank selection, but don't force it.
+function toTimeForm(entry: FeedingTime, shiftTypes: ShiftType[]): FeedingTimeFormState {
+  const matched =
+    entry.feeding_shift_type_id ??
+    shiftTypes.find((st) => st.label === entry.label)?.id ??
+    ''
   return {
-    label: entry.label,
-    time_of_day: entry.time_of_day ? entry.time_of_day.slice(0, 5) : '',
+    feeding_shift_type_id: matched,
     hay: entry.hay ?? '',
     feed: entry.feed ?? '',
     supplements: entry.supplements ?? '',
@@ -46,9 +53,11 @@ function sortFeedingTimes(times: FeedingTime[]): FeedingTime[] {
 
 function FeedingTimeFields({
   form,
+  shiftTypes,
   onChange,
 }: {
   form: FeedingTimeFormState
+  shiftTypes: ShiftType[]
   onChange: <K extends keyof FeedingTimeFormState>(
     key: K,
     value: FeedingTimeFormState[K],
@@ -57,24 +66,35 @@ function FeedingTimeFields({
   const { t } = usePreferences()
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      <label>
-        <span className="field-label">{t('horseDetail.feedingLabel')}</span>
-        <input
-          required
-          className="field"
-          placeholder={t('horseDetail.feedingLabelPlaceholder')}
-          value={form.label}
-          onChange={(e) => onChange('label', e.target.value)}
-        />
-      </label>
-      <label>
+      <label className="sm:col-span-2">
         <span className="field-label">{t('horseDetail.feedingTime')}</span>
-        <input
-          type="time"
-          className="field"
-          value={form.time_of_day}
-          onChange={(e) => onChange('time_of_day', e.target.value)}
-        />
+        {shiftTypes.length === 0 ? (
+          <p className="field flex items-center text-sm text-slate-400">
+            {t('horseDetail.noShiftTypes')}
+          </p>
+        ) : (
+          <select
+            required
+            className="field"
+            value={form.feeding_shift_type_id}
+            onChange={(e) => onChange('feeding_shift_type_id', e.target.value)}
+          >
+            <option value="">{t('horseDetail.selectFeedingTime')}</option>
+            {shiftTypes.map((shiftType) => (
+              <option key={shiftType.id} value={shiftType.id}>
+                {shiftType.label} ({shiftType.time_of_day.slice(0, 5)})
+              </option>
+            ))}
+          </select>
+        )}
+        {shiftTypes.length === 0 && (
+          <Link
+            to="/settings?section=stableRoutine"
+            className="mt-1 block text-xs text-forest hover:underline"
+          >
+            {t('horseDetail.setUpStableRoutine')}
+          </Link>
+        )}
       </label>
       <label>
         <span className="field-label">{t('horseDetail.hay')}</span>
@@ -121,6 +141,14 @@ export function FeedingTab({
 }) {
   const { t } = usePreferences()
 
+  const [shiftTypes, setShiftTypes] = useState<ShiftType[]>([])
+
+  useEffect(() => {
+    listShiftTypes()
+      .then((types) => setShiftTypes(types.filter((st) => st.active)))
+      .catch(() => setShiftTypes([]))
+  }, [])
+
   const [addOpen, setAddOpen] = useState(false)
   const [addForm, setAddForm] = useState<FeedingTimeFormState>(emptyTimeForm)
   const [addSaving, setAddSaving] = useState(false)
@@ -155,14 +183,19 @@ export function FeedingTab({
 
   async function handleAddSubmit(event: FormEvent) {
     event.preventDefault()
+    const shiftType = shiftTypes.find(
+      (st) => st.id === addForm.feeding_shift_type_id,
+    )
+    if (!shiftType) return
     setAddSaving(true)
     setAddError(null)
     try {
       const created = await createFeedingTime({
         horse_id: horseId,
         stable_id: stableId,
-        label: addForm.label,
-        time_of_day: addForm.time_of_day || null,
+        feeding_shift_type_id: shiftType.id,
+        label: shiftType.label,
+        time_of_day: shiftType.time_of_day,
         hay: addForm.hay || null,
         feed: addForm.feed || null,
         supplements: addForm.supplements || null,
@@ -178,7 +211,7 @@ export function FeedingTab({
 
   function openEdit(entry: FeedingTime) {
     setEditing(entry)
-    setEditForm(toTimeForm(entry))
+    setEditForm(toTimeForm(entry, shiftTypes))
     setEditError(null)
   }
 
@@ -192,12 +225,17 @@ export function FeedingTab({
   async function handleEditSubmit(event: FormEvent) {
     event.preventDefault()
     if (!editing) return
+    const shiftType = shiftTypes.find(
+      (st) => st.id === editForm.feeding_shift_type_id,
+    )
+    if (!shiftType) return
     setEditSaving(true)
     setEditError(null)
     try {
       const updated = await updateFeedingTime(editing.id, {
-        label: editForm.label,
-        time_of_day: editForm.time_of_day || null,
+        feeding_shift_type_id: shiftType.id,
+        label: shiftType.label,
+        time_of_day: shiftType.time_of_day,
         hay: editForm.hay || null,
         feed: editForm.feed || null,
         supplements: editForm.supplements || null,
@@ -331,7 +369,11 @@ export function FeedingTab({
               {addError}
             </p>
           )}
-          <FeedingTimeFields form={addForm} onChange={updateAddField} />
+          <FeedingTimeFields
+            form={addForm}
+            shiftTypes={shiftTypes}
+            onChange={updateAddField}
+          />
           <button type="submit" disabled={addSaving} className="btn-primary">
             {addSaving ? t('common.saving') : t('common.add')}
           </button>
@@ -349,7 +391,11 @@ export function FeedingTab({
               {editError}
             </p>
           )}
-          <FeedingTimeFields form={editForm} onChange={updateEditField} />
+          <FeedingTimeFields
+            form={editForm}
+            shiftTypes={shiftTypes}
+            onChange={updateEditField}
+          />
           <button type="submit" disabled={editSaving} className="btn-primary">
             {editSaving ? t('common.saving') : t('common.save')}
           </button>

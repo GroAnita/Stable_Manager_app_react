@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 import { Badge } from '../components/Badge'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { Icon } from '../components/Icon'
@@ -6,21 +7,16 @@ import { Modal } from '../components/Modal'
 import {
   addRotaParticipant,
   createOwnerUnavailability,
-  createShiftType,
   deleteOwnerUnavailability,
   deleteShift,
-  deleteShiftType,
   lastPublishedOwnerByType,
   listOwnerUnavailability,
   listRotaParticipants,
   listShiftsInRange,
-  listShiftTypeHorseIds,
   listShiftTypes,
   publishDraftShifts,
   reassignShift,
   setRotaParticipantActive,
-  setShiftTypeHorses,
-  updateShiftType,
   upsertDraftShifts,
   type FeedingShift,
   type OwnerUnavailability,
@@ -28,22 +24,11 @@ import {
   type ShiftType,
 } from '../features/feedingRota/api'
 import { generateDraftSchedule } from '../lib/feedingRotation'
-import { listHorseOptions, listOwnerOptions } from '../lib/options'
-import type { HorseOption, OwnerOption } from '../lib/options'
+import { listOwnerOptions } from '../lib/options'
+import type { OwnerOption } from '../lib/options'
 import { usePreferences } from '../lib/PreferencesContext'
 import { useAuth } from '../lib/AuthContext'
 import { getCurrentStableId } from '../lib/stableContext'
-
-type ShiftTypeFormState = {
-  label: string
-  time_of_day: string
-  scope: 'all' | 'horses'
-  horse_ids: string[]
-}
-
-function emptyShiftTypeForm(): ShiftTypeFormState {
-  return { label: '', time_of_day: '', scope: 'all', horse_ids: [] }
-}
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10)
@@ -63,15 +48,8 @@ export default function FeedingRota() {
   const [participants, setParticipants] = useState<RotaParticipant[]>([])
   const [unavailability, setUnavailability] = useState<OwnerUnavailability[]>([])
   const [owners, setOwners] = useState<OwnerOption[]>([])
-  const [horses, setHorses] = useState<HorseOption[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
-  const [shiftTypeModalOpen, setShiftTypeModalOpen] = useState(false)
-  const [editingShiftType, setEditingShiftType] = useState<ShiftType | null>(null)
-  const [shiftTypeForm, setShiftTypeForm] = useState<ShiftTypeFormState>(emptyShiftTypeForm())
-  const [shiftTypeSaving, setShiftTypeSaving] = useState(false)
-  const [deletingShiftTypeId, setDeletingShiftTypeId] = useState<string | null>(null)
 
   const [addParticipantOwnerId, setAddParticipantOwnerId] = useState('')
 
@@ -96,14 +74,12 @@ export default function FeedingRota() {
       listRotaParticipants(),
       listOwnerUnavailability(),
       listOwnerOptions(),
-      listHorseOptions(),
     ])
-      .then(([types, parts, unavail, ownerOpts, horseOpts]) => {
+      .then(([types, parts, unavail, ownerOpts]) => {
         setShiftTypes(types)
         setParticipants(parts)
         setUnavailability(unavail)
         setOwners(ownerOpts)
-        setHorses(horseOpts)
       })
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false))
@@ -118,78 +94,6 @@ export default function FeedingRota() {
   }
 
   useEffect(loadShifts, [dateFrom, dateTo])
-
-  // -------------------------------------------------------------------
-  // Shift types
-
-  function openAddShiftType() {
-    setEditingShiftType(null)
-    setShiftTypeForm(emptyShiftTypeForm())
-    setShiftTypeModalOpen(true)
-  }
-
-  function openEditShiftType(shiftType: ShiftType) {
-    setEditingShiftType(shiftType)
-    listShiftTypeHorseIds(shiftType.id)
-      .then((horseIds) => {
-        setShiftTypeForm({
-          label: shiftType.label,
-          time_of_day: shiftType.time_of_day.slice(0, 5),
-          scope: shiftType.scope as 'all' | 'horses',
-          horse_ids: horseIds,
-        })
-        setShiftTypeModalOpen(true)
-      })
-      .catch((err: Error) => setError(err.message))
-  }
-
-  async function handleShiftTypeSubmit(event: FormEvent) {
-    event.preventDefault()
-    setShiftTypeSaving(true)
-    setError(null)
-    try {
-      let shiftTypeId: string
-      if (editingShiftType) {
-        const updated = await updateShiftType(editingShiftType.id, {
-          label: shiftTypeForm.label,
-          time_of_day: shiftTypeForm.time_of_day,
-          scope: shiftTypeForm.scope,
-        })
-        shiftTypeId = updated.id
-      } else {
-        const stableId = await getCurrentStableId()
-        if (!stableId) throw new Error('No stable found.')
-        const created = await createShiftType({
-          stable_id: stableId,
-          label: shiftTypeForm.label,
-          time_of_day: shiftTypeForm.time_of_day,
-          scope: shiftTypeForm.scope,
-        })
-        shiftTypeId = created.id
-      }
-      await setShiftTypeHorses(
-        shiftTypeId,
-        shiftTypeForm.scope === 'horses' ? shiftTypeForm.horse_ids : [],
-      )
-      setShiftTypeModalOpen(false)
-      load()
-    } catch (err) {
-      setError((err as Error).message)
-    } finally {
-      setShiftTypeSaving(false)
-    }
-  }
-
-  async function handleDeleteShiftType() {
-    if (!deletingShiftTypeId) return
-    try {
-      await deleteShiftType(deletingShiftTypeId)
-      setDeletingShiftTypeId(null)
-      load()
-    } catch (err) {
-      setError((err as Error).message)
-    }
-  }
 
   // -------------------------------------------------------------------
   // Participants
@@ -373,10 +277,12 @@ export default function FeedingRota() {
                 {t('feedingRota.shiftTypesHint')}
               </p>
             </div>
-            <button type="button" className="btn-primary shrink-0" onClick={openAddShiftType}>
-              <Icon name="plus" className="h-4 w-4" />
-              {t('feedingRota.addShiftType')}
-            </button>
+            <Link
+              to="/settings?section=stableRoutine"
+              className="btn-ghost shrink-0"
+            >
+              {t('feedingRota.manageInSettings')}
+            </Link>
           </div>
           {shiftTypes.length === 0 ? (
             <p className="mt-4 text-sm text-slate-500">{t('feedingRota.noShiftTypes')}</p>
@@ -395,24 +301,6 @@ export default function FeedingRota() {
                         ? t('feedingRota.scopeAll')
                         : t('feedingRota.scopeHorses')}
                     </p>
-                  </div>
-                  <div className="flex shrink-0 gap-2">
-                    <button
-                      type="button"
-                      aria-label={`${t('common.edit')}: ${shiftType.label}`}
-                      className="text-slate-400 hover:text-forest"
-                      onClick={() => openEditShiftType(shiftType)}
-                    >
-                      <Icon name="edit" className="h-4 w-4" />
-                    </button>
-                    <button
-                      type="button"
-                      aria-label={`${t('common.delete')}: ${shiftType.label}`}
-                      className="text-slate-400 hover:text-red-600"
-                      onClick={() => setDeletingShiftTypeId(shiftType.id)}
-                    >
-                      <Icon name="trash" className="h-4 w-4" />
-                    </button>
                   </div>
                 </div>
               ))}
@@ -657,92 +545,6 @@ export default function FeedingRota() {
         </div>
       </div>
 
-      <Modal
-        open={shiftTypeModalOpen}
-        onClose={() => setShiftTypeModalOpen(false)}
-        title={
-          editingShiftType
-            ? t('feedingRota.editShiftType')
-            : t('feedingRota.addShiftType')
-        }
-      >
-        <form onSubmit={handleShiftTypeSubmit} className="grid gap-4">
-          <label>
-            <span className="field-label">{t('feedingRota.shiftTypeLabel')}</span>
-            <input
-              required
-              className="field"
-              value={shiftTypeForm.label}
-              onChange={(e) =>
-                setShiftTypeForm((prev) => ({ ...prev, label: e.target.value }))
-              }
-            />
-          </label>
-          <label>
-            <span className="field-label">{t('feedingRota.shiftTypeTime')}</span>
-            <input
-              required
-              type="time"
-              className="field"
-              value={shiftTypeForm.time_of_day}
-              onChange={(e) =>
-                setShiftTypeForm((prev) => ({ ...prev, time_of_day: e.target.value }))
-              }
-            />
-          </label>
-          <label>
-            <span className="field-label">{t('feedingRota.shiftTypeScope')}</span>
-            <select
-              className="field"
-              value={shiftTypeForm.scope}
-              onChange={(e) =>
-                setShiftTypeForm((prev) => ({
-                  ...prev,
-                  scope: e.target.value as 'all' | 'horses',
-                }))
-              }
-            >
-              <option value="all">{t('feedingRota.scopeAll')}</option>
-              <option value="horses">{t('feedingRota.scopeHorses')}</option>
-            </select>
-          </label>
-          {shiftTypeForm.scope === 'horses' && (
-            <div>
-              <span className="field-label">{t('feedingRota.selectHorses')}</span>
-              <div className="max-h-40 space-y-1 overflow-y-auto rounded-xl border border-slate-200 p-3">
-                {horses.map((horse) => (
-                  <label key={horse.id} className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={shiftTypeForm.horse_ids.includes(horse.id)}
-                      onChange={(e) =>
-                        setShiftTypeForm((prev) => ({
-                          ...prev,
-                          horse_ids: e.target.checked
-                            ? [...prev.horse_ids, horse.id]
-                            : prev.horse_ids.filter((id) => id !== horse.id),
-                        }))
-                      }
-                    />
-                    {horse.name}
-                  </label>
-                ))}
-              </div>
-            </div>
-          )}
-          <button type="submit" disabled={shiftTypeSaving} className="btn-primary">
-            {shiftTypeSaving ? t('common.saving') : t('common.save')}
-          </button>
-        </form>
-      </Modal>
-
-      <ConfirmDialog
-        open={deletingShiftTypeId !== null}
-        title={t('feedingRota.addShiftType')}
-        message={t('feedingRota.deleteShiftTypeConfirm')}
-        onConfirm={handleDeleteShiftType}
-        onCancel={() => setDeletingShiftTypeId(null)}
-      />
 
       <Modal
         open={unavailabilityModalOpen}
