@@ -24,10 +24,15 @@ import {
   type HorseOption,
   type OwnerOption,
 } from '../lib/options'
+import {
+  CUSTOM_TYPE_MAX_LENGTH,
+  EVENT_TYPES,
+  customTypeFor,
+  type EventType,
+} from '../lib/eventTypes'
 import { usePreferences } from '../lib/PreferencesContext'
 import { categoryLabel } from '../lib/reports'
 import { getCurrentStableId } from '../lib/stableContext'
-import type { Database } from '../types/supabase'
 
 const FEEDING_SHIFT_COLOR = '#0284C7'
 const BILL_COLOR = '#A16207'
@@ -37,27 +42,18 @@ function feedingShiftMoment(shift: FeedingShift): Date {
   return new Date(`${shift.date}T${time}:00`)
 }
 
-type EventType = Database['public']['Enums']['calendar_event_type']
 type ViewMode = 'month' | 'week' | 'day'
-
-const EVENT_TYPES: EventType[] = [
-  'vet',
-  'farrier',
-  'vaccination',
-  'worming',
-  'training',
-  'stable_event',
-  'arena_booking',
-]
 
 const EVENT_COLORS: Record<EventType, string> = {
   vet: '#3A6B52',
   farrier: '#8B6B4A',
+  therapist: '#7A5C8E',
   vaccination: '#DC2626',
   worming: '#D8B25A',
   training: '#5B8A72',
   stable_event: '#688F91',
   arena_booking: '#7C8A7D',
+  other: '#94A3B8',
 }
 
 function startOfMonth(date: Date): Date {
@@ -99,6 +95,7 @@ function fromDatetimeLocal(value: string): string | null {
 type EventFormState = {
   title: string
   event_type: EventType
+  custom_type: string
   horse_id: string
   horse_ids: string[]
   start_time: string
@@ -110,6 +107,7 @@ function emptyForm(defaultStart: string): EventFormState {
   return {
     title: '',
     event_type: 'vet',
+    custom_type: '',
     horse_id: '',
     horse_ids: [],
     start_time: defaultStart,
@@ -122,6 +120,7 @@ function toForm(event: CalendarEvent): EventFormState {
   return {
     title: event.title,
     event_type: event.event_type,
+    custom_type: event.custom_type ?? '',
     horse_id: event.horse?.id ?? '',
     horse_ids: event.horse ? [event.horse.id] : [],
     start_time: toDatetimeLocal(event.start_time),
@@ -158,8 +157,8 @@ function HorseMultiSelect({
     selected.length === 0
       ? t('calendarView.noHorse')
       : selected.length === 1
-        ? horses.find((h) => h.id === selected[0])?.name ??
-          t('calendarView.horsesSelected', { count: 1 })
+        ? (horses.find((h) => h.id === selected[0])?.name ??
+          t('calendarView.horsesSelected', { count: 1 }))
         : t('calendarView.horsesSelected', { count: selected.length })
 
   return (
@@ -270,6 +269,21 @@ function EventFields({
               </option>
             ))}
           </select>
+        </label>
+      )}
+      {form.event_type === 'other' && (
+        <label className="sm:col-span-2">
+          <span className="field-label">
+            {t('calendarView.customEventType')}
+          </span>
+          <input
+            required
+            autoFocus
+            maxLength={CUSTOM_TYPE_MAX_LENGTH}
+            className="field"
+            value={form.custom_type}
+            onChange={(e) => onChange('custom_type', e.target.value)}
+          />
         </label>
       )}
       <label>
@@ -483,6 +497,7 @@ export default function CalendarView() {
             horse_id: horseId,
             title: addForm.title,
             event_type: addForm.event_type,
+            custom_type: customTypeFor(addForm.event_type, addForm.custom_type),
             start_time: startTime,
             end_time: fromDatetimeLocal(addForm.end_time),
             description: addForm.description || null,
@@ -532,6 +547,7 @@ export default function CalendarView() {
         horse_id: editForm.horse_id || null,
         title: editForm.title,
         event_type: editForm.event_type,
+        custom_type: customTypeFor(editForm.event_type, editForm.custom_type),
         start_time: startTime,
         end_time: fromDatetimeLocal(editForm.end_time),
         description: editForm.description || null,
@@ -770,7 +786,10 @@ export default function CalendarView() {
                 <p className="min-w-0 font-medium wrap-break-word text-slate-900">
                   {event.title}
                 </p>
-                <Badge status={event.event_type} />
+                <Badge
+                  status={event.event_type}
+                  label={event.custom_type ?? undefined}
+                />
               </div>
               <p className="mt-1 text-sm text-slate-500">
                 {event.horse?.name ?? t('calendarView.stableEventFallback')}
@@ -1000,7 +1019,10 @@ export default function CalendarView() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-medium text-slate-900">{event.title}</p>
-                    <Badge status={event.event_type} />
+                    <Badge
+                      status={event.event_type}
+                      label={event.custom_type ?? undefined}
+                    />
                   </div>
                   <p className="mt-1 text-xs text-slate-500">
                     {new Date(event.start_time).toLocaleTimeString(undefined, {

@@ -192,6 +192,7 @@ export type Database = {
       calendar_events: {
         Row: {
           created_at: string
+          custom_type: string | null
           description: string | null
           end_time: string | null
           event_type: Database["public"]["Enums"]["calendar_event_type"]
@@ -205,6 +206,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          custom_type?: string | null
           description?: string | null
           end_time?: string | null
           event_type: Database["public"]["Enums"]["calendar_event_type"]
@@ -218,6 +220,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          custom_type?: string | null
           description?: string | null
           end_time?: string | null
           event_type?: Database["public"]["Enums"]["calendar_event_type"]
@@ -3003,6 +3006,8 @@ export type Database = {
         | "training"
         | "stable_event"
         | "arena_booking"
+        | "therapist"
+        | "other"
       co_rider_billing_frequency: "per_session" | "monthly"
       contract_status: "active" | "ending_soon" | "expired" | "cancelled"
       course_booking_mode: "term_only" | "dropin_only" | "mixed"
@@ -3171,6 +3176,8 @@ export const Constants = {
         "training",
         "stable_event",
         "arena_booking",
+        "therapist",
+        "other",
       ],
       co_rider_billing_frequency: ["per_session", "monthly"],
       contract_status: ["active", "ending_soon", "expired", "cancelled"],

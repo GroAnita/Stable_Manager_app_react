@@ -130,17 +130,26 @@ export type FeedingTimeUpdate =
   Database['public']['Tables']['feeding_times']['Update']
 export type HorseEvent = Pick<
   Database['public']['Tables']['calendar_events']['Row'],
-  'id' | 'title' | 'description' | 'event_type' | 'start_time' | 'end_time'
+  | 'id'
+  | 'title'
+  | 'description'
+  | 'event_type'
+  | 'custom_type'
+  | 'start_time'
+  | 'end_time'
 >
 export type CalendarEvent = HorseEvent & {
-  horse: Pick<Database['public']['Tables']['horses']['Row'], 'id' | 'name'> | null
+  horse: Pick<
+    Database['public']['Tables']['horses']['Row'],
+    'id' | 'name'
+  > | null
 }
 
 export async function listAllEvents(): Promise<CalendarEvent[]> {
   const { data, error } = await supabase
     .from('calendar_events')
     .select(
-      'id, title, description, event_type, start_time, end_time, horse:horses(id, name)',
+      'id, title, description, event_type, custom_type, start_time, end_time, horse:horses(id, name)',
     )
     .order('start_time')
   if (error) throw error
@@ -424,8 +433,17 @@ export async function logFeedingExtra(params: {
   formatCurrency: (amount: number) => string
   formatDate: (date: string) => string
 }): Promise<{ plan: FeedingPlan; message: string }> {
-  const { horseId, stableId, priceListItemId, quantity, date, extras, t, formatCurrency, formatDate } =
-    params
+  const {
+    horseId,
+    stableId,
+    priceListItemId,
+    quantity,
+    date,
+    extras,
+    t,
+    formatCurrency,
+    formatDate,
+  } = params
 
   const { data: item, error: itemError } = await supabase
     .from('price_list_items')
@@ -504,7 +522,9 @@ export async function logFeedingExtra(params: {
     const boardLines: string[] = []
     if (baseRent)
       boardLines.push(
-        t('horseDetail.extraMonthlyBoardLine', { amount: formatCurrency(baseRent) }),
+        t('horseDetail.extraMonthlyBoardLine', {
+          amount: formatCurrency(baseRent),
+        }),
       )
     if (hayCharge)
       boardLines.push(
@@ -529,11 +549,14 @@ export async function logFeedingExtra(params: {
       contract_id: contract.id,
       owner_id: contract.owner_id,
       stable_id: stableId,
-      amount: Math.round((baseRent + hayCharge + beddingCharge + amount) * 100) / 100,
+      amount:
+        Math.round((baseRent + hayCharge + beddingCharge + amount) * 100) / 100,
       due_date: dueDate,
       status: 'due',
       invoice_number: `INV-${dueDate.slice(0, 7).replace('-', '')}-${String(sequence).padStart(3, '0')}${alreadyPaid ? '-EXTRA' : ''}`,
-      notes: boardLines.length ? `${boardLines.join('\n')}\n${invoiceLine}` : invoiceLine,
+      notes: boardLines.length
+        ? `${boardLines.join('\n')}\n${invoiceLine}`
+        : invoiceLine,
     })
     paymentId = created.id
     message = alreadyPaid
@@ -648,7 +671,9 @@ export async function deleteFeedingTime(id: string): Promise<void> {
 export async function getHorseSchedule(horseId: string): Promise<HorseEvent[]> {
   const { data, error } = await supabase
     .from('calendar_events')
-    .select('id, title, description, event_type, start_time, end_time')
+    .select(
+      'id, title, description, event_type, custom_type, start_time, end_time',
+    )
     .eq('horse_id', horseId)
     .order('start_time', { ascending: true })
   if (error) throw error
@@ -661,7 +686,9 @@ export async function createHorseEvent(
   const { data, error } = await supabase
     .from('calendar_events')
     .insert(input)
-    .select('id, title, description, event_type, start_time, end_time')
+    .select(
+      'id, title, description, event_type, custom_type, start_time, end_time',
+    )
     .single()
   if (error) throw error
   return data
@@ -675,7 +702,9 @@ export async function updateHorseEvent(
     .from('calendar_events')
     .update(input)
     .eq('id', id)
-    .select('id, title, description, event_type, start_time, end_time')
+    .select(
+      'id, title, description, event_type, custom_type, start_time, end_time',
+    )
     .single()
   if (error) throw error
   return data

@@ -9,19 +9,12 @@ import {
   type HorseEvent,
 } from '../../features/horses/api'
 import { usePreferences } from '../../lib/PreferencesContext'
-import type { Database } from '../../types/supabase'
-
-type EventType = Database['public']['Enums']['calendar_event_type']
-
-const EVENT_TYPES: EventType[] = [
-  'vet',
-  'farrier',
-  'vaccination',
-  'worming',
-  'training',
-  'stable_event',
-  'arena_booking',
-]
+import {
+  CUSTOM_TYPE_MAX_LENGTH,
+  EVENT_TYPES,
+  customTypeFor,
+  type EventType,
+} from '../../lib/eventTypes'
 
 function toDatetimeLocal(iso: string | null): string {
   if (!iso) return ''
@@ -41,6 +34,7 @@ function fromDatetimeLocal(value: string): string | null {
 type EventFormState = {
   title: string
   event_type: EventType
+  custom_type: string
   start_time: string
   end_time: string
   description: string
@@ -50,6 +44,7 @@ function emptyForm(): EventFormState {
   return {
     title: '',
     event_type: 'vet',
+    custom_type: '',
     start_time: '',
     end_time: '',
     description: '',
@@ -60,6 +55,7 @@ function toForm(event: HorseEvent): EventFormState {
   return {
     title: event.title,
     event_type: event.event_type,
+    custom_type: event.custom_type ?? '',
     start_time: toDatetimeLocal(event.start_time),
     end_time: toDatetimeLocal(event.end_time),
     description: event.description ?? '',
@@ -102,7 +98,23 @@ function EventFields({
           ))}
         </select>
       </label>
-      <div />
+      {form.event_type === 'other' ? (
+        <label>
+          <span className="field-label">
+            {t('horseDetail.customEventType')}
+          </span>
+          <input
+            required
+            autoFocus
+            maxLength={CUSTOM_TYPE_MAX_LENGTH}
+            className="field"
+            value={form.custom_type}
+            onChange={(e) => onChange('custom_type', e.target.value)}
+          />
+        </label>
+      ) : (
+        <div />
+      )}
       <label>
         <span className="field-label">{t('horseDetail.startTime')}</span>
         <input
@@ -181,6 +193,7 @@ export function ScheduleTab({
         stable_id: stableId,
         title: addForm.title,
         event_type: addForm.event_type,
+        custom_type: customTypeFor(addForm.event_type, addForm.custom_type),
         start_time: startTime,
         end_time: fromDatetimeLocal(addForm.end_time),
         description: addForm.description || null,
@@ -222,6 +235,7 @@ export function ScheduleTab({
       const updated = await updateHorseEvent(editing.id, {
         title: editForm.title,
         event_type: editForm.event_type,
+        custom_type: customTypeFor(editForm.event_type, editForm.custom_type),
         start_time: startTime,
         end_time: fromDatetimeLocal(editForm.end_time),
         description: editForm.description || null,
@@ -269,7 +283,10 @@ export function ScheduleTab({
                 <p className="min-w-0 font-medium wrap-break-word text-slate-900">
                   {event.title}
                 </p>
-                <Badge status={event.event_type} />
+                <Badge
+                  status={event.event_type}
+                  label={event.custom_type ?? undefined}
+                />
               </div>
               <p className="mt-2 text-sm text-slate-500">
                 {formatDate(event.start_time)}

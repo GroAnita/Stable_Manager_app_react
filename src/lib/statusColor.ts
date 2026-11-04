@@ -42,6 +42,7 @@ export function getStatusColor(status: string): string {
       'info',
       'low',
       'farrier',
+      'therapist',
       'vet',
       'training',
     ].includes(normalized)
