@@ -1046,6 +1046,10 @@ export const en = {
     title: "What's new",
     titleWithCount: "What's new, {count} unread",
     goThere: 'Take me there',
+    contractCreatesOwnerHorse: {
+      title: 'Create owner & horse right from a new contract',
+      body: 'No need to add the owner and horse first anymore — on "New contract," use "+ Add new" next to Owner or Horse to create them on the spot. Contracts with hay included also now cap how much hay can be allocated across the horse\'s feeding times, so it stays within what\'s contracted.',
+    },
     announcementComments: {
       title: 'Comment and acknowledge notices',
       body: 'Anyone can now comment on a stable announcement and tap "Acknowledge" to let staff know they\'ve seen it. Open a notice to see the thread.',

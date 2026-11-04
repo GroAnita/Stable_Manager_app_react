@@ -11,6 +11,13 @@ export type WhatsNewEntry = {
 
 export const WHATS_NEW_ENTRIES: WhatsNewEntry[] = [
   {
+    id: 'contract-creates-owner-horse',
+    date: '2026-11-04',
+    titleKey: 'whatsNew.contractCreatesOwnerHorse.title',
+    bodyKey: 'whatsNew.contractCreatesOwnerHorse.body',
+    linkTo: '/contracts/new',
+  },
+  {
     id: 'announcement-comments',
     date: '2026-11-03',
     titleKey: 'whatsNew.announcementComments.title',

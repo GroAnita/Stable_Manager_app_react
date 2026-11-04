@@ -1046,6 +1046,10 @@ export const no: typeof en = {
     title: 'Nyheter',
     titleWithCount: 'Nyheter, {count} uleste',
     goThere: 'Ta meg dit',
+    contractCreatesOwnerHorse: {
+      title: 'Opprett eier og hest direkte fra en ny kontrakt',
+      body: 'Du trenger ikke lenger legge til eier og hest først — på «Ny kontrakt» kan du bruke «+ Legg til ny» ved Eier eller Hest for å opprette dem der og da. Kontrakter med høy inkludert setter nå også en grense for hvor mye høy som kan fordeles på hestens fôringstidspunkter, slik at det holder seg innenfor det som er avtalt.',
+    },
     announcementComments: {
       title: 'Kommenter og bekreft kunngjøringer',
       body: 'Alle kan nå kommentere på en kunngjøring og trykke «Bekreft lest» for å si ifra at de har sett den. Åpne en kunngjøring for å se tråden.',
