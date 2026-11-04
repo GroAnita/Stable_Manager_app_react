@@ -775,6 +775,8 @@ export const en = {
     exempt: '{amount} VAT-exempt',
     loading: 'Loading contract…',
     noStableFound: 'No stable found for the current user. Please sign in.',
+    saveAndAddAnotherHorse: 'Save & add another horse for this owner',
+    addedAnother: '{name} added. Add another horse for this owner below.',
   },
   contractView: {
     title: 'Contract',

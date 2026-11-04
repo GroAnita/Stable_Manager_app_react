@@ -776,6 +776,8 @@ export const no: typeof en = {
     exempt: '{amount} avgiftsfritt',
     loading: 'Laster kontrakt…',
     noStableFound: 'Fant ingen stall for denne brukeren. Vennligst logg inn.',
+    saveAndAddAnotherHorse: 'Lagre og legg til en ny hest for denne eieren',
+    addedAnother: '{name} lagt til. Legg til en ny hest for denne eieren under.',
   },
   contractView: {
     title: 'Kontrakt',

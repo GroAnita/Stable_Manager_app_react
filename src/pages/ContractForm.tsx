@@ -11,7 +11,7 @@ import {
   type ContractInsert,
   type PriceListItemOption,
 } from '../features/contracts/api'
-import { createHorse } from '../features/horses/api'
+import { createHorse, updateHorse } from '../features/horses/api'
 import { createOwner } from '../features/owners/api'
 import { getStable } from '../features/settings/api'
 import {
@@ -86,6 +86,7 @@ export default function ContractForm() {
   const [loading, setLoading] = useState(isEdit)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   const [addingNewOwner, setAddingNewOwner] = useState(false)
   const [newOwnerName, setNewOwnerName] = useState('')
@@ -222,10 +223,14 @@ export default function ContractForm() {
   const total =
     Math.round((rent + effectiveHayValue + effectiveBeddingAmount) * 100) / 100
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const submitter = (event.nativeEvent as SubmitEvent)
+      .submitter as HTMLButtonElement | null
+    const addAnother = submitter?.value === 'addAnother'
     setSaving(true)
     setError(null)
+    setSuccessMessage(null)
     try {
       const stableId = await getCurrentStableId()
       if (!stableId) throw new Error(t('contractForm.noStableFound'))
@@ -240,6 +245,9 @@ export default function ContractForm() {
       }
 
       let horseId = form.horse_id
+      const createdHorseName = addingNewHorse
+        ? newHorseName
+        : (horses.find((h) => h.id === horseId)?.name ?? '')
       if (!isEdit && addingNewHorse) {
         const createdHorse = await createHorse({
           name: newHorseName,
@@ -247,6 +255,14 @@ export default function ContractForm() {
           owner_id: ownerId || null,
         })
         horseId = createdHorse.id
+      }
+
+      // The stall picked here is the horse's actual assignment, not just a
+      // note on the contract — keep horses.stall_id in sync so the Stalls
+      // page reflects it. Only sets it when a stall is actually chosen;
+      // leaving it blank doesn't clear any existing assignment.
+      if (form.stall_id) {
+        await updateHorse(horseId, { stall_id: form.stall_id })
       }
 
       const payload = {
@@ -274,14 +290,39 @@ export default function ContractForm() {
 
       if (isEdit && id) {
         await updateContract(id, payload)
+        navigate('/contracts')
       } else {
         const insertPayload: ContractInsert = {
           ...payload,
           stable_id: stableId,
         }
         await createContract(insertPayload)
+        if (addAnother) {
+          const [horseOpts, ownerOpts, stallOpts] = await Promise.all([
+            listHorseOptions(),
+            listOwnerOptions(),
+            listStallOptions(),
+          ])
+          setHorses(horseOpts)
+          setOwners(ownerOpts)
+          setStalls(stallOpts)
+          setForm((prev) => ({
+            ...emptyForm,
+            owner_id: ownerId,
+            contract_terms: prev.contract_terms,
+            start_date: prev.start_date,
+          }))
+          setAddingNewOwner(false)
+          setAddingNewHorse(false)
+          setNewOwnerName('')
+          setNewHorseName('')
+          setSuccessMessage(
+            t('contractForm.addedAnother', { name: createdHorseName }),
+          )
+        } else {
+          navigate('/contracts')
+        }
       }
-      navigate('/contracts')
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -303,6 +344,9 @@ export default function ContractForm() {
         <p role="alert" className="text-sm text-red-600">
           {error}
         </p>
+      )}
+      {successMessage && (
+        <p className="text-sm text-forest">{successMessage}</p>
       )}
       <form
         onSubmit={handleSubmit}
@@ -709,10 +753,27 @@ export default function ContractForm() {
           </div>
         </div>
 
-        <div className="md:col-span-2 xl:col-span-3">
-          <button type="submit" disabled={saving} className="btn-primary">
+        <div className="flex flex-wrap gap-3 md:col-span-2 xl:col-span-3">
+          <button
+            type="submit"
+            name="intent"
+            value="save"
+            disabled={saving}
+            className="btn-primary"
+          >
             {saving ? t('common.saving') : t('common.save')}
           </button>
+          {!isEdit && (
+            <button
+              type="submit"
+              name="intent"
+              value="addAnother"
+              disabled={saving}
+              className="btn-ghost"
+            >
+              {t('contractForm.saveAndAddAnotherHorse')}
+            </button>
+          )}
         </div>
       </form>
     </div>
