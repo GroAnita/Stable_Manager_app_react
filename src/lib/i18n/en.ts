@@ -147,6 +147,7 @@ export const en = {
     noHorsesMessage: 'No horse is linked to your account yet.',
     medicalRecords: 'Medical records',
     feedingPlan: 'Feeding plan',
+    editHorse: 'Edit horse',
   },
   myContract: {
     title: 'My Contract',

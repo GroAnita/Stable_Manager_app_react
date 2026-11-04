@@ -150,6 +150,7 @@ export const no: typeof en = {
     noHorsesMessage: 'Ingen hest er koblet til kontoen din ennå.',
     medicalRecords: 'Medisinske journaler',
     feedingPlan: 'Fôringsplan',
+    editHorse: 'Rediger hest',
   },
   myContract: {
     title: 'Min kontrakt',

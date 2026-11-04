@@ -156,6 +156,7 @@ export function FeedingTab({
   feedingTimes,
   onPlanSaved,
   onTimesChanged,
+  showExtras = true,
 }: {
   horseId: string
   stableId: string
@@ -163,6 +164,9 @@ export function FeedingTab({
   feedingTimes: FeedingTime[]
   onPlanSaved: (plan: FeedingPlan) => void
   onTimesChanged: (times: FeedingTime[]) => void
+  // Extra-feed logging also creates/updates a payment, which is a staff
+  // action (self-billing isn't appropriate for the owner's own view).
+  showExtras?: boolean
 }) {
   const { t } = usePreferences()
 
@@ -414,12 +418,14 @@ export function FeedingTab({
         {plan?.special_instructions || t('horseDetail.noSpecialFeeding')}
       </div>
 
-      <FeedingExtras
-        horseId={horseId}
-        stableId={stableId}
-        plan={plan}
-        onPlanSaved={onPlanSaved}
-      />
+      {showExtras && (
+        <FeedingExtras
+          horseId={horseId}
+          stableId={stableId}
+          plan={plan}
+          onPlanSaved={onPlanSaved}
+        />
+      )}
 
       <Modal
         open={addOpen}
