@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { EmptyState } from '../components/EmptyState'
 import { Icon } from '../components/Icon'
 import { Modal } from '../components/Modal'
 import {
-  createPriceListItem,
+  createPriceListItems,
   deletePriceListItem,
   listPriceListItems,
   updatePriceListItem,
@@ -50,6 +50,11 @@ type FormState = {
   vat_exempt: boolean
 }
 
+type AddDraft = {
+  key: number
+  form: FormState
+}
+
 const emptyForm: FormState = {
   item: '',
   category: '',
@@ -83,9 +88,11 @@ function categoryLabel(
 function ItemFields({
   form,
   onChange,
+  autoFocus = false,
 }: {
   form: FormState
   onChange: <K extends keyof FormState>(key: K, value: FormState[K]) => void
+  autoFocus?: boolean
 }) {
   const { t } = usePreferences()
   return (
@@ -94,6 +101,7 @@ function ItemFields({
         <span className="field-label">{t('priceList.itemName')}</span>
         <input
           required
+          autoFocus={autoFocus}
           className="field"
           value={form.item}
           onChange={(e) => onChange('item', e.target.value)}
@@ -177,8 +185,12 @@ export default function PriceList() {
   const [categoryFilter, setCategoryFilter] = useState('all')
 
   const [addOpen, setAddOpen] = useState(false)
-  const [addForm, setAddForm] = useState<FormState>(emptyForm)
+  const nextDraftKey = useRef(1)
+  const [addDrafts, setAddDrafts] = useState<AddDraft[]>([
+    { key: 0, form: emptyForm },
+  ])
   const [addSaving, setAddSaving] = useState(false)
+  const [addError, setAddError] = useState<string | null>(null)
 
   const [editing, setEditing] = useState<PriceListItem | null>(null)
   const [editForm, setEditForm] = useState<FormState>(emptyForm)
@@ -207,33 +219,53 @@ export default function PriceList() {
     [items, categoryFilter],
   )
 
-  function updateAddField<K extends keyof FormState>(
+  function updateDraftField<K extends keyof FormState>(
+    draftKey: number,
     key: K,
     value: FormState[K],
   ) {
-    setAddForm((prev) => ({ ...prev, [key]: value }))
+    setAddDrafts((prev) =>
+      prev.map((draft) =>
+        draft.key === draftKey
+          ? { ...draft, form: { ...draft.form, [key]: value } }
+          : draft,
+      ),
+    )
+  }
+
+  function addDraft() {
+    const key = nextDraftKey.current++
+    setAddDrafts((prev) => [...prev, { key, form: emptyForm }])
+  }
+
+  function removeDraft(draftKey: number) {
+    setAddDrafts((prev) => prev.filter((draft) => draft.key !== draftKey))
   }
 
   async function handleAddSubmit(event: FormEvent) {
     event.preventDefault()
     setAddSaving(true)
+    setAddError(null)
     try {
       const stableId = await getCurrentStableId()
       if (!stableId) throw new Error(t('priceList.noStableFound'))
-      await createPriceListItem({
-        item: addForm.item,
-        category: addForm.category || null,
-        unit: addForm.unit || null,
-        price: Number(addForm.price) || 0,
-        notes: addForm.notes || null,
-        vat_exempt: addForm.vat_exempt,
-        stable_id: stableId,
-      })
+      await createPriceListItems(
+        addDrafts.map(({ form }) => ({
+          item: form.item,
+          category: form.category || null,
+          unit: form.unit || null,
+          price: Number(form.price) || 0,
+          notes: form.notes || null,
+          vat_exempt: form.vat_exempt,
+          stable_id: stableId,
+        })),
+      )
       setAddOpen(false)
-      setAddForm(emptyForm)
+      setAddDrafts([{ key: nextDraftKey.current++, form: emptyForm }])
       refetch()
     } catch (err) {
-      setError((err as Error).message)
+      // Nothing was saved, so keep the form open with everything still filled in.
+      setAddError((err as Error).message)
     } finally {
       setAddSaving(false)
     }
@@ -386,9 +418,54 @@ export default function PriceList() {
         title={t('priceList.addModalTitle')}
       >
         <form onSubmit={handleAddSubmit} className="grid gap-4">
-          <ItemFields form={addForm} onChange={updateAddField} />
+          {addDrafts.map((draft, index) => (
+            <div
+              key={draft.key}
+              className={
+                index > 0
+                  ? 'grid gap-4 border-t border-slate-200 pt-4'
+                  : 'grid gap-4'
+              }
+            >
+              {addDrafts.length > 1 && (
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-semibold text-slate-900">
+                    {t('priceList.itemNumber', { number: index + 1 })}
+                  </h3>
+                  <button
+                    type="button"
+                    className="btn-ghost px-3 py-2"
+                    onClick={() => removeDraft(draft.key)}
+                  >
+                    <Icon name="trash" className="h-4 w-4" />
+                    {t('common.remove')}
+                  </button>
+                </div>
+              )}
+              <ItemFields
+                form={draft.form}
+                autoFocus={index > 0}
+                onChange={(key, value) =>
+                  updateDraftField(draft.key, key, value)
+                }
+              />
+            </div>
+          ))}
+          <button type="button" className="btn-ghost" onClick={addDraft}>
+            <Icon name="plus" className="h-4 w-4" />
+            {t('priceList.addMoreItems')}
+          </button>
+          {addError && (
+            <p role="alert" className="text-sm text-red-600">
+              {addError}
+            </p>
+          )}
           <button type="submit" disabled={addSaving} className="btn-primary">
-            {addSaving ? t('common.saving') : t('priceList.addItem')}
+            {addSaving
+              ? t('common.saving')
+              : addDrafts.length > 1
+                ? t('priceList.addItems', { count: addDrafts.length })
+                : t('priceList.addItem')}
           </button>
         </form>
       </Modal>

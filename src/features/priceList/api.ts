@@ -17,14 +17,14 @@ export async function listPriceListItems(): Promise<PriceListItem[]> {
   return data
 }
 
-export async function createPriceListItem(
-  input: PriceListItemInsert,
-): Promise<PriceListItem> {
+// A single insert statement, so either every item is saved or none are.
+export async function createPriceListItems(
+  inputs: PriceListItemInsert[],
+): Promise<PriceListItem[]> {
   const { data, error } = await supabase
     .from('price_list_items')
-    .insert(input)
+    .insert(inputs)
     .select()
-    .single()
   if (error) throw error
   return data
 }
