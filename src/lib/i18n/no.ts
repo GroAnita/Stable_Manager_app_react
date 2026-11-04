@@ -1050,6 +1050,10 @@ export const no: typeof en = {
       title: 'Opprett eier og hest direkte fra en ny kontrakt',
       body: 'Du trenger ikke lenger legge til eier og hest først — på «Ny kontrakt» kan du bruke «+ Legg til ny» ved Eier eller Hest for å opprette dem der og da. Kontrakter med høy inkludert setter nå også en grense for hvor mye høy som kan fordeles på hestens fôringstidspunkter, slik at det holder seg innenfor det som er avtalt.',
     },
+    stableRoutine: {
+      title: 'Sett stallens fôringstidspunkter én gang, for alle',
+      body: 'Nytt under Innstillinger → Stallrutine: sett opp fôringstidspunktene dine (Morgen, Lunsj, Middag, osv.) én gang for hele stallen. Hester velger nå fra denne listen i stedet for at hver enkelt settes opp manuelt.',
+    },
     announcementComments: {
       title: 'Kommenter og bekreft kunngjøringer',
       body: 'Alle kan nå kommentere på en kunngjøring og trykke «Bekreft lest» for å si ifra at de har sett den. Åpne en kunngjøring for å se tråden.',

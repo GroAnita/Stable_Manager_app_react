@@ -1050,6 +1050,10 @@ export const en = {
       title: 'Create owner & horse right from a new contract',
       body: 'No need to add the owner and horse first anymore — on "New contract," use "+ Add new" next to Owner or Horse to create them on the spot. Contracts with hay included also now cap how much hay can be allocated across the horse\'s feeding times, so it stays within what\'s contracted.',
     },
+    stableRoutine: {
+      title: 'Set the stable\'s feeding times once, for everyone',
+      body: 'New in Settings → Stable routine: set up your feeding times (Morning, Lunch, Dinner, etc.) once for the whole stable. Horses now pick from this list instead of each one being set up by hand.',
+    },
     announcementComments: {
       title: 'Comment and acknowledge notices',
       body: 'Anyone can now comment on a stable announcement and tap "Acknowledge" to let staff know they\'ve seen it. Open a notice to see the thread.',

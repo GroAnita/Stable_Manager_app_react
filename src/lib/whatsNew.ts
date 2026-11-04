@@ -18,6 +18,13 @@ export const WHATS_NEW_ENTRIES: WhatsNewEntry[] = [
     linkTo: '/contracts/new',
   },
   {
+    id: 'stable-routine',
+    date: '2026-11-04',
+    titleKey: 'whatsNew.stableRoutine.title',
+    bodyKey: 'whatsNew.stableRoutine.body',
+    linkTo: '/settings?section=stableRoutine',
+  },
+  {
     id: 'announcement-comments',
     date: '2026-11-03',
     titleKey: 'whatsNew.announcementComments.title',
