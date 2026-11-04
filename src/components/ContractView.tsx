@@ -143,9 +143,15 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
           )}
         </div>
         <div>
-          <span className="field-label">{t('contractView.stall')}</span>
+          <span className="field-label">
+            {contract.turnout_shelter
+              ? t('contractView.turnoutShelter')
+              : t('contractView.stall')}
+          </span>
           <p className="text-slate-900">
-            {contract.stall?.stall_number ?? '—'}
+            {contract.turnout_shelter?.name ??
+              contract.stall?.stall_number ??
+              '—'}
           </p>
         </div>
         <div>

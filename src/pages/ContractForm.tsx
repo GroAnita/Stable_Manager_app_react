@@ -24,8 +24,14 @@ import {
   listHorseOptions,
   listOwnerOptions,
   listStallOptions,
+  listTurnoutShelterOptions,
 } from '../lib/options'
-import type { HorseOption, OwnerOption, StallOption } from '../lib/options'
+import type {
+  HorseOption,
+  OwnerOption,
+  StallOption,
+  TurnoutShelterOption,
+} from '../lib/options'
 import { unitLabel } from '../lib/reports'
 import { getCurrentStableId } from '../lib/stableContext'
 
@@ -35,6 +41,7 @@ type FormState = {
   horse_id: string
   owner_id: string
   stall_id: string
+  turnout_shelter_id: string
   boarding_price_list_item_id: string
   monthly_rent: string
   deposit: string
@@ -54,6 +61,7 @@ const emptyForm: FormState = {
   horse_id: '',
   owner_id: '',
   stall_id: '',
+  turnout_shelter_id: '',
   boarding_price_list_item_id: '',
   monthly_rent: '',
   deposit: '',
@@ -79,6 +87,9 @@ export default function ContractForm() {
   const [horses, setHorses] = useState<HorseOption[]>([])
   const [owners, setOwners] = useState<OwnerOption[]>([])
   const [stalls, setStalls] = useState<StallOption[]>([])
+  const [turnoutShelters, setTurnoutShelters] = useState<
+    TurnoutShelterOption[]
+  >([])
   const [boardingItems, setBoardingItems] = useState<PriceListItemOption[]>([])
   const [hayItems, setHayItems] = useState<PriceListItemOption[]>([])
   const [beddingItems, setBeddingItems] = useState<PriceListItemOption[]>([])
@@ -102,6 +113,9 @@ export default function ContractForm() {
       .catch((err: Error) => setError(err.message))
     listStallOptions()
       .then(setStalls)
+      .catch((err: Error) => setError(err.message))
+    listTurnoutShelterOptions()
+      .then(setTurnoutShelters)
       .catch((err: Error) => setError(err.message))
     listBoardingItems()
       .then(setBoardingItems)
@@ -142,6 +156,7 @@ export default function ContractForm() {
           horse_id: contract.horse_id,
           owner_id: contract.owner_id,
           stall_id: contract.stall_id ?? '',
+          turnout_shelter_id: contract.turnout_shelter_id ?? '',
           boarding_price_list_item_id:
             contract.boarding_price_list_item_id ?? '',
           monthly_rent: contract.monthly_rent.toString(),
@@ -171,6 +186,17 @@ export default function ContractForm() {
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
+  }
+
+  // Stalls and turnout shelters share one dropdown, so a contract can only
+  // ever hold one of them.
+  function selectHousing(value: string) {
+    const [kind, housingId = ''] = value.split(':')
+    setForm((prev) => ({
+      ...prev,
+      stall_id: kind === 'stall' ? housingId : '',
+      turnout_shelter_id: kind === 'shelter' ? housingId : '',
+    }))
   }
 
   function selectBoardingItem(itemId: string) {
@@ -257,18 +283,23 @@ export default function ContractForm() {
         horseId = createdHorse.id
       }
 
-      // The stall picked here is the horse's actual assignment, not just a
-      // note on the contract — keep horses.stall_id in sync so the Stalls
-      // page reflects it. Only sets it when a stall is actually chosen;
-      // leaving it blank doesn't clear any existing assignment.
+      // The stall or turnout shelter picked here is the horse's actual
+      // assignment, not just a note on the contract — keep the horse in sync
+      // so the Stalls and Turnout pages reflect it. Only sets what was chosen
+      // and never clears the other, since a horse can have both.
       if (form.stall_id) {
         await updateHorse(horseId, { stall_id: form.stall_id })
+      } else if (form.turnout_shelter_id) {
+        await updateHorse(horseId, {
+          turnout_shelter_id: form.turnout_shelter_id,
+        })
       }
 
       const payload = {
         horse_id: horseId,
         owner_id: ownerId,
         stall_id: form.stall_id || null,
+        turnout_shelter_id: form.turnout_shelter_id || null,
         boarding_price_list_item_id: form.boarding_price_list_item_id || null,
         monthly_rent: Number(form.monthly_rent) || 0,
         deposit: form.deposit ? Number(form.deposit) : null,
@@ -440,27 +471,42 @@ export default function ContractForm() {
           )}
         </div>
         <label>
-          <span className="field-label">{t('contractForm.stall')}</span>
+          <span className="field-label">{t('contractForm.housing')}</span>
           <select
             className="field"
-            value={form.stall_id}
-            onChange={(e) => updateField('stall_id', e.target.value)}
+            value={
+              form.turnout_shelter_id
+                ? `shelter:${form.turnout_shelter_id}`
+                : form.stall_id
+                  ? `stall:${form.stall_id}`
+                  : ''
+            }
+            onChange={(e) => selectHousing(e.target.value)}
           >
-            <option value="">{t('contractForm.selectStall')}</option>
-            {stalls.map((stall) => {
-              const occupiedByOther =
-                stall.occupant && stall.occupant.id !== form.horse_id
-              return (
-                <option key={stall.id} value={stall.id}>
-                  {stall.stall_number} —{' '}
-                  {occupiedByOther
-                    ? t('horseForm.stallOccupied', {
-                        name: stall.occupant!.name,
-                      })
-                    : t('status.available')}
+            <option value="">{t('contractForm.selectHousing')}</option>
+            <optgroup label={t('contractForm.stallGroup')}>
+              {stalls.map((stall) => {
+                const occupiedByOther =
+                  stall.occupant && stall.occupant.id !== form.horse_id
+                return (
+                  <option key={stall.id} value={`stall:${stall.id}`}>
+                    {stall.stall_number} —{' '}
+                    {occupiedByOther
+                      ? t('horseForm.stallOccupied', {
+                          name: stall.occupant!.name,
+                        })
+                      : t('status.available')}
+                  </option>
+                )
+              })}
+            </optgroup>
+            <optgroup label={t('contractForm.turnoutShelterGroup')}>
+              {turnoutShelters.map((shelter) => (
+                <option key={shelter.id} value={`shelter:${shelter.id}`}>
+                  {shelter.name}
                 </option>
-              )
-            })}
+              ))}
+            </optgroup>
           </select>
         </label>
 

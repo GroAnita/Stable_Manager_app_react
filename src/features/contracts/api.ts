@@ -110,6 +110,10 @@ export type ContractDetail = Contract & {
     Database['public']['Tables']['stalls']['Row'],
     'id' | 'stall_number'
   > | null
+  turnout_shelter: Pick<
+    Database['public']['Tables']['turnout_shelters']['Row'],
+    'id' | 'name'
+  > | null
   boarding_item: PriceListItemOption | null
   hay_item: PriceListItemOption | null
   bedding_item: PriceListItemOption | null
@@ -134,6 +138,7 @@ export async function getContractDetail(id: string): Promise<ContractDetail> {
        horse:horses(id, name, away, breed, color, gender, microchip_number),
        owner:owners(id, full_name, phone, email, address, postal_code, city),
        stall:stalls(id, stall_number),
+       turnout_shelter:turnout_shelters(id, name),
        boarding_item:price_list_items!contracts_boarding_price_list_item_id_fkey(id, item, unit, price, vat_exempt),
        hay_item:price_list_items!contracts_hay_price_list_item_id_fkey(id, item, unit, price, vat_exempt),
        bedding_item:price_list_items!contracts_bedding_price_list_item_id_fkey(id, item, unit, price, vat_exempt),

@@ -393,6 +393,7 @@ export type Database = {
           owner_id: string
           stable_id: string
           stall_id: string | null
+          turnout_shelter_id: string | null
           start_date: string
           status: Database["public"]["Enums"]["contract_status"]
           updated_at: string
@@ -416,6 +417,7 @@ export type Database = {
           owner_id: string
           stable_id: string
           stall_id?: string | null
+          turnout_shelter_id?: string | null
           start_date: string
           status?: Database["public"]["Enums"]["contract_status"]
           updated_at?: string
@@ -439,6 +441,7 @@ export type Database = {
           owner_id?: string
           stable_id?: string
           stall_id?: string | null
+          turnout_shelter_id?: string | null
           start_date?: string
           status?: Database["public"]["Enums"]["contract_status"]
           updated_at?: string
@@ -491,6 +494,13 @@ export type Database = {
             columns: ["stall_id"]
             isOneToOne: false
             referencedRelation: "stalls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_turnout_shelter_id_fkey"
+            columns: ["turnout_shelter_id"]
+            isOneToOne: false
+            referencedRelation: "turnout_shelters"
             referencedColumns: ["id"]
           },
         ]
