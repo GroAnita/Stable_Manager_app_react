@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { Icon } from '../../components/Icon'
 import { Modal } from '../../components/Modal'
+import { getActiveContractForHorse } from '../../features/contracts/api'
 import { listShiftTypes, type ShiftType } from '../../features/feedingRota/api'
 import {
   createFeedingTime,
@@ -54,10 +55,14 @@ function sortFeedingTimes(times: FeedingTime[]): FeedingTime[] {
 function FeedingTimeFields({
   form,
   shiftTypes,
+  hayCapKg,
+  remainingHayKg,
   onChange,
 }: {
   form: FeedingTimeFormState
   shiftTypes: ShiftType[]
+  hayCapKg: number | null
+  remainingHayKg: number | null
   onChange: <K extends keyof FeedingTimeFormState>(
     key: K,
     value: FeedingTimeFormState[K],
@@ -98,11 +103,31 @@ function FeedingTimeFields({
       </label>
       <label>
         <span className="field-label">{t('horseDetail.hay')}</span>
-        <input
-          className="field"
-          value={form.hay}
-          onChange={(e) => onChange('hay', e.target.value)}
-        />
+        {hayCapKg !== null ? (
+          <>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              max={remainingHayKg ?? undefined}
+              className="field"
+              value={form.hay}
+              onChange={(e) => onChange('hay', e.target.value)}
+            />
+            <span className="mt-1 block text-xs text-slate-400">
+              {t('horseDetail.hayRemaining', {
+                remaining: remainingHayKg ?? 0,
+                cap: hayCapKg,
+              })}
+            </span>
+          </>
+        ) : (
+          <input
+            className="field"
+            value={form.hay}
+            onChange={(e) => onChange('hay', e.target.value)}
+          />
+        )}
       </label>
       <label>
         <span className="field-label">{t('horseDetail.grain')}</span>
@@ -142,12 +167,30 @@ export function FeedingTab({
   const { t } = usePreferences()
 
   const [shiftTypes, setShiftTypes] = useState<ShiftType[]>([])
+  const [hayCapKg, setHayCapKg] = useState<number | null>(null)
 
   useEffect(() => {
     listShiftTypes()
       .then((types) => setShiftTypes(types.filter((st) => st.active)))
       .catch(() => setShiftTypes([]))
   }, [])
+
+  useEffect(() => {
+    getActiveContractForHorse(horseId)
+      .then((contract) => setHayCapKg(contract?.included_hay_kg ?? null))
+      .catch(() => setHayCapKg(null))
+  }, [horseId])
+
+  // The contract's included_hay_kg is a per-day budget the owner spreads
+  // across the horse's feeding times — not a free-text amount. excludeId
+  // leaves the entry currently being edited out of the running total.
+  function remainingHayKg(excludeId: string | null): number | null {
+    if (hayCapKg === null) return null
+    const used = feedingTimes
+      .filter((entry) => entry.id !== excludeId)
+      .reduce((sum, entry) => sum + (parseFloat(entry.hay ?? '') || 0), 0)
+    return Math.round((hayCapKg - used) * 100) / 100
+  }
 
   const [addOpen, setAddOpen] = useState(false)
   const [addForm, setAddForm] = useState<FeedingTimeFormState>(emptyTimeForm)
@@ -187,6 +230,16 @@ export function FeedingTab({
       (st) => st.id === addForm.feeding_shift_type_id,
     )
     if (!shiftType) return
+    const remaining = remainingHayKg(null)
+    const hayValue = addForm.hay ? Number(addForm.hay) : null
+    if (remaining !== null && hayValue !== null && hayValue > remaining + 0.001) {
+      setAddError(
+        t('horseDetail.hayExceedsContract', {
+          remaining: Math.max(0, remaining),
+        }),
+      )
+      return
+    }
     setAddSaving(true)
     setAddError(null)
     try {
@@ -229,6 +282,16 @@ export function FeedingTab({
       (st) => st.id === editForm.feeding_shift_type_id,
     )
     if (!shiftType) return
+    const remaining = remainingHayKg(editing.id)
+    const hayValue = editForm.hay ? Number(editForm.hay) : null
+    if (remaining !== null && hayValue !== null && hayValue > remaining + 0.001) {
+      setEditError(
+        t('horseDetail.hayExceedsContract', {
+          remaining: Math.max(0, remaining),
+        }),
+      )
+      return
+    }
     setEditSaving(true)
     setEditError(null)
     try {
@@ -372,6 +435,8 @@ export function FeedingTab({
           <FeedingTimeFields
             form={addForm}
             shiftTypes={shiftTypes}
+            hayCapKg={hayCapKg}
+            remainingHayKg={remainingHayKg(null)}
             onChange={updateAddField}
           />
           <button type="submit" disabled={addSaving} className="btn-primary">
@@ -394,6 +459,8 @@ export function FeedingTab({
           <FeedingTimeFields
             form={editForm}
             shiftTypes={shiftTypes}
+            hayCapKg={hayCapKg}
+            remainingHayKg={remainingHayKg(editing?.id ?? null)}
             onChange={updateEditField}
           />
           <button type="submit" disabled={editSaving} className="btn-primary">

@@ -11,6 +11,8 @@ import {
   type ContractInsert,
   type PriceListItemOption,
 } from '../features/contracts/api'
+import { createHorse } from '../features/horses/api'
+import { createOwner } from '../features/owners/api'
 import { getStable } from '../features/settings/api'
 import {
   beddingAmountIncVat,
@@ -84,6 +86,11 @@ export default function ContractForm() {
   const [loading, setLoading] = useState(isEdit)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const [addingNewOwner, setAddingNewOwner] = useState(false)
+  const [newOwnerName, setNewOwnerName] = useState('')
+  const [addingNewHorse, setAddingNewHorse] = useState(false)
+  const [newHorseName, setNewHorseName] = useState('')
 
   useEffect(() => {
     listHorseOptions()
@@ -220,9 +227,31 @@ export default function ContractForm() {
     setSaving(true)
     setError(null)
     try {
+      const stableId = await getCurrentStableId()
+      if (!stableId) throw new Error(t('contractForm.noStableFound'))
+
+      let ownerId = form.owner_id
+      if (!isEdit && addingNewOwner) {
+        const createdOwner = await createOwner({
+          full_name: newOwnerName,
+          stable_id: stableId,
+        })
+        ownerId = createdOwner.id
+      }
+
+      let horseId = form.horse_id
+      if (!isEdit && addingNewHorse) {
+        const createdHorse = await createHorse({
+          name: newHorseName,
+          stable_id: stableId,
+          owner_id: ownerId || null,
+        })
+        horseId = createdHorse.id
+      }
+
       const payload = {
-        horse_id: form.horse_id,
-        owner_id: form.owner_id,
+        horse_id: horseId,
+        owner_id: ownerId,
         stall_id: form.stall_id || null,
         boarding_price_list_item_id: form.boarding_price_list_item_id || null,
         monthly_rent: Number(form.monthly_rent) || 0,
@@ -246,8 +275,6 @@ export default function ContractForm() {
       if (isEdit && id) {
         await updateContract(id, payload)
       } else {
-        const stableId = await getCurrentStableId()
-        if (!stableId) throw new Error(t('contractForm.noStableFound'))
         const insertPayload: ContractInsert = {
           ...payload,
           stable_id: stableId,
@@ -281,39 +308,93 @@ export default function ContractForm() {
         onSubmit={handleSubmit}
         className="panel grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-3"
       >
-        <label>
-          <span className="field-label">{t('contractForm.horse')}</span>
-          <select
-            required
-            className="field"
-            value={form.horse_id}
-            onChange={(e) => updateField('horse_id', e.target.value)}
-          >
-            <option value="">{t('contractForm.selectHorse')}</option>
-            {horses.map((horse) => (
-              <option key={horse.id} value={horse.id}>
-                {horse.name}
-                {horse.away ? ` (${t('status.away')})` : ''}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          <span className="field-label">{t('contractForm.owner')}</span>
-          <select
-            required
-            className="field"
-            value={form.owner_id}
-            onChange={(e) => updateField('owner_id', e.target.value)}
-          >
-            <option value="">{t('contractForm.selectOwner')}</option>
-            {owners.map((owner) => (
-              <option key={owner.id} value={owner.id}>
-                {owner.full_name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div>
+          <div className="flex items-center justify-between gap-2">
+            <span className="field-label">{t('contractForm.horse')}</span>
+            {!isEdit && (
+              <button
+                type="button"
+                className="text-xs font-medium text-forest hover:underline"
+                onClick={() => {
+                  setAddingNewHorse((prev) => !prev)
+                  setNewHorseName('')
+                  updateField('horse_id', '')
+                }}
+              >
+                {addingNewHorse
+                  ? t('contractForm.selectExistingHorse')
+                  : t('contractForm.addNewHorse')}
+              </button>
+            )}
+          </div>
+          {addingNewHorse ? (
+            <input
+              required
+              className="field"
+              placeholder={t('contractForm.newHorseNamePlaceholder')}
+              value={newHorseName}
+              onChange={(e) => setNewHorseName(e.target.value)}
+            />
+          ) : (
+            <select
+              required
+              className="field"
+              value={form.horse_id}
+              onChange={(e) => updateField('horse_id', e.target.value)}
+            >
+              <option value="">{t('contractForm.selectHorse')}</option>
+              {horses.map((horse) => (
+                <option key={horse.id} value={horse.id}>
+                  {horse.name}
+                  {horse.away ? ` (${t('status.away')})` : ''}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+        <div>
+          <div className="flex items-center justify-between gap-2">
+            <span className="field-label">{t('contractForm.owner')}</span>
+            {!isEdit && (
+              <button
+                type="button"
+                className="text-xs font-medium text-forest hover:underline"
+                onClick={() => {
+                  setAddingNewOwner((prev) => !prev)
+                  setNewOwnerName('')
+                  updateField('owner_id', '')
+                }}
+              >
+                {addingNewOwner
+                  ? t('contractForm.selectExistingOwner')
+                  : t('contractForm.addNewOwner')}
+              </button>
+            )}
+          </div>
+          {addingNewOwner ? (
+            <input
+              required
+              className="field"
+              placeholder={t('contractForm.newOwnerNamePlaceholder')}
+              value={newOwnerName}
+              onChange={(e) => setNewOwnerName(e.target.value)}
+            />
+          ) : (
+            <select
+              required
+              className="field"
+              value={form.owner_id}
+              onChange={(e) => updateField('owner_id', e.target.value)}
+            >
+              <option value="">{t('contractForm.selectOwner')}</option>
+              {owners.map((owner) => (
+                <option key={owner.id} value={owner.id}>
+                  {owner.full_name}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
         <label>
           <span className="field-label">{t('contractForm.stall')}</span>
           <select
