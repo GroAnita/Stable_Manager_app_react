@@ -126,7 +126,32 @@ export async function markPaymentPaid(id: string): Promise<void> {
   if (error) throw error
 }
 
+export type InvoicePaymentMode = 'paidByCard' | 'cardChargePlanned' | 'manual'
+
+// What the invoice should tell the boarder about paying. Bank details stay unless
+// a card charge is really going to happen, so nobody is left without a way to pay.
+export function invoicePaymentMode(input: {
+  status: string
+  chargeStatus: string | null
+  agreementActive: boolean
+  agreementPaused: boolean
+}): InvoicePaymentMode {
+  if (input.status === 'paid') {
+    return input.chargeStatus === 'succeeded' ? 'paidByCard' : 'manual'
+  }
+  if (
+    input.agreementActive &&
+    !input.agreementPaused &&
+    input.chargeStatus !== 'failed'
+  ) {
+    return 'cardChargePlanned'
+  }
+  return 'manual'
+}
+
 export type PaymentDetail = Payment & {
+  paymentMode: InvoicePaymentMode
+
   owner: Pick<
     Database['public']['Tables']['owners']['Row'],
     'id' | 'full_name' | 'address' | 'postal_code' | 'city' | 'phone' | 'email'
@@ -166,7 +191,25 @@ export async function getPaymentDetail(id: string): Promise<PaymentDetail> {
     .eq('id', id)
     .single()
   if (error) throw error
-  return data
+
+  const { data: agreement, error: agreementError } = await supabase
+    .from('card_agreements')
+    .select('paused_at')
+    .eq('contract_id', data.contract_id)
+    .is('withdrawn_at', null)
+    .not('activated_at', 'is', null)
+    .maybeSingle()
+  if (agreementError) throw agreementError
+
+  return {
+    ...data,
+    paymentMode: invoicePaymentMode({
+      status: data.status,
+      chargeStatus: data.charge_status,
+      agreementActive: agreement !== null,
+      agreementPaused: agreement?.paused_at != null,
+    }),
+  }
 }
 
 export async function getPayment(id: string): Promise<Payment | null> {

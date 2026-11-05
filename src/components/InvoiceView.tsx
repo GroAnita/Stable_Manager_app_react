@@ -132,16 +132,36 @@ export function InvoiceFields({ payment }: { payment: PaymentDetail }) {
           <h3 className="mb-2 text-sm font-semibold text-slate-800">
             {t('invoice.paymentInfo')}
           </h3>
-          {stable.bank_account_number && (
+          {payment.paymentMode === 'paidByCard' && (
             <p>
-              {t('invoice.bankAccount')}:{' '}
-              {formatBankAccountNumber(stable.bank_account_number)}
+              {payment.paid_date
+                ? t('invoice.paidByCardOn', {
+                    date: formatDate(payment.paid_date),
+                  })
+                : t('invoice.paidByCard')}
             </p>
           )}
-          <p>
-            {t('invoice.paymentTerms')}:{' '}
-            {t('invoice.daysNet', { days: stable.payment_terms_days })}
-          </p>
+          {payment.paymentMode === 'cardChargePlanned' && (
+            <p>
+              {t('invoice.cardChargePlanned', {
+                date: formatDate(payment.due_date),
+              })}
+            </p>
+          )}
+          {payment.paymentMode === 'manual' && (
+            <>
+              {stable.bank_account_number && (
+                <p>
+                  {t('invoice.bankAccount')}:{' '}
+                  {formatBankAccountNumber(stable.bank_account_number)}
+                </p>
+              )}
+              <p>
+                {t('invoice.paymentTerms')}:{' '}
+                {t('invoice.daysNet', { days: stable.payment_terms_days })}
+              </p>
+            </>
+          )}
           {payment.invoice_number && (
             <p>
               {t('invoice.reference')}: {payment.invoice_number}
