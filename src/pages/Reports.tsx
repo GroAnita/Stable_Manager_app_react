@@ -22,7 +22,7 @@ import {
 import { useAuth } from '../lib/AuthContext'
 import { useConfirm } from '../lib/ConfirmContext'
 import { usePreferences } from '../lib/PreferencesContext'
-import { categoryLabel, monthRange, usageByCategory } from '../lib/reports'
+import { paymentMoneyTotals, categoryLabel, monthRange, usageByCategory } from '../lib/reports'
 
 const EXPENSE_CATEGORIES = [
   'Feed',
@@ -119,24 +119,15 @@ export default function Reports() {
         .reduce((sum, p) => sum + p.amount, 0),
     [payments, from, to],
   )
-  const collected = useMemo(
-    () =>
-      payments
-        .filter(
-          (p) =>
-            p.status === 'paid' &&
-            p.paid_date &&
-            p.paid_date >= from &&
-            p.paid_date <= to,
-        )
-        .reduce((sum, p) => sum + p.amount, 0),
+  const { collected, stripeFees, returned } = useMemo(
+    () => paymentMoneyTotals(payments, from, to),
     [payments, from, to],
   )
   const expensesTotal = useMemo(
     () => expenses.reduce((sum, e) => sum + e.amount, 0),
     [expenses],
   )
-  const net = collected - expensesTotal
+  const net = collected - stripeFees - returned - expensesTotal
 
   const monthLabel = new Date(cursor.year, cursor.month, 1).toLocaleDateString(
     language === 'no' ? 'nb-NO' : 'en-US',
@@ -209,6 +200,12 @@ export default function Reports() {
     const lines: string[] = [`${t('reports.title')} – ${monthLabel}`, '']
     lines.push(`${t('reports.invoiced')}: ${formatCurrency(invoiced)}`)
     lines.push(`${t('reports.collected')}: ${formatCurrency(collected)}`)
+    if (stripeFees > 0) {
+      lines.push(`${t('reports.stripeFees')}: ${formatCurrency(stripeFees)}`)
+    }
+    if (returned > 0) {
+      lines.push(`${t('reports.returned')}: ${formatCurrency(returned)}`)
+    }
     lines.push(
       `${t('reports.expensesTotal')}: ${formatCurrency(expensesTotal)}`,
     )
@@ -339,6 +336,20 @@ export default function Reports() {
               value={formatCurrency(collected)}
               icon={<Icon name="dollar" className="h-4 w-4" />}
             />
+            {stripeFees > 0 && (
+              <Card
+                label={t('reports.stripeFees')}
+                value={formatCurrency(stripeFees)}
+                icon={<Icon name="dollar" className="h-4 w-4" />}
+              />
+            )}
+            {returned > 0 && (
+              <Card
+                label={t('reports.returned')}
+                value={formatCurrency(returned)}
+                icon={<Icon name="dollar" className="h-4 w-4" />}
+              />
+            )}
             <Card
               label={t('reports.expensesTotal')}
               value={formatCurrency(expensesTotal)}

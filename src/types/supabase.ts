@@ -1908,6 +1908,19 @@ export type Database = {
       payments: {
         Row: {
           amount: number
+          stripe_fee: number | null
+          stripe_net: number | null
+          refunded_amount: number
+          refunded_at: string | null
+          dispute_fee: number | null
+          dispute_opened_at: string | null
+          dispute_id: string | null
+          dispute_status: string | null
+          dispute_reason: string | null
+          dispute_amount: number | null
+          dispute_evidence_due_by: string | null
+          dispute_notified_at: string | null
+          dispute_lost_at: string | null
           charge_attempts: number
           charge_failure_notified_attempt: number | null
           charge_retry_not_before: string | null
@@ -1957,6 +1970,19 @@ export type Database = {
           status?: Database["public"]["Enums"]["payment_status"]
           stripe_checkout_session_id?: string | null
           stripe_payment_intent_id?: string | null
+          stripe_fee?: number | null
+          stripe_net?: number | null
+          refunded_amount?: number
+          refunded_at?: string | null
+          dispute_fee?: number | null
+          dispute_opened_at?: string | null
+          dispute_id?: string | null
+          dispute_status?: string | null
+          dispute_reason?: string | null
+          dispute_amount?: number | null
+          dispute_evidence_due_by?: string | null
+          dispute_notified_at?: string | null
+          dispute_lost_at?: string | null
           charge_attempts?: number
           charge_failure_notified_attempt?: number | null
           charge_retry_not_before?: string | null
@@ -1987,6 +2013,19 @@ export type Database = {
           status?: Database["public"]["Enums"]["payment_status"]
           stripe_checkout_session_id?: string | null
           stripe_payment_intent_id?: string | null
+          stripe_fee?: number | null
+          stripe_net?: number | null
+          refunded_amount?: number
+          refunded_at?: string | null
+          dispute_fee?: number | null
+          dispute_opened_at?: string | null
+          dispute_id?: string | null
+          dispute_status?: string | null
+          dispute_reason?: string | null
+          dispute_amount?: number | null
+          dispute_evidence_due_by?: string | null
+          dispute_notified_at?: string | null
+          dispute_lost_at?: string | null
           charge_attempts?: number
           charge_failure_notified_attempt?: number | null
           charge_retry_not_before?: string | null

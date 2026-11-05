@@ -178,6 +178,13 @@ export default function MyContract() {
                     <td>{formatCurrency(payment.amount)}</td>
                     <td>
                       <Badge status={payment.status} />
+                      {payment.refunded_amount > 0 && (
+                        <p className="mt-1 text-xs text-slate-500">
+                          {t('myContract.refundedAmount', {
+                            amount: formatCurrency(payment.refunded_amount),
+                          })}
+                        </p>
+                      )}
                     </td>
                     {canPay && (
                       <td>

@@ -9,6 +9,11 @@ import {
 } from '../_shared/invoiceCharge.ts'
 import { notifyChargeFailure } from '../_shared/chargeFailureNotice.ts'
 import { releaseCheckoutClaim } from '../_shared/invoiceCheckout.ts'
+import {
+  recordStripeFee,
+  syncDispute,
+  syncRefunds,
+} from '../_shared/paymentAftercare.ts'
 
 const cryptoProvider = Stripe.createSubtleCryptoProvider()
 
@@ -42,62 +47,166 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: 'Invalid signature' }, 400)
   }
 
-  if (
-    event.type !== 'payment_intent.succeeded' &&
-    event.type !== 'payment_intent.payment_failed' &&
-    event.type !== 'checkout.session.expired'
-  ) {
-    return jsonResponse({ ignored: true })
-  }
-
   // Test events can't touch real invoices, and the other way round.
   const isLiveKey = /^(sk|rk)_live_/.test(stripeKey)
   if (event.livemode !== isLiveKey) return jsonResponse({ ignored: true })
 
-  const paymentId = event.data.object.metadata?.payment_id
-  if (!paymentId || !event.account) return jsonResponse({ ignored: true })
+  if (!event.account) return jsonResponse({ ignored: true })
+  const stripeAccount = event.account
 
   const admin = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   )
 
-  try {
-    const { data: payment, error: paymentError } = await admin
+  // Checks a payment is real and belongs to the Stripe account the event is from.
+  async function findPayment(
+    column: 'id' | 'stripe_payment_intent_id',
+    value: string,
+  ) {
+    const { data: payment, error } = await admin
       .from('payments')
-      .select('id, stable_id')
-      .eq('id', paymentId)
+      .select('id, stable_id, stripe_fee')
+      .eq(column, value)
       .maybeSingle()
-    if (paymentError) throw paymentError
-    if (!payment) return jsonResponse({ ignored: true })
+    if (error) throw error
+    if (!payment) return null
 
-    // The event must come from the Stripe account of the invoice's own stable.
     const { data: paymentAccount, error: accountError } = await admin
       .from('stable_payment_accounts')
       .select('stripe_account_id')
       .eq('stable_id', payment.stable_id)
       .maybeSingle()
     if (accountError) throw accountError
-    if (paymentAccount?.stripe_account_id !== event.account) {
+    if (paymentAccount?.stripe_account_id !== stripeAccount) {
       console.error('stripe-connect-webhook account mismatch:', event.id)
-      return jsonResponse({ ignored: true })
+      return null
     }
+    return payment
+  }
 
-    if (event.type === 'checkout.session.expired') {
-      await releaseCheckoutClaim(admin, paymentId, event.data.object.id)
-    } else if (event.type === 'payment_intent.succeeded') {
-      await recordChargeSucceeded(admin, paymentId, event.data.object.id)
-    } else {
-      const intent = event.data.object
-      await recordChargeFailed(
-        admin,
-        paymentId,
-        intent.id,
-        intent.last_payment_error?.decline_code ??
-          intent.last_payment_error?.code ??
-          'charge_failed',
-      )
-      await notifyChargeFailure(admin, paymentId)
+  // A payment made on Stripe's page isn't linked to its invoice until its success
+  // event arrives, and Stripe doesn't promise the order of events. So if the link
+  // isn't there yet, ask Stripe which invoice the payment belongs to.
+  async function findPaymentForIntent(paymentIntentId: string) {
+    const linked = await findPayment(
+      'stripe_payment_intent_id',
+      paymentIntentId,
+    )
+    if (linked) return linked
+    const intent = await stripe.paymentIntents.retrieve(
+      paymentIntentId,
+      {},
+      { stripeAccount },
+    )
+    const paymentId = intent.metadata?.payment_id
+    return paymentId ? await findPayment('id', paymentId) : null
+  }
+
+  try {
+    switch (event.type) {
+      case 'payment_intent.succeeded': {
+        const intent = event.data.object
+        const paymentId = intent.metadata?.payment_id
+        const payment = paymentId ? await findPayment('id', paymentId) : null
+        if (!payment) return jsonResponse({ ignored: true })
+        await recordChargeSucceeded(admin, payment.id, intent.id)
+        if (typeof intent.latest_charge === 'string') {
+          await recordStripeFee(
+            stripe,
+            admin,
+            payment.id,
+            intent.latest_charge,
+            stripeAccount,
+          )
+        }
+        break
+      }
+      case 'payment_intent.payment_failed': {
+        const intent = event.data.object
+        const paymentId = intent.metadata?.payment_id
+        const payment = paymentId ? await findPayment('id', paymentId) : null
+        if (!payment) return jsonResponse({ ignored: true })
+        await recordChargeFailed(
+          admin,
+          payment.id,
+          intent.id,
+          intent.last_payment_error?.decline_code ??
+            intent.last_payment_error?.code ??
+            'charge_failed',
+        )
+        await notifyChargeFailure(admin, payment.id)
+        break
+      }
+      case 'checkout.session.expired': {
+        const session = event.data.object
+        const paymentId = session.metadata?.payment_id
+        const payment = paymentId ? await findPayment('id', paymentId) : null
+        if (!payment) return jsonResponse({ ignored: true })
+        await releaseCheckoutClaim(admin, payment.id, session.id)
+        break
+      }
+      case 'charge.updated': {
+        const charge = event.data.object
+        if (typeof charge.payment_intent !== 'string') {
+          return jsonResponse({ ignored: true })
+        }
+        const payment = await findPaymentForIntent(charge.payment_intent)
+        if (!payment || payment.stripe_fee !== null) {
+          return jsonResponse({ ignored: true })
+        }
+        await recordStripeFee(
+          stripe,
+          admin,
+          payment.id,
+          charge.id,
+          stripeAccount,
+        )
+        break
+      }
+      case 'charge.refunded': {
+        const charge = event.data.object
+        if (typeof charge.payment_intent !== 'string') {
+          return jsonResponse({ ignored: true })
+        }
+        const payment = await findPaymentForIntent(charge.payment_intent)
+        if (!payment) return jsonResponse({ ignored: true })
+        await syncRefunds(stripe, admin, payment.id, charge.id, stripeAccount)
+        break
+      }
+      case 'charge.refund.updated': {
+        const refund = event.data.object
+        if (
+          typeof refund.payment_intent !== 'string' ||
+          typeof refund.charge !== 'string'
+        ) {
+          return jsonResponse({ ignored: true })
+        }
+        const payment = await findPaymentForIntent(refund.payment_intent)
+        if (!payment) return jsonResponse({ ignored: true })
+        await syncRefunds(
+          stripe,
+          admin,
+          payment.id,
+          refund.charge,
+          stripeAccount,
+        )
+        break
+      }
+      case 'charge.dispute.created':
+      case 'charge.dispute.updated':
+      case 'charge.dispute.closed': {
+        const dispute = event.data.object
+        if (typeof dispute.payment_intent !== 'string') {
+          return jsonResponse({ ignored: true })
+        }
+        const payment = await findPaymentForIntent(dispute.payment_intent)
+        if (!payment) return jsonResponse({ ignored: true })
+        await syncDispute(stripe, admin, payment.id, dispute.id, stripeAccount)
+        break
+      }
+      default:
+        return jsonResponse({ ignored: true })
     }
     return jsonResponse({ updated: true })
   } catch (error) {

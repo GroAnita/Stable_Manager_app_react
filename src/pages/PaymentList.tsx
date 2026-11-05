@@ -6,6 +6,7 @@ import { Icon } from '../components/Icon'
 import { InvoiceView } from '../components/InvoiceView'
 import { Modal } from '../components/Modal'
 import {
+  disputeState,
   getPaymentSummary,
   listPayments,
   invoiceEmailProblem,
@@ -321,6 +322,22 @@ export default function PaymentList() {
                         {t('paymentList.chargeInProgress')}
                       </p>
                     )}
+                    {payment.refunded_amount > 0 && (
+                      <p className="mt-1 text-xs font-medium text-amber-700">
+                        {t(
+                          payment.refunded_amount >= payment.amount
+                            ? 'paymentList.refunded'
+                            : 'paymentList.partlyRefunded',
+                        )}
+                      </p>
+                    )}
+                    {disputeState(payment.dispute_status) && (
+                      <p className="mt-1 text-xs font-medium text-red-600">
+                        {t(
+                          `paymentList.dispute_${disputeState(payment.dispute_status)}`,
+                        )}
+                      </p>
+                    )}
                   </td>
                   <td>
                     {payment.status === 'paid' ? (
@@ -424,6 +441,52 @@ export default function PaymentList() {
                       </li>
                     ))}
                 </ul>
+              </div>
+            )}
+            {selected.stripe_fee !== null && selected.stripe_net !== null && (
+              <div>
+                <span className="font-medium text-slate-800">
+                  {t('paymentList.stripeFee')}:
+                </span>{' '}
+                {t('paymentList.stripeFeeDetail', {
+                  fee: formatCurrency(selected.stripe_fee),
+                  net: formatCurrency(selected.stripe_net),
+                })}
+              </div>
+            )}
+            {selected.refunded_amount > 0 && (
+              <div>
+                <span className="font-medium text-slate-800">
+                  {t('paymentList.refundedAmount')}:
+                </span>{' '}
+                {formatCurrency(selected.refunded_amount)}
+                {selected.refunded_at
+                  ? ` (${formatDate(selected.refunded_at.slice(0, 10))})`
+                  : ''}
+              </div>
+            )}
+            {disputeState(selected.dispute_status) && (
+              <p className="text-red-600">
+                {t(`paymentList.dispute_${disputeState(selected.dispute_status)}`)}
+                {selected.dispute_amount !== null
+                  ? `: ${formatCurrency(selected.dispute_amount)}`
+                  : ''}
+                {disputeState(selected.dispute_status) === 'open' &&
+                selected.dispute_evidence_due_by
+                  ? `. ${t('paymentList.disputeRespondBy', {
+                      date: formatDate(
+                        selected.dispute_evidence_due_by.slice(0, 10),
+                      ),
+                    })}`
+                  : ''}
+              </p>
+            )}
+            {!!selected.dispute_fee && (
+              <div>
+                <span className="font-medium text-slate-800">
+                  {t('paymentList.disputeFee')}:
+                </span>{' '}
+                {formatCurrency(selected.dispute_fee)}
               </div>
             )}
             {selected.charged_at && (

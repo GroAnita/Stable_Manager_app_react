@@ -28,6 +28,17 @@ export type PaymentListItem = Pick<
   | 'charge_attempts'
   | 'charge_failure_notified_attempt'
   | 'charge_retry_not_before'
+  | 'stripe_fee'
+  | 'stripe_net'
+  | 'refunded_amount'
+  | 'refunded_at'
+  | 'dispute_status'
+  | 'dispute_reason'
+  | 'dispute_amount'
+  | 'dispute_evidence_due_by'
+  | 'dispute_lost_at'
+  | 'dispute_fee'
+  | 'dispute_opened_at'
 > & {
   owner: Pick<
     Database['public']['Tables']['owners']['Row'],
@@ -65,6 +76,17 @@ export function invoiceEmailProblem(
   return payment.invoice_email_error ? 'retrying' : null
 }
 
+export type DisputeState = 'open' | 'won' | 'lost'
+
+export function disputeState(status: string | null): DisputeState | null {
+  if (!status) return null
+  if (status === 'lost') return 'lost'
+  if (status === 'won' || status === 'prevented' || status === 'warning_closed') {
+    return 'won'
+  }
+  return 'open'
+}
+
 export async function getPaymentSummary(): Promise<PaymentSummary> {
   const { data, error } = await supabase
     .from('payment_summary')
@@ -83,6 +105,8 @@ export async function listPayments(): Promise<PaymentListItem[]> {
        invoice_email_error, invoice_email_delivery_status, invoice_email_delivered_at,
        charge_status, charge_error, charged_at, charge_attempts,
        charge_failure_notified_attempt, charge_retry_not_before,
+       stripe_fee, stripe_net, refunded_amount, refunded_at, dispute_status, dispute_reason,
+       dispute_amount, dispute_evidence_due_by, dispute_lost_at, dispute_fee, dispute_opened_at,
        owner:owners(id, full_name),
        contract:contracts(id, horse:horses(id, name))`,
     )

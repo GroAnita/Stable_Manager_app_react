@@ -59,3 +59,49 @@ export function usageByCategory(
     }))
     .filter((line) => line.quantity > 0)
 }
+
+type PaymentMoney = {
+  amount: number
+  status: string
+  paid_date: string | null
+  stripe_fee: number | null
+  refunded_amount: number
+  refunded_at: string | null
+  dispute_amount: number | null
+  dispute_lost_at: string | null
+  dispute_fee: number | null
+  dispute_opened_at: string | null
+}
+
+// Money counts in the month it moved: a payment when it was paid, and a refund or
+// lost dispute when the money went back, which can be a later month. Stripe takes
+// a dispute's fee when the dispute opens.
+export function paymentMoneyTotals(
+  payments: PaymentMoney[],
+  from: string,
+  to: string,
+): { collected: number; stripeFees: number; returned: number } {
+  const inRange = (date: string | null) =>
+    date !== null && date.slice(0, 10) >= from && date.slice(0, 10) <= to
+  let collected = 0
+  let stripeFees = 0
+  let returned = 0
+  for (const payment of payments) {
+    if (payment.status === 'paid' && inRange(payment.paid_date)) {
+      collected += payment.amount
+      stripeFees += payment.stripe_fee ?? 0
+    }
+    if (inRange(payment.dispute_opened_at)) {
+      stripeFees += payment.dispute_fee ?? 0
+    }
+    if (inRange(payment.refunded_at)) returned += payment.refunded_amount
+    if (inRange(payment.dispute_lost_at))
+      returned += payment.dispute_amount ?? 0
+  }
+  const round = (value: number) => Math.round(value * 100) / 100
+  return {
+    collected: round(collected),
+    stripeFees: round(stripeFees),
+    returned: round(returned),
+  }
+}
