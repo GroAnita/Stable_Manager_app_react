@@ -8,6 +8,7 @@ import {
   updatePaddock,
   type PaddockWithHorses,
 } from '../features/paddocks/api'
+import { useConfirm } from '../lib/ConfirmContext'
 import { usePreferences } from '../lib/PreferencesContext'
 import { getCurrentStableId } from '../lib/stableContext'
 
@@ -65,6 +66,7 @@ function PaddockFields({
 
 export default function PaddockView() {
   const { t } = usePreferences()
+  const confirm = useConfirm()
   const [paddocks, setPaddocks] = useState<PaddockWithHorses[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -177,7 +179,7 @@ export default function PaddockView() {
       return
     }
     if (
-      !window.confirm(t('paddockView.confirmDelete', { name: selected.name }))
+      !(await confirm(t('paddockView.confirmDelete', { name: selected.name })))
     )
       return
     await deletePaddock(selected.id)

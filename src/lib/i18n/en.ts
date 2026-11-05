@@ -11,6 +11,7 @@ export const en = {
     saving: 'Saving…',
     cancel: 'Cancel',
     edit: 'Edit',
+    confirmTitle: 'Are you sure?',
     delete: 'Delete',
     remove: 'Remove',
     add: 'Add',
@@ -460,7 +461,6 @@ export const en = {
     extraSubmit: 'Log extra & bill it',
     extraRemoveConfirmWithPayment:
       'Remove this extra? This will subtract {amount} from the invoice due {date}.',
-    extraRemoveTitle: 'Remove extra?',
     extraRemoveConfirmPlain: 'Remove this logged extra?',
     extraNoActiveContract:
       'This horse has no active contract, so no charge could be created.',

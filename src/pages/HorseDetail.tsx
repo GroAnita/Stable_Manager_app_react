@@ -20,6 +20,7 @@ import {
 } from '../features/horses/api'
 import { listHorseLessonBookings } from '../features/lessons/api'
 import { useFeature } from '../lib/features'
+import { useConfirm } from '../lib/ConfirmContext'
 import { usePreferences } from '../lib/PreferencesContext'
 import { AdditionalOwnersCard } from './horseDetail/AdditionalOwnersCard'
 import { DocumentsTab } from './horseDetail/DocumentsTab'
@@ -45,6 +46,7 @@ export default function HorseDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { t } = usePreferences()
+  const confirm = useConfirm()
   const lessonBookingEnabled = useFeature('lesson_booking')
   const [horse, setHorse] = useState<HorseDetailData | null>(null)
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([])
@@ -91,7 +93,7 @@ export default function HorseDetail() {
   }, [id])
 
   async function handleDelete() {
-    if (!id || !window.confirm(t('horseDetail.confirmDelete'))) return
+    if (!id || !(await confirm(t('horseDetail.confirmDelete')))) return
     await deleteHorse(id)
     navigate('/horses')
   }

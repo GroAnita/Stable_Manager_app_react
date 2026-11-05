@@ -16,12 +16,14 @@ import {
   sendOwnerInviteEmail,
 } from '../features/invites/api'
 import { useAuth } from '../lib/AuthContext'
+import { useConfirm } from '../lib/ConfirmContext'
 import { usePreferences } from '../lib/PreferencesContext'
 
 export default function OwnerDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { t } = usePreferences()
+  const confirm = useConfirm()
   const { session, profile } = useAuth()
   const [owner, setOwner] = useState<Owner | null>(null)
   const [horses, setHorses] = useState<OwnerHorse[]>([])
@@ -59,7 +61,7 @@ export default function OwnerDetail() {
     if (
       !id ||
       !owner ||
-      !window.confirm(t('ownerDetail.confirmDelete', { name: owner.full_name }))
+      !(await confirm(t('ownerDetail.confirmDelete', { name: owner.full_name })))
     )
       return
     await deleteOwner(id)

@@ -27,6 +27,7 @@ import {
   daysRemaining,
   isLowStock,
 } from '../lib/inventory'
+import { useConfirm } from '../lib/ConfirmContext'
 import { usePreferences } from '../lib/PreferencesContext'
 import { getCurrentStableId } from '../lib/stableContext'
 
@@ -58,6 +59,7 @@ function emptyDeliveryForm(): DeliveryFormState {
 
 export default function Inventory() {
   const { t, formatDate } = usePreferences()
+  const confirm = useConfirm()
   const [items, setItems] = useState<InventoryItemWithDeliveries[]>([])
   const [priceListItems, setPriceListItems] = useState<PriceListItem[]>([])
   const [contractAllocations, setContractAllocations] = useState<
@@ -199,9 +201,9 @@ export default function Inventory() {
 
   async function handleDeleteItem(item: InventoryItemWithDeliveries) {
     if (
-      !window.confirm(
+      !(await confirm(
         t('inventory.confirmDeleteItem', { name: item.price_list_item.item }),
-      )
+      ))
     )
       return
     await deleteInventoryItem(item.id)
@@ -253,7 +255,12 @@ export default function Inventory() {
     item: InventoryItemWithDeliveries,
     deliveryId: string,
   ) {
-    if (!window.confirm(t('inventory.confirmDeleteDelivery'))) return
+    if (
+      !(await confirm(t('inventory.confirmDeleteDelivery'), {
+        confirmLabel: t('common.remove'),
+      }))
+    )
+      return
     await deleteDelivery(deliveryId)
     setItems((prev) =>
       prev.map((i) =>

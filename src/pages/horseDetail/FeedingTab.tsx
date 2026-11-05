@@ -12,6 +12,7 @@ import {
   type FeedingPlan,
   type FeedingTime,
 } from '../../features/horses/api'
+import { useConfirm } from '../../lib/ConfirmContext'
 import { usePreferences } from '../../lib/PreferencesContext'
 import { FeedingExtras } from './FeedingExtras'
 
@@ -169,6 +170,7 @@ export function FeedingTab({
   showExtras?: boolean
 }) {
   const { t } = usePreferences()
+  const confirm = useConfirm()
 
   const [shiftTypes, setShiftTypes] = useState<ShiftType[]>([])
   const [hayCapKg, setHayCapKg] = useState<number | null>(null)
@@ -324,7 +326,7 @@ export function FeedingTab({
 
   async function handleDelete() {
     if (!editing) return
-    if (!window.confirm(t('horseDetail.deleteFeedingTimeConfirm'))) return
+    if (!(await confirm(t('horseDetail.deleteFeedingTimeConfirm')))) return
     await deleteFeedingTime(editing.id)
     onTimesChanged(feedingTimes.filter((entry) => entry.id !== editing.id))
     setEditing(null)

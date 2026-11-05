@@ -15,6 +15,7 @@ import {
   currentBillingCycleDays,
   hayValueIncVat,
 } from '../lib/billing'
+import { useConfirm } from '../lib/ConfirmContext'
 import { usePreferences } from '../lib/PreferencesContext'
 
 type Filter = 'all' | 'active' | 'ending_soon' | 'expired' | 'cancelled'
@@ -51,6 +52,7 @@ function totalMonthlyPrice(contract: ContractListItem): number {
 
 export default function ContractList() {
   const { t, formatCurrency, formatDate } = usePreferences()
+  const confirm = useConfirm()
   const [contracts, setContracts] = useState<ContractListItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -90,7 +92,7 @@ export default function ContractList() {
 
   async function handleDelete(contract: ContractListItem) {
     const name = contract.horse?.name ?? t('contractList.fallbackHorse')
-    if (!window.confirm(t('contractList.confirmDelete', { name }))) return
+    if (!(await confirm(t('contractList.confirmDelete', { name })))) return
     await deleteContract(contract.id)
     setContracts((prev) => prev.filter((c) => c.id !== contract.id))
   }

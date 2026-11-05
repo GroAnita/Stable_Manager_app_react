@@ -9,6 +9,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react'
 import './index.css'
 import { ConsentBanner } from './components/ConsentBanner'
 import { AuthProvider } from './lib/AuthContext'
+import { ConfirmProvider } from './lib/ConfirmContext'
 import { initClarity } from './lib/clarity'
 import { disableNumberInputStepping } from './lib/numberInputs'
 import { PreferencesProvider } from './lib/PreferencesContext'
@@ -44,7 +45,9 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <PreferencesProvider>
       <AuthProvider>
-        <RouterProvider router={router} />
+        <ConfirmProvider>
+          <RouterProvider router={router} />
+        </ConfirmProvider>
       </AuthProvider>
       <ConsentBanner />
       <SpeedInsights />

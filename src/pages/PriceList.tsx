@@ -9,6 +9,7 @@ import {
   updatePriceListItem,
   type PriceListItem,
 } from '../features/priceList/api'
+import { useConfirm } from '../lib/ConfirmContext'
 import { usePreferences } from '../lib/PreferencesContext'
 import { unitLabel } from '../lib/reports'
 import { getCurrentStableId } from '../lib/stableContext'
@@ -179,6 +180,7 @@ function ItemFields({
 
 export default function PriceList() {
   const { t, formatCurrency } = usePreferences()
+  const confirm = useConfirm()
   const [items, setItems] = useState<PriceListItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -307,7 +309,11 @@ export default function PriceList() {
 
   async function handleDelete() {
     if (!editing) return
-    if (!window.confirm(t('priceList.confirmDelete', { name: editing.item })))
+    if (
+      !(await confirm(t('priceList.confirmDelete', { name: editing.item }), {
+        confirmLabel: t('common.remove'),
+      }))
+    )
       return
     await deletePriceListItem(editing.id)
     setEditing(null)

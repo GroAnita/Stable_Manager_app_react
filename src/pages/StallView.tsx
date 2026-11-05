@@ -10,6 +10,7 @@ import {
   type Stall,
   type StallWithHorses,
 } from '../features/stalls/api'
+import { useConfirm } from '../lib/ConfirmContext'
 import { usePreferences } from '../lib/PreferencesContext'
 import { getCurrentStableId } from '../lib/stableContext'
 import { TurnoutShelterSection } from './stallView/TurnoutShelterSection'
@@ -101,6 +102,7 @@ function StallFields({
 
 export default function StallView() {
   const { t } = usePreferences()
+  const confirm = useConfirm()
   const [stalls, setStalls] = useState<StallWithHorses[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -212,9 +214,9 @@ export default function StallView() {
       return
     }
     if (
-      !window.confirm(
+      !(await confirm(
         t('stallView.confirmDelete', { number: selected.stall_number }),
-      )
+      ))
     )
       return
     await deleteStall(selected.id)

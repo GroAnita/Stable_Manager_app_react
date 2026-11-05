@@ -6,6 +6,7 @@ import {
   type DocumentType,
   type HorseDocument,
 } from '../../features/documents/api'
+import { useConfirm } from '../../lib/ConfirmContext'
 import { usePreferences } from '../../lib/PreferencesContext'
 
 const DOCUMENT_TYPES: DocumentType[] = [
@@ -25,6 +26,7 @@ export function DocumentsTab({
   stableId: string
 }) {
   const { t, formatDate } = usePreferences()
+  const confirm = useConfirm()
   const [documents, setDocuments] = useState<HorseDocument[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -67,7 +69,7 @@ export function DocumentsTab({
   }
 
   async function handleDelete(doc: HorseDocument) {
-    if (!window.confirm(t('horseDetail.deleteDocumentConfirm'))) return
+    if (!(await confirm(t('horseDetail.deleteDocumentConfirm')))) return
     await deleteHorseDocument(doc)
     setDocuments((prev) => prev.filter((d) => d.id !== doc.id))
   }

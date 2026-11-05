@@ -13,6 +13,7 @@ export const no: typeof en = {
     saving: 'Lagrer…',
     cancel: 'Avbryt',
     edit: 'Rediger',
+    confirmTitle: 'Er du sikker?',
     delete: 'Slett',
     remove: 'Fjern',
     add: 'Legg til',
@@ -461,7 +462,6 @@ export const no: typeof en = {
     extraSubmit: 'Registrer og fakturer',
     extraRemoveConfirmWithPayment:
       'Fjerne denne ekstrakostnaden? Dette trekker {amount} fra fakturaen som forfaller {date}.',
-    extraRemoveTitle: 'Fjerne tillegget?',
     extraRemoveConfirmPlain: 'Fjerne denne registrerte ekstrakostnaden?',
     extraNoActiveContract:
       'Denne hesten har ingen aktiv kontrakt, så ingen kostnad kunne opprettes.',

@@ -8,6 +8,7 @@ import {
   updateHorseEvent,
   type HorseEvent,
 } from '../../features/horses/api'
+import { useConfirm } from '../../lib/ConfirmContext'
 import { usePreferences } from '../../lib/PreferencesContext'
 import {
   CUSTOM_TYPE_MAX_LENGTH,
@@ -158,6 +159,7 @@ export function ScheduleTab({
   onChange: (events: HorseEvent[]) => void
 }) {
   const { t, formatDate } = usePreferences()
+  const confirm = useConfirm()
   const [addOpen, setAddOpen] = useState(false)
   const [addForm, setAddForm] = useState<EventFormState>(emptyForm)
   const [addSaving, setAddSaving] = useState(false)
@@ -251,7 +253,7 @@ export function ScheduleTab({
 
   async function handleDelete() {
     if (!editing) return
-    if (!window.confirm(t('horseDetail.deleteEventConfirm'))) return
+    if (!(await confirm(t('horseDetail.deleteEventConfirm')))) return
     await deleteHorseEvent(editing.id)
     onChange(events.filter((e) => e.id !== editing.id))
     setEditing(null)

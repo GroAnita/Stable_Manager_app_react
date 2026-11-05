@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { ConfirmDialog } from '../../components/ConfirmDialog'
 import { Icon } from '../../components/Icon'
 import { Modal } from '../../components/Modal'
 import {
@@ -25,6 +24,7 @@ import {
   amountIncVat,
   billingCycleDueDate,
 } from '../../lib/billing'
+import { useConfirm } from '../../lib/ConfirmContext'
 import { usePreferences } from '../../lib/PreferencesContext'
 import { unitLabel } from '../../lib/reports'
 
@@ -61,6 +61,7 @@ export function FeedingExtras({
   onPlanSaved: (plan: FeedingPlan) => void
 }) {
   const { t, formatCurrency, formatDate } = usePreferences()
+  const confirm = useConfirm()
 
   const extras = parseFeedingExtras(plan?.extras ?? null)
 
@@ -76,10 +77,6 @@ export function FeedingExtras({
   const [extraError, setExtraError] = useState<string | null>(null)
   const [extraMessage, setExtraMessage] = useState<string | null>(null)
   const [removeError, setRemoveError] = useState<string | null>(null)
-  const [pendingRemoval, setPendingRemoval] = useState<{
-    entry: FeedingExtraEntry
-    message: string
-  } | null>(null)
 
   async function openExtra() {
     setExtraError(null)
@@ -142,27 +139,20 @@ export function FeedingExtras({
     }
   }
 
-  async function askToRemoveExtra(entry: FeedingExtraEntry) {
+  async function handleRemoveExtra(entry: FeedingExtraEntry) {
     setRemoveError(null)
     try {
       const payment = entry.paymentId ? await getPayment(entry.paymentId) : null
-      setPendingRemoval({
-        entry,
-        message: payment
+      const confirmed = await confirm(
+        payment
           ? t('horseDetail.extraRemoveConfirmWithPayment', {
               amount: formatCurrency(entry.amount),
               date: formatDate(payment.due_date),
             })
           : t('horseDetail.extraRemoveConfirmPlain'),
-      })
-    } catch (err) {
-      setRemoveError((err as Error).message)
-    }
-  }
-
-  async function handleRemoveExtra(entry: FeedingExtraEntry) {
-    setPendingRemoval(null)
-    try {
+        { confirmLabel: t('common.remove') },
+      )
+      if (!confirmed) return
       const updatedPlan = await removeFeedingExtra({
         horseId,
         stableId,
@@ -258,7 +248,7 @@ export function FeedingExtras({
               <button
                 type="button"
                 className="btn-ghost px-3 py-2"
-                onClick={() => askToRemoveExtra(entry)}
+                onClick={() => handleRemoveExtra(entry)}
               >
                 {t('common.remove')}
               </button>
@@ -266,17 +256,6 @@ export function FeedingExtras({
           ))
         )}
       </div>
-
-      <ConfirmDialog
-        open={pendingRemoval !== null}
-        title={t('horseDetail.extraRemoveTitle')}
-        message={pendingRemoval?.message ?? ''}
-        confirmLabel={t('common.remove')}
-        onConfirm={() => {
-          if (pendingRemoval) void handleRemoveExtra(pendingRemoval.entry)
-        }}
-        onCancel={() => setPendingRemoval(null)}
-      />
 
       <Modal
         open={extraOpen}

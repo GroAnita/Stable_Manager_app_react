@@ -14,6 +14,7 @@ import {
   type Staff,
   type StaffRole,
 } from '../../features/staff/api'
+import { useConfirm } from '../../lib/ConfirmContext'
 import { usePreferences } from '../../lib/PreferencesContext'
 
 type AddForm = {
@@ -35,6 +36,7 @@ export function StaffAccessPanel({
   createdBy: string
 }) {
   const { t } = usePreferences()
+  const confirm = useConfirm()
   const [staff, setStaff] = useState<Staff[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -117,7 +119,12 @@ export function StaffAccessPanel({
     const confirmKey = member.user_id
       ? 'settings.staffRemoveConfirm'
       : 'settings.staffRemoveConfirmPending'
-    if (!window.confirm(t(confirmKey, { name: member.full_name }))) return
+    if (
+      !(await confirm(t(confirmKey, { name: member.full_name }), {
+        confirmLabel: t('common.remove'),
+      }))
+    )
+      return
     setError(null)
     try {
       await removeStaff(member)

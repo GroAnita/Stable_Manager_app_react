@@ -8,6 +8,7 @@ import {
   updateTurnoutShelter,
   type TurnoutShelterWithHorses,
 } from '../../features/turnoutShelters/api'
+import { useConfirm } from '../../lib/ConfirmContext'
 import { usePreferences } from '../../lib/PreferencesContext'
 import { getCurrentStableId } from '../../lib/stableContext'
 
@@ -65,6 +66,7 @@ function ShelterFields({
 
 export function TurnoutShelterSection() {
   const { t } = usePreferences()
+  const confirm = useConfirm()
   const [shelters, setShelters] = useState<TurnoutShelterWithHorses[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -168,9 +170,9 @@ export function TurnoutShelterSection() {
       return
     }
     if (
-      !window.confirm(
+      !(await confirm(
         t('turnoutShelterView.confirmDelete', { name: selected.name }),
-      )
+      ))
     )
       return
     await deleteTurnoutShelter(selected.id)

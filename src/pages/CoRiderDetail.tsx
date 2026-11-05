@@ -13,6 +13,7 @@ import {
   type CoRiderAgreementWithHorse,
   type HorsePickerOption,
 } from '../features/co-riders/api'
+import { useConfirm } from '../lib/ConfirmContext'
 import { usePreferences } from '../lib/PreferencesContext'
 import { getCurrentStableId } from '../lib/stableContext'
 
@@ -38,6 +39,7 @@ export default function CoRiderDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { t } = usePreferences()
+  const confirm = useConfirm()
 
   const [coRider, setCoRider] = useState<CoRider | null>(null)
   const [agreements, setAgreements] = useState<CoRiderAgreementWithHorse[]>([])
@@ -77,9 +79,9 @@ export default function CoRiderDetail() {
     if (
       !id ||
       !coRider ||
-      !window.confirm(
+      !(await confirm(
         t('coRiderDetail.confirmDelete', { name: coRider.full_name }),
-      )
+      ))
     )
       return
     await deleteCoRider(id)
@@ -125,7 +127,13 @@ export default function CoRiderDetail() {
   }
 
   async function handleRemoveAgreement(agreementId: string) {
-    if (!id || !window.confirm(t('coRiderDetail.confirmRemoveLink'))) return
+    if (
+      !id ||
+      !(await confirm(t('coRiderDetail.confirmRemoveLink'), {
+        confirmLabel: t('common.remove'),
+      }))
+    )
+      return
     await deleteCoRiderAgreement(agreementId)
     const refreshed = await listCoRiderAgreements(id)
     setAgreements(refreshed)

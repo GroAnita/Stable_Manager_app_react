@@ -30,6 +30,7 @@ import {
   customTypeFor,
   type EventType,
 } from '../lib/eventTypes'
+import { useConfirm } from '../lib/ConfirmContext'
 import { usePreferences } from '../lib/PreferencesContext'
 import { categoryLabel } from '../lib/reports'
 import { getCurrentStableId } from '../lib/stableContext'
@@ -319,6 +320,7 @@ function EventFields({
 
 export default function CalendarView() {
   const { t, formatCurrency, formatDate, formatTime } = usePreferences()
+  const confirm = useConfirm()
   const { profile } = useAuth()
   const canManage = profile?.role !== 'horse_owner'
   const [events, setEvents] = useState<CalendarEvent[]>([])
@@ -566,7 +568,7 @@ export default function CalendarView() {
 
   async function handleDelete() {
     if (!editing) return
-    if (!window.confirm(t('calendarView.deleteConfirm'))) return
+    if (!(await confirm(t('calendarView.deleteConfirm')))) return
     await deleteHorseEvent(editing.id)
     setEvents((prev) => prev.filter((e) => e.id !== editing.id))
     setEditing(null)

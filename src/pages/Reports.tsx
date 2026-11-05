@@ -20,6 +20,7 @@ import {
   type PriceListItem,
 } from '../features/priceList/api'
 import { useAuth } from '../lib/AuthContext'
+import { useConfirm } from '../lib/ConfirmContext'
 import { usePreferences } from '../lib/PreferencesContext'
 import { categoryLabel, monthRange, usageByCategory } from '../lib/reports'
 
@@ -50,6 +51,7 @@ function emptyExpenseForm(): ExpenseFormState {
 
 export default function Reports() {
   const { t, formatCurrency, formatDate, language } = usePreferences()
+  const confirm = useConfirm()
   const { profile } = useAuth()
 
   const [cursor, setCursor] = useState(() => {
@@ -194,7 +196,7 @@ export default function Reports() {
   }
 
   async function handleDeleteExpense(id: string) {
-    if (!window.confirm(t('reports.confirmDeleteExpense'))) return
+    if (!(await confirm(t('reports.confirmDeleteExpense')))) return
     try {
       await deleteExpense(id)
       setExpenses((prev) => prev.filter((e) => e.id !== id))

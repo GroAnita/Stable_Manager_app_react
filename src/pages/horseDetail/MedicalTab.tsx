@@ -9,6 +9,7 @@ import {
   type MedicalRecord,
   type Vaccination,
 } from '../../features/horses/api'
+import { useConfirm } from '../../lib/ConfirmContext'
 import { usePreferences } from '../../lib/PreferencesContext'
 import { VaccinationSection } from './VaccinationSection'
 
@@ -128,6 +129,7 @@ export function MedicalTab({
   onVaccinationsChange: (vaccinations: Vaccination[]) => void
 }) {
   const { t, formatDate } = usePreferences()
+  const confirm = useConfirm()
   const [addOpen, setAddOpen] = useState(false)
   const [addForm, setAddForm] = useState<MedicalFormState>(emptyForm)
   const [addSaving, setAddSaving] = useState(false)
@@ -213,7 +215,7 @@ export function MedicalTab({
 
   async function handleDelete() {
     if (!editing) return
-    if (!window.confirm(t('horseDetail.deleteRecordConfirm'))) return
+    if (!(await confirm(t('horseDetail.deleteRecordConfirm')))) return
     await deleteMedicalRecord(editing.id)
     onChange(records.filter((r) => r.id !== editing.id))
     setEditing(null)
