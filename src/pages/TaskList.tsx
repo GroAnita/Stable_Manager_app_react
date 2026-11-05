@@ -26,6 +26,7 @@ type PriorityFilter = 'all' | Priority
 type StatusFilter = 'all' | 'incomplete' | 'completed'
 
 const PRIORITIES: Priority[] = ['high', 'medium', 'low']
+const REPEAT_OPTIONS = ['none', 'daily', 'weekly', 'monthly']
 
 type TaskFormState = {
   title: string
@@ -33,6 +34,7 @@ type TaskFormState = {
   assigned_to: string
   horse_id: string
   due_date: string
+  repeat_interval: string
   description: string
 }
 
@@ -43,6 +45,7 @@ function emptyForm(): TaskFormState {
     assigned_to: '',
     horse_id: '',
     due_date: new Date().toISOString().slice(0, 10),
+    repeat_interval: 'none',
     description: '',
   }
 }
@@ -54,6 +57,7 @@ function toForm(task: TaskListItem): TaskFormState {
     assigned_to: task.assigned_to ?? '',
     horse_id: task.horse_id ?? '',
     due_date: task.due_date ?? '',
+    repeat_interval: task.repeat_interval,
     description: task.description ?? '',
   }
 }
@@ -106,6 +110,20 @@ function TaskFields({
           value={form.due_date}
           onChange={(e) => onChange('due_date', e.target.value)}
         />
+      </label>
+      <label>
+        <span className="field-label">{t('taskList.repeat')}</span>
+        <select
+          className="field"
+          value={form.repeat_interval}
+          onChange={(e) => onChange('repeat_interval', e.target.value)}
+        >
+          {REPEAT_OPTIONS.map((value) => (
+            <option key={value} value={value}>
+              {t(`taskList.repeat_${value}`)}
+            </option>
+          ))}
+        </select>
       </label>
       <label>
         <span className="field-label">{t('taskList.assignedTo')}</span>
@@ -238,6 +256,7 @@ export default function TaskList() {
         assigned_to: addForm.assigned_to || null,
         horse_id: addForm.horse_id || null,
         due_date: addForm.due_date || null,
+        repeat_interval: addForm.repeat_interval,
         description: addForm.description || null,
       })
       const horse = horses.find((h) => h.id === created.horse_id) ?? null
@@ -281,6 +300,7 @@ export default function TaskList() {
         assigned_to: editForm.assigned_to || null,
         horse_id: editForm.horse_id || null,
         due_date: editForm.due_date || null,
+        repeat_interval: editForm.repeat_interval,
         description: editForm.description || null,
       })
       const horse = horses.find((h) => h.id === updated.horse_id) ?? null
@@ -310,6 +330,11 @@ export default function TaskList() {
       completed,
       completed_at: completed ? new Date().toISOString() : null,
     })
+    // The database has just created the next one.
+    if (completed && task.repeat_interval !== 'none') {
+      setTasks(await listTasks())
+      return
+    }
     setTasks((prev) =>
       prev.map((t) =>
         t.id === task.id ? { ...t, ...updated } : t,
@@ -411,6 +436,9 @@ export default function TaskList() {
                   <p className="mt-1 text-sm text-slate-500">
                     {[
                       task.due_date ? formatDate(task.due_date) : null,
+                      task.repeat_interval !== 'none'
+                        ? t(`taskList.repeat_${task.repeat_interval}`)
+                        : null,
                       task.assignee?.full_name,
                       task.horse?.name,
                     ]

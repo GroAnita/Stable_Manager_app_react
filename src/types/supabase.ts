@@ -2558,7 +2558,9 @@ export type Database = {
           due_date: string | null
           horse_id: string | null
           id: string
+          next_task_created_at: string | null
           priority: Database["public"]["Enums"]["task_priority"]
+          repeat_interval: string
           stable_id: string
           title: string
           updated_at: string
@@ -2572,7 +2574,9 @@ export type Database = {
           due_date?: string | null
           horse_id?: string | null
           id?: string
+          next_task_created_at?: string | null
           priority?: Database["public"]["Enums"]["task_priority"]
+          repeat_interval?: string
           stable_id: string
           title: string
           updated_at?: string
@@ -2586,7 +2590,9 @@ export type Database = {
           due_date?: string | null
           horse_id?: string | null
           id?: string
+          next_task_created_at?: string | null
           priority?: Database["public"]["Enums"]["task_priority"]
+          repeat_interval?: string
           stable_id?: string
           title?: string
           updated_at?: string
