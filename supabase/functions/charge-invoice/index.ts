@@ -14,6 +14,7 @@ import {
   recordChargeProcessing,
   recordChargeSucceeded,
 } from '../_shared/invoiceCharge.ts'
+import { syncCheckout } from '../_shared/invoiceCheckout.ts'
 import { chargeBlocker, toMinorUnits } from './chargeRules.ts'
 
 const corsHeaders = {
@@ -87,7 +88,7 @@ Deno.serve(async (req) => {
       .from('payments')
       .select(
         `id, stable_id, contract_id, status, amount, due_date, invoice_number,
-         charge_status, stripe_payment_intent_id,
+         charge_status, stripe_payment_intent_id, stripe_checkout_session_id,
          invoice_email_delivery_status, invoice_email_delivered_at, invoice_email_sent_to,
          owner:owners(email)`,
       )
@@ -131,6 +132,31 @@ Deno.serve(async (req) => {
         intent.status
       await recordChargeFailed(admin, paymentId, intent.id, reason)
       return jsonResponse({ outcome: 'failed', reason, testMode: !isLive })
+    }
+
+    // The boarder has a payment page for this invoice, so charging the saved card
+    // now could collect it twice.
+    if (
+      payment.charge_status === 'processing' &&
+      payment.stripe_checkout_session_id
+    ) {
+      const checkout = await syncCheckout(
+        stripe,
+        admin,
+        paymentId,
+        payment.stripe_checkout_session_id,
+        stripeAccount,
+      )
+      if (checkout.state === 'paid') {
+        return jsonResponse({ outcome: 'succeeded', testMode: !isLive })
+      }
+      return jsonResponse({
+        blocked:
+          checkout.state === 'released'
+            ? 'checkout_ended'
+            : 'charge_in_progress',
+        testMode: !isLive,
+      })
     }
 
     // A charge already at Stripe: report what it became rather than starting one.

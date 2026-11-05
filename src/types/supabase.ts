@@ -1927,6 +1927,7 @@ export type Database = {
           payment_method: string | null
           stable_id: string
           status: Database["public"]["Enums"]["payment_status"]
+          stripe_checkout_session_id: string | null
           stripe_payment_intent_id: string | null
           updated_at: string
         }
@@ -1949,6 +1950,7 @@ export type Database = {
           payment_method?: string | null
           stable_id: string
           status?: Database["public"]["Enums"]["payment_status"]
+          stripe_checkout_session_id?: string | null
           stripe_payment_intent_id?: string | null
           charge_attempts?: number
           charge_error?: string | null
@@ -1976,6 +1978,7 @@ export type Database = {
           payment_method?: string | null
           stable_id?: string
           status?: Database["public"]["Enums"]["payment_status"]
+          stripe_checkout_session_id?: string | null
           stripe_payment_intent_id?: string | null
           charge_attempts?: number
           charge_error?: string | null
@@ -2887,6 +2890,7 @@ export type Database = {
       }
     }
     Functions: {
+      can_pay_invoices_online: { Args: never; Returns: boolean }
       get_billing_rules: {
         Args: never
         Returns: { addon_enabled: boolean; charge_day: number }[]

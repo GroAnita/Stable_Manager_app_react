@@ -7,6 +7,7 @@ import {
   recordChargeFailed,
   recordChargeSucceeded,
 } from '../_shared/invoiceCharge.ts'
+import { releaseCheckoutClaim } from '../_shared/invoiceCheckout.ts'
 
 const cryptoProvider = Stripe.createSubtleCryptoProvider()
 
@@ -42,7 +43,8 @@ Deno.serve(async (req) => {
 
   if (
     event.type !== 'payment_intent.succeeded' &&
-    event.type !== 'payment_intent.payment_failed'
+    event.type !== 'payment_intent.payment_failed' &&
+    event.type !== 'checkout.session.expired'
   ) {
     return jsonResponse({ ignored: true })
   }
@@ -51,8 +53,7 @@ Deno.serve(async (req) => {
   const isLiveKey = /^(sk|rk)_live_/.test(stripeKey)
   if (event.livemode !== isLiveKey) return jsonResponse({ ignored: true })
 
-  const intent = event.data.object
-  const paymentId = intent.metadata?.payment_id
+  const paymentId = event.data.object.metadata?.payment_id
   if (!paymentId || !event.account) return jsonResponse({ ignored: true })
 
   const admin = createClient(
@@ -81,9 +82,12 @@ Deno.serve(async (req) => {
       return jsonResponse({ ignored: true })
     }
 
-    if (event.type === 'payment_intent.succeeded') {
-      await recordChargeSucceeded(admin, paymentId, intent.id)
+    if (event.type === 'checkout.session.expired') {
+      await releaseCheckoutClaim(admin, paymentId, event.data.object.id)
+    } else if (event.type === 'payment_intent.succeeded') {
+      await recordChargeSucceeded(admin, paymentId, event.data.object.id)
     } else {
+      const intent = event.data.object
       await recordChargeFailed(
         admin,
         paymentId,

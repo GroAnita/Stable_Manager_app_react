@@ -41,6 +41,9 @@ export async function recordChargeFailed(
     })
     .eq('id', paymentId)
     .eq('charge_status', 'processing')
+    // A declined card on the boarder's payment page isn't final, because they
+    // can try another card there. The claim has to hold until that page ends.
+    .is('stripe_checkout_session_id', null)
   if (paymentIntentId) {
     query = query.or(
       `stripe_payment_intent_id.is.null,stripe_payment_intent_id.eq.${paymentIntentId}`,

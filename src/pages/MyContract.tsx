@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { Browser } from '@capacitor/browser'
+import { Capacitor } from '@capacitor/core'
 import { Badge } from '../components/Badge'
 import { ContractFields } from '../components/ContractView'
 import { EmptyState } from '../components/EmptyState'
@@ -9,6 +11,11 @@ import {
 } from '../features/contracts/api'
 import { listMyHorses } from '../features/horses/api'
 import { listPayments, type PaymentListItem } from '../features/payments/api'
+import {
+  canPayInvoicesOnline,
+  startInvoicePayment,
+  syncInvoicePayment,
+} from '../features/payments/pay'
 import { usePreferences } from '../lib/PreferencesContext'
 import { CardAgreementPanel } from './myContract/CardAgreementPanel'
 
@@ -18,6 +25,66 @@ export default function MyContract() {
   const [payments, setPayments] = useState<PaymentListItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [canPay, setCanPay] = useState(false)
+  const [paying, setPaying] = useState<string | null>(null)
+  const [payError, setPayError] = useState<string | null>(null)
+
+  // Picks up a payment finished on Stripe's page, since the webhook can arrive
+  // after the boarder is back here. A failure just leaves the list as it was.
+  const refreshPayments = useCallback(async () => {
+    const list = await listPayments()
+    const inProgress = list.filter((p) => p.charge_status === 'processing')
+    if (inProgress.length === 0) {
+      setPayments(list)
+      return
+    }
+    await Promise.allSettled(inProgress.map((p) => syncInvoicePayment(p.id)))
+    setPayments(await listPayments())
+  }, [])
+
+  useEffect(() => {
+    canPayInvoicesOnline()
+      .then(setCanPay)
+      .catch(() => setCanPay(false))
+    void refreshPayments().catch(() => undefined)
+  }, [refreshPayments])
+
+  // In the iOS app Stripe's page opens in an in-app browser, so re-check when
+  // the user closes it instead of relying on a redirect back to this page.
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return
+    const listener = Browser.addListener('browserFinished', () => {
+      void refreshPayments().catch(() => undefined)
+    })
+    return () => {
+      void listener.then((handle) => handle.remove())
+    }
+  }, [refreshPayments])
+
+  async function handlePay(paymentId: string) {
+    setPaying(paymentId)
+    setPayError(null)
+    try {
+      const result = await startInvoicePayment(paymentId)
+      if (result.url) {
+        if (Capacitor.isNativePlatform()) {
+          await Browser.open({ url: result.url })
+          setPaying(null)
+        } else {
+          window.location.assign(result.url)
+        }
+        return
+      }
+      if (result.blocked) {
+        setPayError(t('myContract.payBlocked'))
+      }
+      await refreshPayments()
+      setPaying(null)
+    } catch (err) {
+      setPayError((err as Error).message)
+      setPaying(null)
+    }
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -82,6 +149,11 @@ export default function MyContract() {
 
       <div className="panel p-6">
         <h2 className="section-title">{t('myContract.invoices')}</h2>
+        {payError && (
+          <p role="alert" className="mt-3 text-sm text-red-600">
+            {payError}
+          </p>
+        )}
         {payments.length === 0 ? (
           <p className="mt-3 text-sm text-slate-500">
             {t('myContract.noInvoices')}
@@ -95,7 +167,7 @@ export default function MyContract() {
                   <th>{t('myContract.dueDate')}</th>
                   <th>{t('myContract.amount')}</th>
                   <th>{t('myContract.status')}</th>
-                  <th>{t('myContract.actions')}</th>
+                  {canPay && <th>{t('myContract.actions')}</th>}
                 </tr>
               </thead>
               <tbody>
@@ -107,24 +179,22 @@ export default function MyContract() {
                     <td>
                       <Badge status={payment.status} />
                     </td>
-                    <td>
-                      <div className="flex flex-wrap gap-2">
-                        <button
-                          type="button"
-                          disabled={payment.status === 'paid'}
-                          className="btn-secondary disabled:cursor-not-allowed disabled:opacity-40"
-                        >
-                          {t('myContract.payWithCard')}
-                        </button>
-                        <button
-                          type="button"
-                          disabled={payment.status === 'paid'}
-                          className="rounded-xl bg-[#ff5b24] px-3 py-2 text-sm font-semibold text-white hover:bg-[#e54f1d] disabled:cursor-not-allowed disabled:bg-[#ff5b24] disabled:opacity-40 disabled:hover:bg-[#ff5b24]"
-                        >
-                          {t('myContract.payWithVipps')}
-                        </button>
-                      </div>
-                    </td>
+                    {canPay && (
+                      <td>
+                        {payment.status !== 'paid' && (
+                          <button
+                            type="button"
+                            className="btn-secondary"
+                            disabled={paying === payment.id}
+                            onClick={() => handlePay(payment.id)}
+                          >
+                            {paying === payment.id
+                              ? t('myContract.payOpening')
+                              : t('myContract.payNow')}
+                          </button>
+                        )}
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
