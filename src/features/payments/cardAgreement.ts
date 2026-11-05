@@ -60,6 +60,15 @@ export async function acceptCardAgreement(
   return url
 }
 
+export async function changeSavedCard(contractId: string): Promise<string> {
+  const { url } = await invoke<{ url: string }>({
+    action: 'change_card',
+    contractId,
+    returnOrigin: webOrigin(),
+  })
+  return url
+}
+
 export async function withdrawCardAgreement(contractId: string): Promise<void> {
   await invoke({ action: 'withdraw', contractId })
 }

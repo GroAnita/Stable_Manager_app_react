@@ -152,6 +152,19 @@ Deno.serve(async (req) => {
         .eq('id', contractId)
       if (contractUpdateError) throw contractUpdateError
 
+      // An open page to change the card must not save one after this.
+      if (agreementRow.pending_card_session_id && stripeAccount) {
+        try {
+          await stripe.checkout.sessions.expire(
+            agreementRow.pending_card_session_id,
+            {},
+            { stripeAccount },
+          )
+        } catch (error) {
+          console.error('card-agreement expire failed:', error)
+        }
+      }
+
       if (agreementRow.stripe_payment_method_id && stripeAccount) {
         try {
           await stripe.paymentMethods.detach(
@@ -240,6 +253,123 @@ Deno.serve(async (req) => {
           agreementRow = current ?? agreementRow
         }
       }
+    }
+
+    // Finish a card change saved on Stripe's page, for the same reason as above.
+    let changeCardUrl: string | null = null
+    if (agreementRow?.pending_card_session_id && stripeAccount) {
+      const session = await stripe.checkout.sessions.retrieve(
+        agreementRow.pending_card_session_id,
+        { expand: ['setup_intent.payment_method'] },
+        { stripeAccount },
+      )
+      const setupIntent = session.setup_intent as Stripe.SetupIntent | null
+      const paymentMethod = setupIntent?.payment_method as
+        Stripe.PaymentMethod | null | undefined
+      if (session.status === 'complete' && paymentMethod) {
+        const oldPaymentMethodId = agreementRow.stripe_payment_method_id
+        const { data: changed, error: changeError } = await admin
+          .from('card_agreements')
+          .update({
+            stripe_payment_method_id: paymentMethod.id,
+            card_brand: paymentMethod.card?.brand ?? null,
+            card_last4: paymentMethod.card?.last4 ?? null,
+            pending_card_session_id: null,
+          })
+          .eq('id', agreementRow.id)
+          .eq('pending_card_session_id', agreementRow.pending_card_session_id)
+          .select('*')
+          .maybeSingle()
+        if (changeError) throw changeError
+
+        // Only the request that made the change cleans up and sends the email.
+        if (changed) {
+          agreementRow = changed
+          if (oldPaymentMethodId && oldPaymentMethodId !== paymentMethod.id) {
+            try {
+              await stripe.paymentMethods.detach(
+                oldPaymentMethodId,
+                {},
+                { stripeAccount },
+              )
+            } catch (error) {
+              console.error('card-agreement detach failed:', error)
+            }
+          }
+          await sendEmail({
+            to: ownerEmail,
+            stableName,
+            replyTo: stableEmail,
+            subject: `Kortet ditt hos ${stableName} er byttet`,
+            text: `Kortet for automatiske trekk er byttet til kortet som slutter på ${changed.card_last4 ?? '—'}. Avtalen din er ellers uendret.
+
+Hvis du ikke har byttet kort selv, ta kontakt med stallen med en gang${stableEmail ? `: ${stableEmail}` : ''}.`,
+          })
+        } else {
+          const { data: current } = await admin
+            .from('card_agreements')
+            .select('*')
+            .eq('id', agreementRow.id)
+            .maybeSingle()
+          agreementRow = current ?? agreementRow
+        }
+      } else if (session.status === 'expired') {
+        const { error: clearError } = await admin
+          .from('card_agreements')
+          .update({ pending_card_session_id: null })
+          .eq('id', agreementRow.id)
+          .eq('pending_card_session_id', agreementRow.pending_card_session_id)
+        if (clearError) throw clearError
+        agreementRow = { ...agreementRow, pending_card_session_id: null }
+      } else {
+        changeCardUrl = session.url
+      }
+    }
+
+    if (action === 'change_card') {
+      if (!agreementRow?.activated_at || !stripeAccount) {
+        return jsonResponse({ error: 'No active agreement' }, 409)
+      }
+      // Coming back to a page still open continues it, so only one can exist.
+      if (changeCardUrl) return jsonResponse({ url: changeCardUrl })
+
+      const origin = ALLOWED_RETURN_ORIGINS.includes(returnOrigin)
+        ? returnOrigin
+        : PRODUCTION_ORIGIN
+      const returnUrl = `${origin}/my-contract`
+      const session = await stripe.checkout.sessions.create(
+        {
+          mode: 'setup',
+          currency: 'nok',
+          customer: agreementRow.stripe_customer_id,
+          allowed_payment_method_types: ['card'],
+          locale: 'nb',
+          success_url: returnUrl,
+          cancel_url: returnUrl,
+          metadata: {
+            card_agreement_id: agreementRow.id,
+            contract_id: contractId,
+          },
+          setup_intent_data: {
+            metadata: {
+              card_agreement_id: agreementRow.id,
+              contract_id: contractId,
+            },
+          },
+          custom_text: {
+            submit: {
+              message: `Det nye kortet erstatter det gamle for automatiske månedlige trekk til ${stableName}, etter avtalen du allerede har godtatt.`,
+            },
+          },
+        },
+        { stripeAccount },
+      )
+      const { error: pendingError } = await admin
+        .from('card_agreements')
+        .update({ pending_card_session_id: session.id })
+        .eq('id', agreementRow.id)
+      if (pendingError) throw pendingError
+      return jsonResponse({ url: session.url })
     }
 
     if (agreementRow?.activated_at) {

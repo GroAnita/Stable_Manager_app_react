@@ -166,6 +166,7 @@ export const en = {
     cardAcceptedOn: 'Agreement accepted {date}.',
     cardShowAgreement: 'Show agreement',
     cardHideAgreement: 'Hide agreement',
+    cardChange: 'Change card',
     cardWithdraw: 'End automatic payment',
     cardWithdrawConfirm:
       'End automatic payment? Your card will not be charged automatically from now on, but unpaid and future invoices must still be paid another way.',

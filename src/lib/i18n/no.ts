@@ -169,6 +169,7 @@ export const no: typeof en = {
     cardAcceptedOn: 'Avtalen ble godtatt {date}.',
     cardShowAgreement: 'Vis avtalen',
     cardHideAgreement: 'Skjul avtalen',
+    cardChange: 'Bytt kort',
     cardWithdraw: 'Avslutt automatisk betaling',
     cardWithdrawConfirm:
       'Avslutte automatisk betaling? Kortet ditt blir ikke trukket automatisk fremover, men ubetalte og fremtidige fakturaer må fortsatt betales på annen måte.',

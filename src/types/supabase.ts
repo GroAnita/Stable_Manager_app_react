@@ -31,6 +31,7 @@ export type Database = {
           owner_id: string
           paused_at: string | null
           paused_by: string | null
+          pending_card_session_id: string | null
           stable_id: string
           stripe_checkout_session_id: string | null
           stripe_customer_id: string | null

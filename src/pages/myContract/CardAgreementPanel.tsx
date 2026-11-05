@@ -3,6 +3,7 @@ import { Browser } from '@capacitor/browser'
 import { Capacitor } from '@capacitor/core'
 import {
   acceptCardAgreement,
+  changeSavedCard,
   getCardAgreementStatus,
   withdrawCardAgreement,
   type CardAgreementStatus,
@@ -57,6 +58,23 @@ export function CardAgreementPanel({ contractId }: { contractId: string }) {
       setError((err as Error).message)
       setBusy(false)
       void refresh()
+    }
+  }
+
+  async function handleChangeCard() {
+    setBusy(true)
+    setError(null)
+    try {
+      const url = await changeSavedCard(contractId)
+      if (Capacitor.isNativePlatform()) {
+        await Browser.open({ url })
+        setBusy(false)
+      } else {
+        window.location.assign(url)
+      }
+    } catch (err) {
+      setError((err as Error).message)
+      setBusy(false)
     }
   }
 
@@ -129,6 +147,14 @@ export function CardAgreementPanel({ contractId }: { contractId: string }) {
               {showText
                 ? t('myContract.cardHideAgreement')
                 : t('myContract.cardShowAgreement')}
+            </button>
+            <button
+              type="button"
+              className="btn-ghost"
+              disabled={busy}
+              onClick={handleChangeCard}
+            >
+              {t('myContract.cardChange')}
             </button>
             <button
               type="button"
