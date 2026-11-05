@@ -1,3 +1,7 @@
+import {
+  buildCardAgreementOverview,
+  type OverviewLine,
+} from '../../lib/cardAgreementOverview'
 import { webOrigin } from '../../lib/platform'
 import { supabaseFunctionError } from '../../lib/supabaseFunctionError'
 import { supabase } from '../../lib/supabaseClient'
@@ -67,6 +71,31 @@ export async function changeSavedCard(contractId: string): Promise<string> {
     returnOrigin: webOrigin(),
   })
   return url
+}
+
+// Every active contract with where its card agreement stands, signed or not.
+export async function listCardAgreementOverview(): Promise<OverviewLine[]> {
+  const [contracts, agreements] = await Promise.all([
+    supabase
+      .from('contracts')
+      .select('id, horse:horses(name), owner:owners(full_name)')
+      .eq('status', 'active'),
+    supabase
+      .from('card_agreements')
+      .select(
+        'contract_id, accepted_at, activated_at, paused_at, withdrawn_at, charge_day, card_brand, card_last4',
+      ),
+  ])
+  if (contracts.error) throw contracts.error
+  if (agreements.error) throw agreements.error
+  return buildCardAgreementOverview(
+    contracts.data.map((contract) => ({
+      id: contract.id,
+      horseName: contract.horse?.name ?? '—',
+      ownerName: contract.owner?.full_name ?? '—',
+    })),
+    agreements.data,
+  )
 }
 
 export async function withdrawCardAgreement(contractId: string): Promise<void> {

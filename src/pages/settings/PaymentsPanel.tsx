@@ -9,6 +9,7 @@ import {
   type StripeConnectStatus,
 } from '../../features/payments/connect'
 import { usePreferences } from '../../lib/PreferencesContext'
+import { CardAgreementOverview } from './CardAgreementOverview'
 
 const STRIPE_DASHBOARD_URL = 'https://dashboard.stripe.com'
 const CHARGE_DAYS = Array.from({ length: 28 }, (_, index) => index + 1)
@@ -209,6 +210,7 @@ export function PaymentsPanel() {
       )}
 
       {status && <ChargeDaySetting />}
+      {status?.chargesEnabled && <CardAgreementOverview />}
     </div>
   )
 }
