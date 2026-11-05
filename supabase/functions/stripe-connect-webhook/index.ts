@@ -7,6 +7,7 @@ import {
   recordChargeFailed,
   recordChargeSucceeded,
 } from '../_shared/invoiceCharge.ts'
+import { notifyChargeFailure } from '../_shared/chargeFailureNotice.ts'
 import { releaseCheckoutClaim } from '../_shared/invoiceCheckout.ts'
 
 const cryptoProvider = Stripe.createSubtleCryptoProvider()
@@ -96,6 +97,7 @@ Deno.serve(async (req) => {
           intent.last_payment_error?.code ??
           'charge_failed',
       )
+      await notifyChargeFailure(admin, paymentId)
     }
     return jsonResponse({ updated: true })
   } catch (error) {

@@ -29,6 +29,8 @@ export type Database = {
           created_at: string
           id: string
           owner_id: string
+          paused_at: string | null
+          paused_by: string | null
           stable_id: string
           stripe_checkout_session_id: string | null
           stripe_customer_id: string | null
@@ -1906,6 +1908,8 @@ export type Database = {
         Row: {
           amount: number
           charge_attempts: number
+          charge_failure_notified_attempt: number | null
+          charge_retry_not_before: string | null
           charge_error: string | null
           charge_started_at: string | null
           charge_status: string | null
@@ -1953,6 +1957,8 @@ export type Database = {
           stripe_checkout_session_id?: string | null
           stripe_payment_intent_id?: string | null
           charge_attempts?: number
+          charge_failure_notified_attempt?: number | null
+          charge_retry_not_before?: string | null
           charge_error?: string | null
           charge_started_at?: string | null
           charge_status?: string | null
@@ -1981,6 +1987,8 @@ export type Database = {
           stripe_checkout_session_id?: string | null
           stripe_payment_intent_id?: string | null
           charge_attempts?: number
+          charge_failure_notified_attempt?: number | null
+          charge_retry_not_before?: string | null
           charge_error?: string | null
           charge_started_at?: string | null
           charge_status?: string | null
@@ -2890,6 +2898,10 @@ export type Database = {
       }
     }
     Functions: {
+      set_card_agreement_paused: {
+        Args: { p_contract_id: string; p_paused: boolean }
+        Returns: undefined
+      }
       can_pay_invoices_online: { Args: never; Returns: boolean }
       get_billing_rules: {
         Args: never

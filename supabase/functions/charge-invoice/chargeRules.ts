@@ -8,6 +8,9 @@ export type ChargeBlocker =
   | 'charge_in_progress'
   | 'no_agreement'
   | 'no_card'
+  | 'paused'
+  | 'retry_not_notified'
+  | 'retry_too_soon'
   | 'email_not_delivered'
   | 'notice_too_short'
   | 'not_due_yet'
@@ -20,6 +23,8 @@ export type ChargeCheck = {
   dueDate: string
   agreementActive: boolean
   hasCard: boolean
+  paused: boolean
+  retryNotBefore: string | null
   deliveryStatus: string | null
   deliveredAt: string | null
   sentTo: string | null
@@ -42,6 +47,7 @@ export function chargeBlocker(check: ChargeCheck): ChargeBlocker | null {
   if (check.chargeStatus === 'succeeded') return 'already_paid'
   if (!check.agreementActive) return 'no_agreement'
   if (!check.hasCard) return 'no_card'
+  if (check.paused) return 'paused'
   if (
     check.deliveryStatus !== 'delivered' ||
     !check.deliveredAt ||
@@ -56,6 +62,11 @@ export function chargeBlocker(check: ChargeCheck): ChargeBlocker | null {
       return 'notice_too_short'
     }
     if (check.today < check.dueDate) return 'not_due_yet'
+    // The boarder must have been told the amount and date of a new attempt.
+    if (check.chargeStatus === 'failed') {
+      if (!check.retryNotBefore) return 'retry_not_notified'
+      if (check.today < check.retryNotBefore) return 'retry_too_soon'
+    }
   }
   if (toMinorUnits(check.amount) < 300) return 'amount_too_low'
   return null

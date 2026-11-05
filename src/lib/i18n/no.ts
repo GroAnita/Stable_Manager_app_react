@@ -156,6 +156,7 @@ export const no: typeof en = {
   myContract: {
     title: 'Min kontrakt',
     subtitle: 'Boardingkontrakten og fakturaene dine.',
+    cardPaused: 'Automatiske trekk er satt på pause av stallen. Fakturaene dine kan fortsatt betales med Betal nå.',
     cardTitle: 'Automatisk kortbetaling',
     cardIntro:
       'Les avtalen under. Når du godtar den, lagrer du kortet ditt på Stripes sikre side. Ingenting trekkes nå.',
@@ -884,6 +885,15 @@ export const no: typeof en = {
     chargedOn: 'Trukket',
     chargeTestMode: '(Testmodus, ingen ekte penger.)',
     chargeBlocked_checkout_ended: 'Hesteeierens betaling ble ikke fullført. Du kan trekke fakturaen nå.',
+    chargesPause: 'Sett trekk på pause',
+    chargesResume: 'Fortsett trekk',
+    chargesPaused: 'Trekk fra kortet til denne hesteeieren er satt på pause. Hesteeieren kan fortsatt betale fakturaen selv.',
+    chargeBoarderNotified: 'Hesteeieren har fått beskjed på e-post om hvordan fakturaen kan betales.',
+    chargeBoarderNotNotified: 'Hesteeieren kunne ikke varsles på e-post, så kortet kan ikke trekkes på nytt ennå.',
+    chargeRetryFrom: 'Hesteeieren har fått beskjed. Kortet kan trekkes på nytt fra og med {date}.',
+    chargeBlocked_paused: 'Trekk fra kortet til denne hesteeieren er satt på pause.',
+    chargeBlocked_retry_not_notified: 'Hesteeieren er ikke varslet om et nytt forsøk, så kortet kan ikke trekkes på nytt.',
+    chargeBlocked_retry_too_soon: 'Hesteeieren er varslet om et nytt forsøk på en senere dato. Det er for tidlig å trekke på nytt.',
     chargeBlocked_already_paid: 'Denne fakturaen er allerede betalt.',
     chargeBlocked_charge_in_progress: 'Et trekk for denne fakturaen pågår allerede.',
     chargeBlocked_no_agreement: 'Hesteeieren har ingen aktiv avtale om korttrekk.',

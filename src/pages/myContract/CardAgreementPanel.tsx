@@ -104,6 +104,11 @@ export function CardAgreementPanel({ contractId }: { contractId: string }) {
           <p className="text-sm font-medium text-forest">
             {t('myContract.cardActive', { day: status.chargeDay })}
           </p>
+          {status.pausedAt && (
+            <p className="text-sm font-medium text-amber-700">
+              {t('myContract.cardPaused')}
+            </p>
+          )}
           <p className="text-sm text-slate-600">
             {status.cardLast4
               ? t('myContract.cardDetails', {

@@ -14,6 +14,7 @@ import {
   recordChargeProcessing,
   recordChargeSucceeded,
 } from '../_shared/invoiceCharge.ts'
+import { notifyChargeFailure } from '../_shared/chargeFailureNotice.ts'
 import { syncCheckout } from '../_shared/invoiceCheckout.ts'
 import { chargeBlocker, toMinorUnits } from './chargeRules.ts'
 
@@ -88,7 +89,7 @@ Deno.serve(async (req) => {
       .from('payments')
       .select(
         `id, stable_id, contract_id, status, amount, due_date, invoice_number,
-         charge_status, stripe_payment_intent_id, stripe_checkout_session_id,
+         charge_status, charge_retry_not_before, stripe_payment_intent_id, stripe_checkout_session_id,
          invoice_email_delivery_status, invoice_email_delivered_at, invoice_email_sent_to,
          owner:owners(email)`,
       )
@@ -131,7 +132,13 @@ Deno.serve(async (req) => {
         intent.last_payment_error?.code ??
         intent.status
       await recordChargeFailed(admin, paymentId, intent.id, reason)
-      return jsonResponse({ outcome: 'failed', reason, testMode: !isLive })
+      const boarderNotified = await notifyChargeFailure(admin, paymentId)
+      return jsonResponse({
+        outcome: 'failed',
+        reason,
+        boarderNotified,
+        testMode: !isLive,
+      })
     }
 
     // The boarder has a payment page for this invoice, so charging the saved card
@@ -174,7 +181,9 @@ Deno.serve(async (req) => {
 
     const { data: agreement, error: agreementError } = await admin
       .from('card_agreements')
-      .select('id, stripe_customer_id, stripe_payment_method_id, activated_at')
+      .select(
+        'id, stripe_customer_id, stripe_payment_method_id, activated_at, paused_at',
+      )
       .eq('contract_id', payment.contract_id)
       .is('withdrawn_at', null)
       .maybeSingle()
@@ -192,6 +201,8 @@ Deno.serve(async (req) => {
       hasCard: Boolean(
         agreement?.stripe_customer_id && agreement?.stripe_payment_method_id,
       ),
+      paused: Boolean(agreement?.paused_at),
+      retryNotBefore: payment.charge_retry_not_before,
       deliveryStatus: payment.invoice_email_delivery_status,
       deliveredAt: payment.invoice_email_delivered_at,
       sentTo: payment.invoice_email_sent_to,
@@ -251,7 +262,13 @@ Deno.serve(async (req) => {
           error.payment_intent?.id ?? null,
           reason,
         )
-        return jsonResponse({ outcome: 'failed', reason, testMode: !isLive })
+        const boarderNotified = await notifyChargeFailure(admin, paymentId)
+        return jsonResponse({
+          outcome: 'failed',
+          reason,
+          boarderNotified,
+          testMode: !isLive,
+        })
       }
       // No clear answer: the charge may have gone through. The invoice stays
       // claimed, so it can't be charged again until this is cleared up.

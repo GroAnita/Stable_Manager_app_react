@@ -25,6 +25,9 @@ export type PaymentListItem = Pick<
   | 'charge_status'
   | 'charge_error'
   | 'charged_at'
+  | 'charge_attempts'
+  | 'charge_failure_notified_attempt'
+  | 'charge_retry_not_before'
 > & {
   owner: Pick<
     Database['public']['Tables']['owners']['Row'],
@@ -78,7 +81,8 @@ export async function listPayments(): Promise<PaymentListItem[]> {
       `id, invoice_number, amount, due_date, paid_date, status, notes,
        invoice_email_required, invoice_email_sent_at, invoice_email_sent_to,
        invoice_email_error, invoice_email_delivery_status, invoice_email_delivered_at,
-       charge_status, charge_error, charged_at,
+       charge_status, charge_error, charged_at, charge_attempts,
+       charge_failure_notified_attempt, charge_retry_not_before,
        owner:owners(id, full_name),
        contract:contracts(id, horse:horses(id, name))`,
     )

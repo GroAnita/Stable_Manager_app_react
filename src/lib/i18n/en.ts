@@ -153,6 +153,7 @@ export const en = {
   myContract: {
     title: 'My Contract',
     subtitle: 'Your boarding contract and invoices.',
+    cardPaused: 'Automatic charges are paused by the stable. Your invoices can still be paid with Pay now.',
     cardTitle: 'Automatic card payment',
     cardIntro:
       'Read the agreement below. When you accept it, you save your card on Stripe\'s secure page. Nothing is charged now.',
@@ -883,6 +884,15 @@ export const en = {
     chargedOn: 'Charged on',
     chargeTestMode: '(Test mode, no real money.)',
     chargeBlocked_checkout_ended: "The boarder's payment was not completed. You can charge the invoice now.",
+    chargesPause: 'Pause charges',
+    chargesResume: 'Resume charges',
+    chargesPaused: 'Charges to this boarder\'s card are paused. They can still pay the invoice themselves.',
+    chargeBoarderNotified: 'The boarder has been told by email how to pay.',
+    chargeBoarderNotNotified: 'The boarder could not be told by email, so the card cannot be charged again yet.',
+    chargeRetryFrom: 'The boarder has been told. The card can be charged again from {date}.',
+    chargeBlocked_paused: 'Charges to this boarder\'s card are paused.',
+    chargeBlocked_retry_not_notified: 'The boarder has not been told about a new attempt, so the card cannot be charged again.',
+    chargeBlocked_retry_too_soon: 'The boarder was told about a new attempt on a later date. It is too early to charge again.',
     chargeBlocked_already_paid: 'This invoice is already paid.',
     chargeBlocked_charge_in_progress: 'A charge for this invoice is already under way.',
     chargeBlocked_no_agreement: 'The boarder has no active agreement on card charges.',

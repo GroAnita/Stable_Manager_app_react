@@ -11,6 +11,7 @@
 // INVOICE_EMAIL_TEST_TO unless INVOICE_EMAIL_ALLOW_REAL is 'true'.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'npm:stripe@23.1.0'
+import { sendEmail } from '../_shared/sendEmail.ts'
 import { agreementAsText, buildAgreement } from './agreementText.ts'
 
 const corsHeaders = {
@@ -31,47 +32,6 @@ function jsonResponse(body: unknown, status = 200) {
     status,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   })
-}
-
-// A failed email must not undo an acceptance or a withdrawal, so this reports
-// the outcome rather than throwing.
-async function sendEmail(input: {
-  to: string | null
-  stableName: string
-  replyTo: string | null
-  subject: string
-  text: string
-}): Promise<boolean> {
-  const resendKey = Deno.env.get('RESEND_API_KEY')
-  const from = Deno.env.get('INVOICE_EMAIL_FROM')
-  const allowReal = Deno.env.get('INVOICE_EMAIL_ALLOW_REAL') === 'true'
-  const to = allowReal ? input.to : Deno.env.get('INVOICE_EMAIL_TEST_TO')
-  if (!resendKey || !from || !to) return false
-
-  const name = input.stableName.replace(/["\\<>\r\n]/g, '').trim()
-  try {
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${resendKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: name ? `"${name} via Stalldrift" <${from}>` : from,
-        to: [to],
-        ...(input.replyTo ? { reply_to: input.replyTo } : {}),
-        subject: input.subject,
-        text: input.text,
-      }),
-    })
-    if (!response.ok) {
-      console.error('card-agreement email failed:', await response.text())
-    }
-    return response.ok
-  } catch (error) {
-    console.error('card-agreement email failed:', error)
-    return false
-  }
 }
 
 Deno.serve(async (req) => {
@@ -291,6 +251,7 @@ Deno.serve(async (req) => {
         cardBrand: agreementRow.card_brand,
         cardLast4: agreementRow.card_last4,
         agreementText: agreementRow.agreement_text,
+        pausedAt: agreementRow.paused_at,
       })
     }
 

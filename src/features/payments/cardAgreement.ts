@@ -21,6 +21,7 @@ export type CardAgreementStatus =
       cardBrand: string | null
       cardLast4: string | null
       agreementText: string
+      pausedAt: string | null
     }
   | {
       available: true

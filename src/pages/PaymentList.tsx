@@ -16,6 +16,7 @@ import {
 import {
   chargeInvoice,
   listContractsWithCardAgreement,
+  setCardAgreementPaused,
   type ChargeResult,
 } from '../features/payments/charge'
 import { useAuth } from '../lib/AuthContext'
@@ -28,7 +29,9 @@ export default function PaymentList() {
   const { t, formatCurrency, formatDate } = usePreferences()
   const { profile } = useAuth()
   const confirm = useConfirm()
-  const [cardContracts, setCardContracts] = useState<Set<string>>(new Set())
+  const [cardContracts, setCardContracts] = useState<
+    Map<string, { paused: boolean }>
+  >(new Map())
   const [charging, setCharging] = useState(false)
   const [chargeMessage, setChargeMessage] = useState<{
     ok: boolean
@@ -74,7 +77,7 @@ export default function PaymentList() {
     if (!isStableOwner) return
     listContractsWithCardAgreement()
       .then(setCardContracts)
-      .catch(() => setCardContracts(new Set()))
+      .catch(() => setCardContracts(new Map()))
   }, [isStableOwner])
 
   const filtered = useMemo(() => {
@@ -136,6 +139,12 @@ export default function PaymentList() {
       ok: false,
       text:
         t('paymentList.chargeFailed', { reason: result.reason ?? '—' }) +
+        ' ' +
+        t(
+          result.boarderNotified
+            ? 'paymentList.chargeBoarderNotified'
+            : 'paymentList.chargeBoarderNotNotified',
+        ) +
         suffix,
     }
   }
@@ -169,6 +178,16 @@ export default function PaymentList() {
       setChargeMessage({ ok: false, text: (err as Error).message })
     } finally {
       setCharging(false)
+    }
+  }
+
+  async function handleTogglePause(contractId: string, paused: boolean) {
+    setChargeMessage(null)
+    try {
+      await setCardAgreementPaused(contractId, paused)
+      setCardContracts(await listContractsWithCardAgreement())
+    } catch (err) {
+      setChargeMessage({ ok: false, text: (err as Error).message })
     }
   }
 
@@ -420,7 +439,19 @@ export default function PaymentList() {
                 <p className="text-red-600">
                   {t('paymentList.chargeFailed', {
                     reason: selected.charge_error ?? '—',
-                  })}
+                  })}{' '}
+                  {selected.charge_failure_notified_attempt ===
+                    selected.charge_attempts && selected.charge_retry_not_before
+                    ? t('paymentList.chargeRetryFrom', {
+                        date: formatDate(selected.charge_retry_not_before),
+                      })
+                    : t('paymentList.chargeBoarderNotNotified')}
+                </p>
+              )}
+            {selected.contract &&
+              cardContracts.get(selected.contract.id)?.paused && (
+                <p className="text-amber-700">
+                  {t('paymentList.chargesPaused')}
                 </p>
               )}
             {chargeMessage && (
@@ -435,7 +466,8 @@ export default function PaymentList() {
               {isStableOwner &&
                 selected.status !== 'paid' &&
                 selected.contract &&
-                cardContracts.has(selected.contract.id) && (
+                cardContracts.has(selected.contract.id) &&
+                !cardContracts.get(selected.contract.id)?.paused && (
                   <button
                     type="button"
                     className="btn-primary"
@@ -447,6 +479,26 @@ export default function PaymentList() {
                       : selected.charge_status === 'processing'
                         ? t('paymentList.chargeCheck')
                         : t('paymentList.chargeNow')}
+                  </button>
+                )}
+              {isStableOwner &&
+                selected.contract &&
+                cardContracts.has(selected.contract.id) && (
+                  <button
+                    type="button"
+                    className="btn-ghost"
+                    onClick={() => {
+                      const contractId = selected.contract?.id
+                      if (!contractId) return
+                      void handleTogglePause(
+                        contractId,
+                        !cardContracts.get(contractId)?.paused,
+                      )
+                    }}
+                  >
+                    {cardContracts.get(selected.contract.id)?.paused
+                      ? t('paymentList.chargesResume')
+                      : t('paymentList.chargesPause')}
                   </button>
                 )}
               <button
