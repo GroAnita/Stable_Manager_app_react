@@ -29,6 +29,7 @@ import type { OwnerOption } from '../lib/options'
 import { usePreferences } from '../lib/PreferencesContext'
 import { useAuth } from '../lib/AuthContext'
 import { getCurrentStableId } from '../lib/stableContext'
+import { FeedingRotaDraft } from './feedingRota/FeedingRotaDraft'
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10)
@@ -545,6 +546,7 @@ export default function FeedingRota() {
         </div>
       </div>
 
+      <FeedingRotaDraft unavailability={unavailability} />
 
       <Modal
         open={unavailabilityModalOpen}

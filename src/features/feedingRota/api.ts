@@ -527,3 +527,29 @@ export async function markAllNotificationsRead(
     .in('id', unreadIds)
   if (error) throw error
 }
+
+// ---------------------------------------------------------------------------
+// Rota test section
+
+export type OwnerHorseCount = { id: string; full_name: string; horses: number }
+
+export async function listOwnerHorseCounts(): Promise<OwnerHorseCount[]> {
+  const { data, error } = await supabase
+    .from('horses')
+    .select('owner:owners!horses_owner_id_fkey(id, full_name)')
+    .eq('active', true)
+  if (error) throw error
+  const owners = new Map<string, OwnerHorseCount>()
+  for (const { owner } of data) {
+    if (!owner) continue
+    const current = owners.get(owner.id)
+    owners.set(owner.id, {
+      id: owner.id,
+      full_name: owner.full_name,
+      horses: (current?.horses ?? 0) + 1,
+    })
+  }
+  return [...owners.values()].sort((a, b) =>
+    a.full_name.localeCompare(b.full_name, 'nb'),
+  )
+}
