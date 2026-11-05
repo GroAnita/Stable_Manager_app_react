@@ -108,7 +108,10 @@ export default function Reports() {
     [priceListItems, allocations, days],
   )
   const beddingLines = useMemo(
-    () => usageByCategory('Bedding', priceListItems, allocations, days),
+    () => [
+      ...usageByCategory('Bedding', priceListItems, allocations, days),
+      ...usageByCategory('Straw', priceListItems, allocations, days),
+    ],
     [priceListItems, allocations, days],
   )
 

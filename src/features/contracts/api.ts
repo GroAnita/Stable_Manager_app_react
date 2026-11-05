@@ -218,7 +218,7 @@ export async function listBeddingItems(): Promise<PriceListItemOption[]> {
   const { data, error } = await supabase
     .from('price_list_items')
     .select('id, item, unit, price, vat_exempt')
-    .eq('category', 'Bedding')
+    .in('category', ['Bedding', 'Straw'])
     .order('item')
   if (error) throw error
   return data

@@ -26,13 +26,14 @@ import {
 } from '../../lib/billing'
 import { useConfirm } from '../../lib/ConfirmContext'
 import { usePreferences } from '../../lib/PreferencesContext'
-import { unitLabel } from '../../lib/reports'
+import { categoryLabel, unitLabel } from '../../lib/reports'
 
 const EXTRA_CATEGORIES = [
   'Hay',
   'Grain',
   'Supplements',
   'Bedding',
+  'Straw',
   'Mucking',
   'Veterinary',
   'Farrier',
@@ -235,7 +236,7 @@ export function FeedingExtras({
                   {entry.item}
                   {entry.category && (
                     <span className="ml-1 text-xs font-normal text-slate-400">
-                      ({entry.category})
+                      ({categoryLabel(t, entry.category)})
                     </span>
                   )}
                 </p>

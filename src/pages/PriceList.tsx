@@ -38,6 +38,7 @@ const CATEGORY_OPTIONS = [
   'Veterinary',
   'Farrier',
   'Bedding',
+  'Straw',
   'Mucking',
   'Other',
 ]

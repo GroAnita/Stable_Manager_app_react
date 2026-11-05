@@ -31,7 +31,13 @@ import { useConfirm } from '../lib/ConfirmContext'
 import { usePreferences } from '../lib/PreferencesContext'
 import { getCurrentStableId } from '../lib/stableContext'
 
-const TRACKABLE_CATEGORIES = ['Hay', 'Grain', 'Supplements', 'Bedding']
+const TRACKABLE_CATEGORIES = [
+  'Hay',
+  'Grain',
+  'Supplements',
+  'Bedding',
+  'Straw',
+]
 
 type ItemFormState = {
   price_list_item_id: string
