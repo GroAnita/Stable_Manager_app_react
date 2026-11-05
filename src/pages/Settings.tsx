@@ -252,6 +252,12 @@ export default function Settings() {
   }, [loading, section, canUsePayments])
 
   function handleStableChange(updated: Stable) {
+    // The plan decides whether card payments are on.
+    if (updated.plan !== stable?.plan) {
+      isPaymentsAddonEnabled(updated.id)
+        .then(setPaymentsAddonEnabled)
+        .catch((err: Error) => setError(err.message))
+    }
     setStable(updated)
     void refreshProfile()
   }

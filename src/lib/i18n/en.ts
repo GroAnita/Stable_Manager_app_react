@@ -1300,6 +1300,9 @@ export const en = {
     paymentsChargeDayOption: 'Day {day} of the month',
     paymentsChargeDaySave: 'Save date',
     paymentsChargeDaySaved: 'Charge date saved.',
+    planHasAgreements:
+      'You can’t switch to a plan without card payments while {count} card agreement(s) are active. Contact Stalldrift for help.',
+    planNotAvailable: 'This plan isn’t available yet.',
     paymentsSignedTitle: 'Who has signed the card agreement',
     paymentsSignedCount: '{signed} of {total} active contracts have signed.',
     paymentsSignedEmpty: 'No active contracts yet.',

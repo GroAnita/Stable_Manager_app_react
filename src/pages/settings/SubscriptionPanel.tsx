@@ -64,6 +64,11 @@ export function SubscriptionPanel({
 
   const { trialEnd, trialActive } = getTrialStatus(stable.created_at)
 
+  // A stable already on a hidden plan still sees the plan it's on.
+  const shownPlans = plans.filter(
+    (plan) => plan.visible !== false || plan.key === stable.plan,
+  )
+
   async function handleSelect(plan: Stable['plan']) {
     if (!canEdit || plan === stable.plan || saving) return
     setSaving(true)
@@ -72,7 +77,14 @@ export function SubscriptionPanel({
       const updated = await updateStable(stable.id, { plan })
       onChange(updated)
     } catch (err) {
-      setError((err as Error).message)
+      const { message, details } = err as { message: string; details?: string }
+      if (message.includes('plan_has_card_agreements')) {
+        setError(t('settings.planHasAgreements', { count: details ?? '' }))
+      } else if (message.includes('plan_not_available')) {
+        setError(t('settings.planNotAvailable'))
+      } else {
+        setError(message)
+      }
     } finally {
       setSaving(false)
     }
@@ -117,7 +129,7 @@ export function SubscriptionPanel({
       <div className="mt-6">
         <p className="field-label">{t('settings.planLabel')}</p>
         <div className="mt-2 space-y-3">
-          {plans.map((plan) => {
+          {shownPlans.map((plan) => {
             const selected = stable.plan === plan.key
             return (
               <label

@@ -1300,6 +1300,9 @@ export const no: typeof en = {
     paymentsChargeDayOption: '{day}. i måneden',
     paymentsChargeDaySave: 'Lagre dato',
     paymentsChargeDaySaved: 'Trekkdatoen er lagret.',
+    planHasAgreements:
+      'Du kan ikke bytte til et abonnement uten kortbetaling mens {count} kortavtale(r) er aktive. Kontakt Stalldrift for hjelp.',
+    planNotAvailable: 'Dette abonnementet er ikke tilgjengelig ennå.',
     paymentsSignedTitle: 'Hvem har signert kortavtalen',
     paymentsSignedCount: '{signed} av {total} aktive kontrakter har signert.',
     paymentsSignedEmpty: 'Ingen aktive kontrakter ennå.',

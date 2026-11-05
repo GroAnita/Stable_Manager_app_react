@@ -2516,29 +2516,35 @@ export type Database = {
         Row: {
           horse_max: number | null
           horse_min: number
+          includes_payments: boolean
           key: Database["public"]["Enums"]["stable_plan"]
           name: string
           price_nok: number
           sort_order: number
           updated_at: string
+          visible: boolean
         }
         Insert: {
           horse_max?: number | null
           horse_min: number
+          includes_payments?: boolean
           key: Database["public"]["Enums"]["stable_plan"]
           name: string
           price_nok: number
           sort_order: number
           updated_at?: string
+          visible?: boolean
         }
         Update: {
           horse_max?: number | null
           horse_min?: number
+          includes_payments?: boolean
           key?: Database["public"]["Enums"]["stable_plan"]
           name?: string
           price_nok?: number
           sort_order?: number
           updated_at?: string
+          visible?: boolean
         }
         Relationships: []
       }
@@ -3228,7 +3234,15 @@ export type Database = {
         | "feeding_shift_swap_declined"
         | "feeding_shift_reminder"
       payment_status: "paid" | "due" | "overdue"
-      stable_plan: "small" | "medium" | "large" | "xlarge"
+      stable_plan:
+        | "small"
+        | "medium"
+        | "large"
+        | "xlarge"
+        | "small_payments"
+        | "medium_payments"
+        | "large_payments"
+        | "xlarge_payments"
       stable_type: "boarding" | "riding_school" | "sales" | "private"
       stall_status: "available" | "occupied" | "reserved" | "maintenance"
       task_priority: "low" | "medium" | "high"
@@ -3401,7 +3415,16 @@ export const Constants = {
         "feeding_shift_reminder",
       ],
       payment_status: ["paid", "due", "overdue"],
-      stable_plan: ["small", "medium", "large", "xlarge"],
+      stable_plan: [
+        "small",
+        "medium",
+        "large",
+        "xlarge",
+        "small_payments",
+        "medium_payments",
+        "large_payments",
+        "xlarge_payments",
+      ],
       stable_type: ["boarding", "riding_school", "sales", "private"],
       stall_status: ["available", "occupied", "reserved", "maintenance"],
       task_priority: ["low", "medium", "high"],
