@@ -54,11 +54,14 @@ Deno.serve(async (req) => {
     .select(
       `id, invoice_number, amount, due_date, notes,
        owner:owners(full_name, email),
-       contract:contracts(horse:horses(name)),
+       invoice_email_sent_to, invoice_email_delivery_status,
+       contract:contracts(card_agreement_accepted_at, horse:horses(name)),
        stable:stables(name, org_number, email, phone)`,
     )
     .eq('invoice_email_required', true)
-    .is('invoice_email_sent_at', null)
+    .or(
+      'invoice_email_sent_at.is.null,invoice_email_delivery_status.in.(bounced,suppressed,failed)',
+    )
     .neq('status', 'paid')
     .gte('due_date', today)
     .order('due_date')
@@ -77,9 +80,17 @@ Deno.serve(async (req) => {
       ? (row.owner?.email ?? null)
       : (testRecipient ?? null)
 
+    // After a failed delivery, only try again once the address has been changed.
+    if (
+      row.invoice_email_delivery_status &&
+      row.invoice_email_sent_to === recipient
+    ) {
+      continue
+    }
+
     let sendError: string | null = null
     if (!recipient) {
-      sendError = 'The horse owner has no email address'
+      sendError = 'owner_has_no_email'
     } else {
       const email = buildInvoiceEmail({
         invoiceNumber: row.invoice_number,
@@ -88,6 +99,7 @@ Deno.serve(async (req) => {
         notes: row.notes,
         ownerName: row.owner?.full_name ?? null,
         horseName: row.contract?.horse?.name ?? null,
+        cardChargePlanned: Boolean(row.contract?.card_agreement_accepted_at),
         stableName: row.stable?.name ?? 'Stallen',
         stableOrgNumber: row.stable?.org_number ?? null,
         stableEmail: row.stable?.email ?? null,
@@ -110,6 +122,8 @@ Deno.serve(async (req) => {
             subject: email.subject,
             html: email.html,
             text: email.text,
+            // Resend's delivery reports use this to find the invoice.
+            tags: [{ name: 'payment_id', value: row.id }],
           }),
         })
         if (!response.ok) {
@@ -133,6 +147,8 @@ Deno.serve(async (req) => {
               invoice_email_sent_at: new Date().toISOString(),
               invoice_email_sent_to: recipient,
               invoice_email_error: null,
+              invoice_email_delivery_status: null,
+              invoice_email_delivered_at: null,
             },
       )
       .eq('id', row.id)

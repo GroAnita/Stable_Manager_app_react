@@ -842,6 +842,16 @@ export const no: typeof en = {
     loading: 'Laster betalinger…',
     failedToLoad: 'Kunne ikke laste betalinger: {error}',
     detailsFallback: 'Betalingsdetaljer',
+    emailNotDelivered: 'E-post ikke levert',
+    invoiceEmail: 'Faktura-e-post',
+    emailNoAddress:
+      'Ikke sendt. Hesteeieren har ingen e-postadresse. Legg til en, så sendes den automatisk.',
+    emailBadAddress:
+      'Ikke levert til {email}. Rett e-postadressen til hesteeieren, så sendes den automatisk på nytt.',
+    emailRetrying: 'Sendingen feilet. Prøver igjen automatisk.',
+    emailDelivered: 'Levert {date} til {email}',
+    emailSent: 'Sendt, venter på bekreftelse på levering',
+    emailNotSentYet: 'Ikke sendt ennå',
     breakdown: 'Spesifikasjon',
     viewInvoice: 'Vis faktura',
   },

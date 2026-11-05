@@ -8,6 +8,8 @@ export type InvoiceEmailInput = {
   notes: string | null
   ownerName: string | null
   horseName: string | null
+  // True only for boarders who have agreed to automatic card charges.
+  cardChargePlanned: boolean
   stableName: string
   stableOrgNumber: string | null
   stableEmail: string | null
@@ -86,10 +88,16 @@ export function buildInvoiceEmail(input: InvoiceEmailInput): {
   const complaint = contact
     ? `Hvis du mener fakturaen er feil, kontakt stallen: ${contact}.`
     : 'Hvis du mener fakturaen er feil, kontakt stallen.'
+  const dateLabel = input.cardChargePlanned
+    ? 'Planlagt trekkdato'
+    : 'Forfallsdato'
+  const chargeNote = input.cardChargePlanned
+    ? `Beløpet trekkes automatisk fra kortet ditt ${dueDate}.`
+    : null
   const details = [
     input.ownerName ? `Til: ${input.ownerName}` : null,
     input.horseName ? `Hest: ${input.horseName}` : null,
-    `Forfallsdato: ${dueDate}`,
+    `${dateLabel}: ${dueDate}`,
   ].filter((line): line is string => line !== null)
 
   const text = [
@@ -101,6 +109,7 @@ export function buildInvoiceEmail(input: InvoiceEmailInput): {
     '',
     `Å betale: ${total} (NOK)`,
     '',
+    ...(chargeNote ? [chargeNote, ''] : []),
     complaint,
   ].join('\n')
 
@@ -124,12 +133,13 @@ export function buildInvoiceEmail(input: InvoiceEmailInput): {
       <td style="padding: 8px 0; font-weight: bold; text-align: right; white-space: nowrap;">${escapeHtml(total)}</td>
     </tr>
   </table>
+  ${chargeNote ? `<p>${escapeHtml(chargeNote)}</p>` : ''}
   <p style="color: #64748b; font-size: 14px;">${escapeHtml(complaint)}</p>
 </body>
 </html>`
 
   return {
-    subject: `${invoiceLabel} fra ${input.stableName}, forfall ${dueDate}`,
+    subject: `${invoiceLabel} fra ${input.stableName}, ${input.cardChargePlanned ? 'trekk' : 'forfall'} ${dueDate}`,
     html,
     text,
   }

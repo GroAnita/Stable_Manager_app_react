@@ -378,6 +378,7 @@ export type Database = {
           additional_services: string | null
           bedding_price_list_item_id: string | null
           bedding_quantity: number
+          card_agreement_accepted_at: string | null
           charge_day: number | null
           boarding_price_list_item_id: string | null
           contract_terms: string | null
@@ -403,6 +404,7 @@ export type Database = {
           additional_services?: string | null
           bedding_price_list_item_id?: string | null
           bedding_quantity?: number
+          card_agreement_accepted_at?: string | null
           charge_day?: number | null
           boarding_price_list_item_id?: string | null
           contract_terms?: string | null
@@ -428,6 +430,7 @@ export type Database = {
           additional_services?: string | null
           bedding_price_list_item_id?: string | null
           bedding_quantity?: number
+          card_agreement_accepted_at?: string | null
           charge_day?: number | null
           boarding_price_list_item_id?: string | null
           contract_terms?: string | null
@@ -1878,6 +1881,8 @@ export type Database = {
           created_at: string
           due_date: string
           id: string
+          invoice_email_delivered_at: string | null
+          invoice_email_delivery_status: string | null
           invoice_email_error: string | null
           invoice_email_required: boolean
           invoice_email_sent_at: string | null
@@ -1897,6 +1902,8 @@ export type Database = {
           created_at?: string
           due_date: string
           id?: string
+          invoice_email_delivered_at?: string | null
+          invoice_email_delivery_status?: string | null
           invoice_email_error?: string | null
           invoice_email_required?: boolean
           invoice_email_sent_at?: string | null
@@ -1916,6 +1923,8 @@ export type Database = {
           created_at?: string
           due_date?: string
           id?: string
+          invoice_email_delivered_at?: string | null
+          invoice_email_delivery_status?: string | null
           invoice_email_error?: string | null
           invoice_email_required?: boolean
           invoice_email_sent_at?: string | null

@@ -841,6 +841,16 @@ export const en = {
     loading: 'Loading payments…',
     failedToLoad: 'Failed to load payments: {error}',
     detailsFallback: 'Payment details',
+    emailNotDelivered: 'Email not delivered',
+    invoiceEmail: 'Invoice email',
+    emailNoAddress:
+      'Not sent. The horse owner has no email address. Add one and it will be sent automatically.',
+    emailBadAddress:
+      'Not delivered to {email}. Correct the horse owner\'s email address and it will be sent again automatically.',
+    emailRetrying: 'Sending failed. Trying again automatically.',
+    emailDelivered: 'Delivered {date} to {email}',
+    emailSent: 'Sent, waiting for confirmation of delivery',
+    emailNotSentYet: 'Not sent yet',
     breakdown: 'Breakdown',
     viewInvoice: 'View invoice',
   },

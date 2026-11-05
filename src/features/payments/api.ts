@@ -16,6 +16,12 @@ export type PaymentListItem = Pick<
   | 'paid_date'
   | 'status'
   | 'notes'
+  | 'invoice_email_required'
+  | 'invoice_email_sent_at'
+  | 'invoice_email_sent_to'
+  | 'invoice_email_error'
+  | 'invoice_email_delivery_status'
+  | 'invoice_email_delivered_at'
 > & {
   owner: Pick<
     Database['public']['Tables']['owners']['Row'],
@@ -28,6 +34,29 @@ export type PaymentListItem = Pick<
       'id' | 'name'
     > | null
   } | null
+}
+
+export type InvoiceEmailProblem = 'noEmail' | 'badAddress' | 'retrying'
+
+// Why an invoice email hasn't reached the boarder, or null if nothing's wrong.
+export function invoiceEmailProblem(
+  payment: Pick<
+    PaymentListItem,
+    | 'invoice_email_required'
+    | 'invoice_email_error'
+    | 'invoice_email_delivery_status'
+    | 'status'
+  >,
+): InvoiceEmailProblem | null {
+  if (!payment.invoice_email_required || payment.status === 'paid') return null
+  if (payment.invoice_email_error === 'owner_has_no_email') return 'noEmail'
+  if (
+    payment.invoice_email_delivery_status &&
+    payment.invoice_email_delivery_status !== 'delivered'
+  ) {
+    return 'badAddress'
+  }
+  return payment.invoice_email_error ? 'retrying' : null
 }
 
 export async function getPaymentSummary(): Promise<PaymentSummary> {
@@ -44,6 +73,8 @@ export async function listPayments(): Promise<PaymentListItem[]> {
     .from('payments')
     .select(
       `id, invoice_number, amount, due_date, paid_date, status, notes,
+       invoice_email_required, invoice_email_sent_at, invoice_email_sent_to,
+       invoice_email_error, invoice_email_delivery_status, invoice_email_delivered_at,
        owner:owners(id, full_name),
        contract:contracts(id, horse:horses(id, name))`,
     )

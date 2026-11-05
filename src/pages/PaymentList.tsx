@@ -8,6 +8,7 @@ import { Modal } from '../components/Modal'
 import {
   getPaymentSummary,
   listPayments,
+  invoiceEmailProblem,
   markPaymentPaid,
   type PaymentListItem,
   type PaymentSummary,
@@ -65,6 +66,26 @@ export default function PaymentList() {
       return matchesSearch && matchesStatus
     })
   }, [payments, search, statusFilter])
+
+  function invoiceEmailStatusText(payment: PaymentListItem): string {
+    const problem = invoiceEmailProblem(payment)
+    if (problem === 'noEmail') return t('paymentList.emailNoAddress')
+    if (problem === 'badAddress') {
+      return t('paymentList.emailBadAddress', {
+        email: payment.invoice_email_sent_to ?? '—',
+      })
+    }
+    if (problem === 'retrying') return t('paymentList.emailRetrying')
+    if (payment.invoice_email_delivered_at) {
+      return t('paymentList.emailDelivered', {
+        date: formatDate(payment.invoice_email_delivered_at.slice(0, 10)),
+        email: payment.invoice_email_sent_to ?? '—',
+      })
+    }
+    return payment.invoice_email_sent_at
+      ? t('paymentList.emailSent')
+      : t('paymentList.emailNotSentYet')
+  }
 
   async function handleMarkPaid(id: string) {
     setMarkingPaid(id)
@@ -180,6 +201,11 @@ export default function PaymentList() {
                   <td>{formatDate(payment.due_date)}</td>
                   <td>
                     <Badge status={payment.status} />
+                    {invoiceEmailProblem(payment) && (
+                      <p className="mt-1 text-xs font-medium text-red-600">
+                        {t('paymentList.emailNotDelivered')}
+                      </p>
+                    )}
                   </td>
                   <td>
                     {payment.status === 'paid' ? (
@@ -252,6 +278,14 @@ export default function PaymentList() {
                   {t('paymentList.paidDate')}:
                 </span>{' '}
                 {formatDate(selected.paid_date)}
+              </div>
+            )}
+            {selected.invoice_email_required && (
+              <div>
+                <span className="font-medium text-slate-800">
+                  {t('paymentList.invoiceEmail')}:
+                </span>{' '}
+                {invoiceEmailStatusText(selected)}
               </div>
             )}
             {selected.notes && (
