@@ -1672,7 +1672,7 @@ export const en = {
     stepHorsesOwnersTitle: 'Horses and owners',
     stepHorsesOwnersBody: 'Who stands in which stall, and who pays.',
     stepPriceListTitle: 'Price list',
-    stepPriceListBody: 'Boarding and hay, so the invoices come out right.',
+    stepPriceListBody: 'Boarding and roughage, so the invoices come out right.',
     stepContractsTitle: 'Contracts',
     stepContractsBody:
       'The contracts are the basis for the invoice each month.',

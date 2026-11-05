@@ -1669,7 +1669,7 @@ export const no: typeof en = {
     stepHorsesOwnersTitle: 'Hester og eiere',
     stepHorsesOwnersBody: 'Hvem står i hvilken boks, og hvem betaler.',
     stepPriceListTitle: 'Prisliste',
-    stepPriceListBody: 'Oppstalling og høy, slik at fakturaene blir riktige.',
+    stepPriceListBody: 'Oppstalling og grovfôr, slik at fakturaene blir riktige.',
     stepContractsTitle: 'Kontrakter',
     stepContractsBody: 'Kontraktene er grunnlaget for fakturaen hver måned.',
     stepFeedingRoundsTitle: 'Fôringsrunder',
