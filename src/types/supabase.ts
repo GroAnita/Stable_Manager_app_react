@@ -378,6 +378,7 @@ export type Database = {
           additional_services: string | null
           bedding_price_list_item_id: string | null
           bedding_quantity: number
+          charge_day: number | null
           boarding_price_list_item_id: string | null
           contract_terms: string | null
           created_at: string
@@ -402,6 +403,7 @@ export type Database = {
           additional_services?: string | null
           bedding_price_list_item_id?: string | null
           bedding_quantity?: number
+          charge_day?: number | null
           boarding_price_list_item_id?: string | null
           contract_terms?: string | null
           created_at?: string
@@ -426,6 +428,7 @@ export type Database = {
           additional_services?: string | null
           bedding_price_list_item_id?: string | null
           bedding_quantity?: number
+          charge_day?: number | null
           boarding_price_list_item_id?: string | null
           contract_terms?: string | null
           created_at?: string
@@ -1875,6 +1878,10 @@ export type Database = {
           created_at: string
           due_date: string
           id: string
+          invoice_email_error: string | null
+          invoice_email_required: boolean
+          invoice_email_sent_at: string | null
+          invoice_email_sent_to: string | null
           invoice_number: string | null
           notes: string | null
           owner_id: string
@@ -1890,6 +1897,10 @@ export type Database = {
           created_at?: string
           due_date: string
           id?: string
+          invoice_email_error?: string | null
+          invoice_email_required?: boolean
+          invoice_email_sent_at?: string | null
+          invoice_email_sent_to?: string | null
           invoice_number?: string | null
           notes?: string | null
           owner_id: string
@@ -1905,6 +1916,10 @@ export type Database = {
           created_at?: string
           due_date?: string
           id?: string
+          invoice_email_error?: string | null
+          invoice_email_required?: boolean
+          invoice_email_sent_at?: string | null
+          invoice_email_sent_to?: string | null
           invoice_number?: string | null
           notes?: string | null
           owner_id?: string
@@ -2183,6 +2198,7 @@ export type Database = {
       stable_payment_accounts: {
         Row: {
           addon_enabled: boolean
+          charge_day: number
           charges_enabled: boolean
           created_at: string
           payouts_enabled: boolean
@@ -2192,6 +2208,7 @@ export type Database = {
         }
         Insert: {
           addon_enabled?: boolean
+          charge_day?: number
           charges_enabled?: boolean
           created_at?: string
           payouts_enabled?: boolean
@@ -2201,6 +2218,7 @@ export type Database = {
         }
         Update: {
           addon_enabled?: boolean
+          charge_day?: number
           charges_enabled?: boolean
           created_at?: string
           payouts_enabled?: boolean
@@ -2811,6 +2829,22 @@ export type Database = {
       }
     }
     Functions: {
+      get_billing_rules: {
+        Args: never
+        Returns: { addon_enabled: boolean; charge_day: number }[]
+      }
+      queue_invoice_extra: {
+        Args: {
+          p_contract_id: string
+          p_description: string
+          p_price_list_item_id: string
+          p_purchased_on: string
+          p_quantity: number
+        }
+        Returns: { amount: number; bills_on: string; id: string }[]
+      }
+      remove_invoice_extra: { Args: { p_id: string }; Returns: undefined }
+      set_charge_day: { Args: { p_charge_day: number }; Returns: undefined }
       accept_stable_invite: { Args: { p_token: string }; Returns: undefined }
       assign_staff_role: {
         Args: {

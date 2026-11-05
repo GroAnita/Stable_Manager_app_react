@@ -15,8 +15,11 @@ import {
   findOpenPayment,
   getPayment,
   hasPaidPayment,
+  queueInvoiceExtra,
+  removeInvoiceExtra,
   updatePayment,
 } from '../payments/api'
+import { getBillingRules } from '../payments/connect'
 
 export type Horse = Database['public']['Tables']['horses']['Row']
 export type HorseInsert = Database['public']['Tables']['horses']['Insert']
@@ -400,7 +403,10 @@ export type FeedingExtraEntry = {
   quantity: number
   amount: number
   date: string
-  paymentId: string
+  // Set once on an invoice. On add-on stables an extra waits in invoice_extras
+  // instead, identified by invoiceExtraId.
+  paymentId: string | null
+  invoiceExtraId?: string
   invoiceLine: string
 }
 
@@ -454,6 +460,49 @@ export async function logFeedingExtra(params: {
 
   const contract = await getActiveContractForHorse(horseId)
   if (!contract) throw new Error(t('horseDetail.extraNoActiveContract'))
+
+  const { addonEnabled } = await getBillingRules()
+  if (addonEnabled) {
+    const invoiceLine = t('horseDetail.extraWaitingLine', {
+      item: item.item,
+      quantity,
+      unit: item.unit ? ` ${item.unit}` : '',
+      date: formatDate(date),
+    })
+    const queued = await queueInvoiceExtra({
+      contractId: contract.id,
+      priceListItemId: item.id,
+      quantity,
+      purchasedOn: date,
+      description: invoiceLine,
+    })
+    const entry: FeedingExtraEntry = {
+      id: crypto.randomUUID(),
+      priceListItemId: item.id,
+      item: item.item,
+      category: item.category ?? '',
+      unit: item.unit ?? '',
+      price: item.price ?? 0,
+      quantity,
+      amount: queued.amount,
+      date,
+      paymentId: null,
+      invoiceExtraId: queued.id,
+      invoiceLine,
+    }
+    const plan = await upsertFeedingPlan({
+      horse_id: horseId,
+      stable_id: stableId,
+      extras: JSON.stringify([...extras, entry]),
+    })
+    return {
+      plan,
+      message: t('horseDetail.extraQueuedForInvoice', {
+        item: item.item,
+        date: formatDate(queued.billsOn),
+      }),
+    }
+  }
 
   const amount = amountIncVat(item.price ?? 0, quantity, item.vat_exempt)
   const dueDate = billingCycleDueDate(date)
@@ -601,7 +650,11 @@ export async function removeFeedingExtra(params: {
 }): Promise<FeedingPlan> {
   const { horseId, stableId, entry, extras } = params
 
-  const payment = await getPayment(entry.paymentId)
+  if (entry.invoiceExtraId) {
+    await removeInvoiceExtra(entry.invoiceExtraId)
+  }
+
+  const payment = entry.paymentId ? await getPayment(entry.paymentId) : null
   if (payment) {
     const remaining = Math.round((payment.amount - entry.amount) * 100) / 100
     if (remaining <= 0) {

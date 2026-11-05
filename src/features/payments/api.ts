@@ -155,6 +155,31 @@ export async function countPaymentsDueOn(dueDate: string): Promise<number> {
   return count ?? 0
 }
 
+export async function queueInvoiceExtra(input: {
+  contractId: string
+  priceListItemId: string
+  quantity: number
+  purchasedOn: string
+  description: string
+}): Promise<{ id: string; amount: number; billsOn: string }> {
+  const { data, error } = await supabase.rpc('queue_invoice_extra', {
+    p_contract_id: input.contractId,
+    p_price_list_item_id: input.priceListItemId,
+    p_quantity: input.quantity,
+    p_purchased_on: input.purchasedOn,
+    p_description: input.description,
+  })
+  if (error) throw error
+  const row = data?.[0]
+  if (!row) throw new Error('Empty response from queue_invoice_extra')
+  return { id: row.id, amount: row.amount, billsOn: row.bills_on }
+}
+
+export async function removeInvoiceExtra(id: string): Promise<void> {
+  const { error } = await supabase.rpc('remove_invoice_extra', { p_id: id })
+  if (error) throw error
+}
+
 export async function createPayment(input: PaymentInsert): Promise<Payment> {
   const { data, error } = await supabase
     .from('payments')

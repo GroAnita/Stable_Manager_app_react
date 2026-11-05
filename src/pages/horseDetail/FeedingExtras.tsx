@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
+import { ConfirmDialog } from '../../components/ConfirmDialog'
 import { Icon } from '../../components/Icon'
 import { Modal } from '../../components/Modal'
 import {
@@ -9,16 +10,34 @@ import {
   type FeedingExtraEntry,
   type FeedingPlan,
 } from '../../features/horses/api'
+import { getActiveContractForHorse } from '../../features/contracts/api'
 import { getPayment } from '../../features/payments/api'
+import {
+  getBillingRules,
+  type BillingRules,
+} from '../../features/payments/connect'
 import {
   listPriceListItems,
   type PriceListItem,
 } from '../../features/priceList/api'
-import { amountIncVat, billingCycleDueDate } from '../../lib/billing'
+import {
+  addonExtraBillingDate,
+  amountIncVat,
+  billingCycleDueDate,
+} from '../../lib/billing'
 import { usePreferences } from '../../lib/PreferencesContext'
 import { unitLabel } from '../../lib/reports'
 
-const FEED_CATEGORIES = ['Hay', 'Grain', 'Supplements']
+const EXTRA_CATEGORIES = [
+  'Hay',
+  'Grain',
+  'Supplements',
+  'Bedding',
+  'Mucking',
+  'Veterinary',
+  'Farrier',
+  'Other',
+]
 
 type ExtraFormState = {
   priceListItemId: string
@@ -47,6 +66,7 @@ export function FeedingExtras({
 
   const [extraOpen, setExtraOpen] = useState(false)
   const [extraItems, setExtraItems] = useState<PriceListItem[]>([])
+  const [billingRules, setBillingRules] = useState<BillingRules | null>(null)
   const [extraForm, setExtraForm] = useState<ExtraFormState>({
     priceListItemId: '',
     quantity: '1',
@@ -55,13 +75,27 @@ export function FeedingExtras({
   const [extraSaving, setExtraSaving] = useState(false)
   const [extraError, setExtraError] = useState<string | null>(null)
   const [extraMessage, setExtraMessage] = useState<string | null>(null)
+  const [removeError, setRemoveError] = useState<string | null>(null)
+  const [pendingRemoval, setPendingRemoval] = useState<{
+    entry: FeedingExtraEntry
+    message: string
+  } | null>(null)
 
   async function openExtra() {
     setExtraError(null)
     setExtraMessage(null)
-    const items = await listPriceListItems()
+    setRemoveError(null)
+    const [items, rules, contract] = await Promise.all([
+      listPriceListItems(),
+      getBillingRules(),
+      getActiveContractForHorse(horseId),
+    ])
+    setBillingRules({
+      ...rules,
+      chargeDay: contract?.charge_day ?? rules.chargeDay,
+    })
     const feedItems = items.filter((item) =>
-      FEED_CATEGORIES.includes(item.category ?? ''),
+      EXTRA_CATEGORIES.includes(item.category ?? ''),
     )
     setExtraItems(feedItems)
     setExtraForm({
@@ -108,25 +142,44 @@ export function FeedingExtras({
     }
   }
 
+  async function askToRemoveExtra(entry: FeedingExtraEntry) {
+    setRemoveError(null)
+    try {
+      const payment = entry.paymentId ? await getPayment(entry.paymentId) : null
+      setPendingRemoval({
+        entry,
+        message: payment
+          ? t('horseDetail.extraRemoveConfirmWithPayment', {
+              amount: formatCurrency(entry.amount),
+              date: formatDate(payment.due_date),
+            })
+          : t('horseDetail.extraRemoveConfirmPlain'),
+      })
+    } catch (err) {
+      setRemoveError((err as Error).message)
+    }
+  }
+
   async function handleRemoveExtra(entry: FeedingExtraEntry) {
-    const payment = await getPayment(entry.paymentId)
-    const confirmed = window.confirm(
-      payment
-        ? t('horseDetail.extraRemoveConfirmWithPayment', {
-            amount: formatCurrency(entry.amount),
-            date: formatDate(payment.due_date),
-          })
-        : t('horseDetail.extraRemoveConfirmPlain'),
-    )
-    if (!confirmed) return
-    const updatedPlan = await removeFeedingExtra({
-      horseId,
-      stableId,
-      entry,
-      extras,
-    })
-    onPlanSaved(updatedPlan)
-    setExtraMessage(null)
+    setPendingRemoval(null)
+    try {
+      const updatedPlan = await removeFeedingExtra({
+        horseId,
+        stableId,
+        entry,
+        extras,
+      })
+      onPlanSaved(updatedPlan)
+      setExtraMessage(null)
+    } catch (err) {
+      const message = (err as Error).message
+      setRemoveError(
+        message.includes('extra_already_invoiced') ||
+          message.includes('invoice_locked')
+          ? t('horseDetail.extraLockedOnInvoice')
+          : message,
+      )
+    }
   }
 
   const selectedExtraItem = extraItems.find(
@@ -139,9 +192,16 @@ export function FeedingExtras({
         selectedExtraItem.vat_exempt,
       )
     : 0
-  const estimatedExtraDueDate = billingCycleDueDate(
-    extraForm.date || todayIso(),
-  )
+  const extraDate = extraForm.date || todayIso()
+  const extraBilledOnText = billingRules?.addonEnabled
+    ? t('horseDetail.extraBilledOnAddon', {
+        date: formatDate(
+          addonExtraBillingDate(extraDate, billingRules.chargeDay, todayIso()),
+        ),
+      })
+    : t('horseDetail.extraBilledOn', {
+        date: formatDate(billingCycleDueDate(extraDate)),
+      })
 
   return (
     <div className="mt-8 border-t border-slate-100 pt-6">
@@ -162,6 +222,11 @@ export function FeedingExtras({
 
       {extraMessage && (
         <p className="mt-3 text-sm text-forest">{extraMessage}</p>
+      )}
+      {removeError && (
+        <p role="alert" className="mt-3 text-sm text-red-600">
+          {removeError}
+        </p>
       )}
 
       <div className="mt-3 space-y-2">
@@ -193,7 +258,7 @@ export function FeedingExtras({
               <button
                 type="button"
                 className="btn-ghost px-3 py-2"
-                onClick={() => handleRemoveExtra(entry)}
+                onClick={() => askToRemoveExtra(entry)}
               >
                 {t('common.remove')}
               </button>
@@ -201,6 +266,17 @@ export function FeedingExtras({
           ))
         )}
       </div>
+
+      <ConfirmDialog
+        open={pendingRemoval !== null}
+        title={t('horseDetail.extraRemoveTitle')}
+        message={pendingRemoval?.message ?? ''}
+        confirmLabel={t('common.remove')}
+        onConfirm={() => {
+          if (pendingRemoval) void handleRemoveExtra(pendingRemoval.entry)
+        }}
+        onCancel={() => setPendingRemoval(null)}
+      />
 
       <Modal
         open={extraOpen}
@@ -237,13 +313,16 @@ export function FeedingExtras({
                   updateExtraField('priceListItemId', e.target.value)
                 }
               >
-                {FEED_CATEGORIES.map((category) => {
+                {EXTRA_CATEGORIES.map((category) => {
                   const categoryItems = extraItems.filter(
                     (item) => item.category === category,
                   )
                   if (categoryItems.length === 0) return null
                   return (
-                    <optgroup key={category} label={category}>
+                    <optgroup
+                      key={category}
+                      label={t(`category.${category.toLowerCase()}`)}
+                    >
                       {categoryItems.map((item) => (
                         <option key={item.id} value={item.id}>
                           {item.item} (
@@ -292,11 +371,7 @@ export function FeedingExtras({
                 {formatCurrency(estimatedExtraAmount)}
               </span>
             </p>
-            <p className="text-xs text-slate-400">
-              {t('horseDetail.extraBilledOn', {
-                date: formatDate(estimatedExtraDueDate),
-              })}
-            </p>
+            <p className="text-xs text-slate-400">{extraBilledOnText}</p>
             <button
               type="submit"
               disabled={extraSaving}

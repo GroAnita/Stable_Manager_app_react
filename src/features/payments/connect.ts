@@ -22,6 +22,27 @@ export async function isPaymentsAddonEnabled(
   return data?.addon_enabled ?? false
 }
 
+export type BillingRules = { addonEnabled: boolean; chargeDay: number }
+
+// Staff who log extras need these too, and they can't read
+// stable_payment_accounts directly.
+export async function getBillingRules(): Promise<BillingRules> {
+  const { data, error } = await supabase.rpc('get_billing_rules')
+  if (error) throw error
+  const rules = data?.[0]
+  return {
+    addonEnabled: rules?.addon_enabled ?? false,
+    chargeDay: rules?.charge_day ?? 25,
+  }
+}
+
+export async function setChargeDay(chargeDay: number): Promise<void> {
+  const { error } = await supabase.rpc('set_charge_day', {
+    p_charge_day: chargeDay,
+  })
+  if (error) throw error
+}
+
 export async function getStripeConnectStatus(): Promise<StripeConnectStatus> {
   const { data, error } = await supabase.functions.invoke<StripeConnectStatus>(
     'stripe-connect',

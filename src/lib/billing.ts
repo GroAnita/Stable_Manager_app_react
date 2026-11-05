@@ -63,6 +63,23 @@ export function daysInBillingCycleFor(dueDateIso: string): number {
   return daysInBillingCycle(new Date(dueDateIso))
 }
 
+// For stables with the payments add-on: an extra goes on the invoice after its
+// billing period ends, later if that invoice has already been issued (8 days
+// before the charge day). The database decides the real date; this only shows
+// it in advance and mirrors public.extra_billing_date.
+export function addonExtraBillingDate(
+  purchasedOn: string,
+  chargeDay: number,
+  today: string,
+): string {
+  const [year, month, day] = purchasedOn.split('-').map(Number)
+  const todayMs = Date.parse(`${today}T00:00:00Z`)
+  let monthOffset = day > chargeDay ? 2 : 1
+  const billsOnMs = () => Date.UTC(year, month - 1 + monthOffset, chargeDay)
+  while ((billsOnMs() - todayMs) / 86400000 - 8 <= 0) monthOffset += 1
+  return new Date(billsOnMs()).toISOString().slice(0, 10)
+}
+
 export type InvoiceLineItem = { description: string; amount: number }
 
 // Payment notes are generated as newline-separated lines; lines that carry

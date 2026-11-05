@@ -19,6 +19,7 @@ import {
   currentBillingCycleDays,
   hayValueIncVat,
 } from '../lib/billing'
+import { getBillingRules, type BillingRules } from '../features/payments/connect'
 import { usePreferences } from '../lib/PreferencesContext'
 import {
   listHorseOptions,
@@ -47,6 +48,7 @@ type FormState = {
   deposit: string
   start_date: string
   end_date: string
+  charge_day: string
   status: ContractStatus
   hay_price_list_item_id: string
   included_hay_kg: string
@@ -56,6 +58,8 @@ type FormState = {
   notes: string
   contract_terms: string
 }
+
+const CHARGE_DAYS = Array.from({ length: 28 }, (_, index) => index + 1)
 
 const emptyForm: FormState = {
   horse_id: '',
@@ -67,6 +71,7 @@ const emptyForm: FormState = {
   deposit: '',
   start_date: '',
   end_date: '',
+  charge_day: '',
   status: 'active',
   hay_price_list_item_id: '',
   included_hay_kg: '',
@@ -83,6 +88,7 @@ export default function ContractForm() {
   const navigate = useNavigate()
   const { t, formatCurrency } = usePreferences()
 
+  const [billingRules, setBillingRules] = useState<BillingRules | null>(null)
   const [form, setForm] = useState<FormState>(emptyForm)
   const [horses, setHorses] = useState<HorseOption[]>([])
   const [owners, setOwners] = useState<OwnerOption[]>([])
@@ -119,6 +125,9 @@ export default function ContractForm() {
       .catch((err: Error) => setError(err.message))
     listBoardingItems()
       .then(setBoardingItems)
+      .catch((err: Error) => setError(err.message))
+    getBillingRules()
+      .then(setBillingRules)
       .catch((err: Error) => setError(err.message))
     getCurrentStableId()
       .then((stableId) => (stableId ? getEmptyBoxRate(stableId) : null))
@@ -163,6 +172,7 @@ export default function ContractForm() {
           deposit: contract.deposit?.toString() ?? '',
           start_date: contract.start_date,
           end_date: contract.end_date ?? '',
+          charge_day: contract.charge_day?.toString() ?? '',
           status: contract.status as ContractStatus,
           hay_price_list_item_id: contract.hay_price_list_item_id ?? '',
           included_hay_kg: contract.included_hay_kg?.toString() ?? '',
@@ -305,6 +315,9 @@ export default function ContractForm() {
         deposit: form.deposit ? Number(form.deposit) : null,
         start_date: form.start_date,
         end_date: form.end_date || null,
+        ...(billingRules?.addonEnabled
+          ? { charge_day: Number(form.charge_day) || billingRules.chargeDay }
+          : {}),
         status: form.status,
         hay_price_list_item_id: form.hay_price_list_item_id || null,
         included_hay_kg: form.included_hay_kg
@@ -618,7 +631,28 @@ export default function ContractForm() {
             onChange={(e) => updateField('end_date', e.target.value)}
           />
         </label>
-        <div />
+        {billingRules?.addonEnabled ? (
+          <label>
+            <span className="field-label">{t('contractForm.chargeDay')}</span>
+            <select
+              required
+              className="field"
+              value={form.charge_day || String(billingRules.chargeDay)}
+              onChange={(e) => updateField('charge_day', e.target.value)}
+            >
+              {CHARGE_DAYS.map((day) => (
+                <option key={day} value={day}>
+                  {t('settings.paymentsChargeDayOption', { day })}
+                </option>
+              ))}
+            </select>
+            <span className="mt-1 block text-xs text-slate-500">
+              {t('contractForm.chargeDayHint')}
+            </span>
+          </label>
+        ) : (
+          <div />
+        )}
 
         <div>
           <span className="field-label">{t('contractForm.hayItem')}</span>

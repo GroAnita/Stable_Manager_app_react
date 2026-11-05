@@ -442,13 +442,13 @@ export const en = {
     editFeedingTime: 'Edit feeding time',
     deleteFeedingTimeConfirm: 'Delete this feeding time?',
     noFeedingTimes: 'No feeding times added yet.',
-    extraFeedTitle: 'Extra feed & supplements',
+    extraFeedTitle: 'Extras',
     extraFeedDescription:
       "Log purchases from the price list beyond what the boarding contract covers. Each entry creates a due charge against the horse's active contract.",
-    logExtraFeed: 'Log extra feed',
+    logExtraFeed: 'Log extra',
     noExtrasLogged: 'No extras logged yet.',
     extraEmptyCategories:
-      'Your price list has no Hay, Grain or Supplements items yet. Add some there first.',
+      'Your price list has no feed, bedding or service items yet. Add some there first.',
     goToPriceList: 'Go to price list',
     extraItem: 'Item',
     extraQuantity: 'Quantity',
@@ -460,6 +460,7 @@ export const en = {
     extraSubmit: 'Log extra & bill it',
     extraRemoveConfirmWithPayment:
       'Remove this extra? This will subtract {amount} from the invoice due {date}.',
+    extraRemoveTitle: 'Remove extra?',
     extraRemoveConfirmPlain: 'Remove this logged extra?',
     extraNoActiveContract:
       'This horse has no active contract, so no charge could be created.',
@@ -474,6 +475,12 @@ export const en = {
     extraMonthlyHayLineExempt: 'Hay (VAT-exempt) — {amount}',
     extraMonthlyBeddingLine: 'Bedding (incl. 25% VAT) — {amount}',
     extraMonthlyBeddingLineExempt: 'Bedding (VAT-exempt) — {amount}',
+    extraBilledOnAddon: 'Will be on the invoice charged {date}.',
+    extraQueuedForInvoice:
+      'Logged {item}. It will be on the invoice charged {date}.',
+    extraWaitingLine: 'Extra: {item} × {quantity}{unit} ({date})',
+    extraLockedOnInvoice:
+      'This extra is already on an issued invoice, so it can no longer be removed.',
     extraLogError: 'Could not log this extra: {error}',
     docPassport: 'Passport',
     docInsurance: 'Insurance',
@@ -757,6 +764,9 @@ export const en = {
     statusCancelled: 'Cancelled',
     startDate: 'Start date',
     endDate: 'End date',
+    chargeDay: 'Monthly charge date',
+    chargeDayHint:
+      'The date this boarder is charged each month. The invoice is sent at least 7 days before.',
     hayItem: 'Hay item',
     selectHayItem: 'Select hay item',
     noHayItems: 'No hay items in the price list.',
@@ -1207,6 +1217,12 @@ export const en = {
     paymentsActive: 'Payments are active',
     paymentsPayoutsPending:
       'Payouts aren\'t ready yet. Check your account with Stripe.',
+    paymentsChargeDayTitle: 'Default charge date',
+    paymentsChargeDayHelp:
+      'Used for new contracts unless you choose another date on the contract, and for existing contracts without a date. Boarders get their invoice at least 7 days before the charge. Extras go on the invoice after the billing period they were bought in.',
+    paymentsChargeDayOption: 'Day {day} of the month',
+    paymentsChargeDaySave: 'Save date',
+    paymentsChargeDaySaved: 'Charge date saved.',
     paymentsOpenDashboard: 'Open Stripe',
     navIntegrations: 'Integrations',
     navAccount: 'My account & two-factor',

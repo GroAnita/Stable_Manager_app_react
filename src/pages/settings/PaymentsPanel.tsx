@@ -2,13 +2,94 @@ import { useCallback, useEffect, useState } from 'react'
 import { Browser } from '@capacitor/browser'
 import { Capacitor } from '@capacitor/core'
 import {
+  getBillingRules,
   getStripeConnectStatus,
+  setChargeDay,
   startStripeOnboarding,
   type StripeConnectStatus,
 } from '../../features/payments/connect'
 import { usePreferences } from '../../lib/PreferencesContext'
 
 const STRIPE_DASHBOARD_URL = 'https://dashboard.stripe.com'
+const CHARGE_DAYS = Array.from({ length: 28 }, (_, index) => index + 1)
+
+function ChargeDaySetting() {
+  const { t } = usePreferences()
+  const [chargeDay, setChargeDayValue] = useState<number | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    getBillingRules()
+      .then((rules) => setChargeDayValue(rules.chargeDay))
+      .catch((err: Error) => setError(err.message))
+  }, [])
+
+  async function handleSave() {
+    if (chargeDay === null) return
+    setSaving(true)
+    setSaved(false)
+    setError(null)
+    try {
+      await setChargeDay(chargeDay)
+      setSaved(true)
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="space-y-3 border-t border-slate-100 pt-4">
+      {error && (
+        <p role="alert" className="text-sm text-red-600">
+          {error}
+        </p>
+      )}
+      {chargeDay !== null && (
+        <>
+          <label className="block">
+            <span className="field-label">
+              {t('settings.paymentsChargeDayTitle')}
+            </span>
+            <select
+              className="field"
+              value={chargeDay}
+              onChange={(e) => {
+                setChargeDayValue(Number(e.target.value))
+                setSaved(false)
+              }}
+            >
+              {CHARGE_DAYS.map((day) => (
+                <option key={day} value={day}>
+                  {t('settings.paymentsChargeDayOption', { day })}
+                </option>
+              ))}
+            </select>
+          </label>
+          <p className="text-sm text-slate-500">
+            {t('settings.paymentsChargeDayHelp')}
+          </p>
+          <button
+            type="button"
+            className="btn-ghost"
+            disabled={saving}
+            onClick={handleSave}
+          >
+            {t('settings.paymentsChargeDaySave')}
+          </button>
+          {saved && (
+            <p className="text-sm text-forest">
+              {t('settings.paymentsChargeDaySaved')}
+            </p>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
 
 export function PaymentsPanel() {
   const { t } = usePreferences()
@@ -126,6 +207,8 @@ export function PaymentsPanel() {
           </a>
         </>
       )}
+
+      {status && <ChargeDaySetting />}
     </div>
   )
 }

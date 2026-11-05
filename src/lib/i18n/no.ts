@@ -443,13 +443,13 @@ export const no: typeof en = {
     editFeedingTime: 'Rediger fôringstidspunkt',
     deleteFeedingTimeConfirm: 'Slette dette fôringstidspunktet?',
     noFeedingTimes: 'Ingen fôringstidspunkter lagt til ennå.',
-    extraFeedTitle: 'Ekstra fôr og tilskudd',
+    extraFeedTitle: 'Tillegg',
     extraFeedDescription:
       'Registrer kjøp fra prislisten utover det fôringskontrakten dekker. Hver oppføring oppretter en utestående kostnad mot hestens aktive kontrakt.',
-    logExtraFeed: 'Registrer ekstra fôr',
+    logExtraFeed: 'Registrer tillegg',
     noExtrasLogged: 'Ingen ekstrakostnader registrert ennå.',
     extraEmptyCategories:
-      'Prislisten din har ingen varer i kategoriene Høy, Kraftfôr eller Tilskudd ennå. Legg til noen der først.',
+      'Prislisten din har ingen fôr, strø eller tjenester ennå. Legg til noen der først.',
     goToPriceList: 'Gå til prisliste',
     extraItem: 'Vare',
     extraQuantity: 'Antall',
@@ -461,6 +461,7 @@ export const no: typeof en = {
     extraSubmit: 'Registrer og fakturer',
     extraRemoveConfirmWithPayment:
       'Fjerne denne ekstrakostnaden? Dette trekker {amount} fra fakturaen som forfaller {date}.',
+    extraRemoveTitle: 'Fjerne tillegget?',
     extraRemoveConfirmPlain: 'Fjerne denne registrerte ekstrakostnaden?',
     extraNoActiveContract:
       'Denne hesten har ingen aktiv kontrakt, så ingen kostnad kunne opprettes.',
@@ -475,6 +476,12 @@ export const no: typeof en = {
     extraMonthlyHayLineExempt: 'Høy (avgiftsfritt) — {amount}',
     extraMonthlyBeddingLine: 'Flis/strø (inkl. 25% MVA) — {amount}',
     extraMonthlyBeddingLineExempt: 'Flis/strø (avgiftsfritt) — {amount}',
+    extraBilledOnAddon: 'Kommer på fakturaen som trekkes {date}.',
+    extraQueuedForInvoice:
+      '{item} er registrert. Det kommer på fakturaen som trekkes {date}.',
+    extraWaitingLine: 'Ekstra: {item} × {quantity}{unit} ({date})',
+    extraLockedOnInvoice:
+      'Dette tillegget står allerede på en utstedt faktura og kan ikke lenger fjernes.',
     extraLogError: 'Kunne ikke registrere denne ekstrakostnaden: {error}',
     docPassport: 'Pass',
     docInsurance: 'Forsikring',
@@ -758,6 +765,9 @@ export const no: typeof en = {
     statusCancelled: 'Kansellert',
     startDate: 'Startdato',
     endDate: 'Sluttdato',
+    chargeDay: 'Månedlig trekkdato',
+    chargeDayHint:
+      'Datoen hesteeieren trekkes hver måned. Fakturaen sendes minst 7 dager før.',
     hayItem: 'Høyvare',
     selectHayItem: 'Velg høyvare',
     noHayItems: 'Ingen høyvarer i prislisten.',
@@ -1207,6 +1217,12 @@ export const no: typeof en = {
     paymentsActive: 'Betalinger er aktive',
     paymentsPayoutsPending:
       'Utbetalinger er ikke klare ennå. Sjekk kontoen din hos Stripe.',
+    paymentsChargeDayTitle: 'Standard trekkdato',
+    paymentsChargeDayHelp:
+      'Brukes på nye kontrakter hvis du ikke velger en annen dato på kontrakten, og på eksisterende kontrakter uten dato. Hesteeierne får fakturaen minst 7 dager før trekket. Tillegg kommer på fakturaen etter faktureringsperioden de ble kjøpt i.',
+    paymentsChargeDayOption: '{day}. i måneden',
+    paymentsChargeDaySave: 'Lagre dato',
+    paymentsChargeDaySaved: 'Trekkdatoen er lagret.',
     paymentsOpenDashboard: 'Åpne Stripe',
     navIntegrations: 'Integrasjoner',
     navAccount: 'Min konto og tofaktor',
