@@ -89,6 +89,7 @@ export default function ContractForm() {
   const { t, formatCurrency } = usePreferences()
 
   const [billingRules, setBillingRules] = useState<BillingRules | null>(null)
+  const [chargeDayLocked, setChargeDayLocked] = useState(false)
   const [form, setForm] = useState<FormState>(emptyForm)
   const [horses, setHorses] = useState<HorseOption[]>([])
   const [owners, setOwners] = useState<OwnerOption[]>([])
@@ -161,6 +162,7 @@ export default function ContractForm() {
     getContract(id)
       .then((contract) => {
         if (cancelled) return
+        setChargeDayLocked(contract.card_agreement_accepted_at !== null)
         setForm({
           horse_id: contract.horse_id,
           owner_id: contract.owner_id,
@@ -637,6 +639,7 @@ export default function ContractForm() {
             <select
               required
               className="field"
+              disabled={chargeDayLocked}
               value={form.charge_day || String(billingRules.chargeDay)}
               onChange={(e) => updateField('charge_day', e.target.value)}
             >
@@ -647,7 +650,11 @@ export default function ContractForm() {
               ))}
             </select>
             <span className="mt-1 block text-xs text-slate-500">
-              {t('contractForm.chargeDayHint')}
+              {t(
+                chargeDayLocked
+                  ? 'contractForm.chargeDayLocked'
+                  : 'contractForm.chargeDayHint',
+              )}
             </span>
           </label>
         ) : (

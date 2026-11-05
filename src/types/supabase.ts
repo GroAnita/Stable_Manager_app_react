@@ -2207,6 +2207,7 @@ export type Database = {
       stable_payment_accounts: {
         Row: {
           addon_enabled: boolean
+          card_signing_enabled: boolean
           charge_day: number
           charges_enabled: boolean
           created_at: string
@@ -2217,6 +2218,7 @@ export type Database = {
         }
         Insert: {
           addon_enabled?: boolean
+          card_signing_enabled?: boolean
           charge_day?: number
           charges_enabled?: boolean
           created_at?: string
@@ -2227,6 +2229,7 @@ export type Database = {
         }
         Update: {
           addon_enabled?: boolean
+          card_signing_enabled?: boolean
           charge_day?: number
           charges_enabled?: boolean
           created_at?: string

@@ -10,6 +10,7 @@ import {
 import { listMyHorses } from '../features/horses/api'
 import { listPayments, type PaymentListItem } from '../features/payments/api'
 import { usePreferences } from '../lib/PreferencesContext'
+import { CardAgreementPanel } from './myContract/CardAgreementPanel'
 
 export default function MyContract() {
   const { t, formatCurrency, formatDate } = usePreferences()
@@ -75,6 +76,7 @@ export default function MyContract() {
       {contracts.map((contract) => (
         <div key={contract.id} className="panel p-6">
           <ContractFields contract={contract} />
+          <CardAgreementPanel contractId={contract.id} />
         </div>
       ))}
 

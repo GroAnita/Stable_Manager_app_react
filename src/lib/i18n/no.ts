@@ -156,6 +156,22 @@ export const no: typeof en = {
   myContract: {
     title: 'Min kontrakt',
     subtitle: 'Boardingkontrakten og fakturaene dine.',
+    cardTitle: 'Automatisk kortbetaling',
+    cardIntro:
+      'Les avtalen under. Når du godtar den, lagrer du kortet ditt på Stripes sikre side. Ingenting trekkes nå.',
+    cardAccept: 'Godta og legg inn kort',
+    cardOpening: 'Åpner Stripe…',
+    cardMissingEmail:
+      'Vi trenger e-postadressen din, slik at du får faktura før hvert trekk. Be stallen om å legge den inn.',
+    cardActive: 'Automatisk betaling er på. Kortet ditt trekkes den {day}. hver måned.',
+    cardDetails: '{brand} som slutter på {last4}. Avtalen ble godtatt {date}.',
+    cardAcceptedOn: 'Avtalen ble godtatt {date}.',
+    cardShowAgreement: 'Vis avtalen',
+    cardHideAgreement: 'Skjul avtalen',
+    cardWithdraw: 'Avslutt automatisk betaling',
+    cardWithdrawConfirm:
+      'Avslutte automatisk betaling? Kortet ditt blir ikke trukket automatisk fremover, men ubetalte og fremtidige fakturaer må fortsatt betales på annen måte.',
+    cardWithdrawn: 'Automatisk betaling er avsluttet. Vi har sendt deg en bekreftelse på e-post.',
     loading: 'Laster…',
     failedToLoad: 'Kunne ikke laste: {error}',
     noContractTitle: 'Ingen kontrakt funnet',
@@ -766,6 +782,8 @@ export const no: typeof en = {
     startDate: 'Startdato',
     endDate: 'Sluttdato',
     chargeDay: 'Månedlig trekkdato',
+    chargeDayLocked:
+      'Hesteeieren har godtatt denne datoen. Den kan bare endres hvis hesteeieren avslutter avtalen og signerer på nytt.',
     chargeDayHint:
       'Datoen hesteeieren trekkes hver måned. Fakturaen sendes minst 7 dager før.',
     hayItem: 'Høyvare',

@@ -153,6 +153,22 @@ export const en = {
   myContract: {
     title: 'My Contract',
     subtitle: 'Your boarding contract and invoices.',
+    cardTitle: 'Automatic card payment',
+    cardIntro:
+      'Read the agreement below. When you accept it, you save your card on Stripe\'s secure page. Nothing is charged now.',
+    cardAccept: 'Accept and add card',
+    cardOpening: 'Opening Stripe…',
+    cardMissingEmail:
+      'We need your email address so you can get invoices before each charge. Ask the stable to add it.',
+    cardActive: 'Automatic payment is on. Your card is charged on day {day} of each month.',
+    cardDetails: '{brand} ending in {last4}. Agreement accepted {date}.',
+    cardAcceptedOn: 'Agreement accepted {date}.',
+    cardShowAgreement: 'Show agreement',
+    cardHideAgreement: 'Hide agreement',
+    cardWithdraw: 'End automatic payment',
+    cardWithdrawConfirm:
+      'End automatic payment? Your card will not be charged automatically from now on, but unpaid and future invoices must still be paid another way.',
+    cardWithdrawn: 'Automatic payment has ended. We have sent you a confirmation by email.',
     loading: 'Loading…',
     failedToLoad: 'Failed to load: {error}',
     noContractTitle: 'No contract found',
@@ -765,6 +781,8 @@ export const en = {
     startDate: 'Start date',
     endDate: 'End date',
     chargeDay: 'Monthly charge date',
+    chargeDayLocked:
+      'The boarder has agreed to this date. It can only change if they withdraw and sign again.',
     chargeDayHint:
       'The date this boarder is charged each month. The invoice is sent at least 7 days before.',
     hayItem: 'Hay item',
