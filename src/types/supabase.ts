@@ -14,6 +14,34 @@ export type Database = {
   }
   public: {
     Tables: {
+      card_agreements: {
+        Row: {
+          accepted_at: string
+          accepted_by: string | null
+          accepted_by_name: string
+          activated_at: string | null
+          agreement_text: string
+          card_brand: string | null
+          card_last4: string | null
+          charge_day: number
+          contract_id: string
+          copy_sent_at: string | null
+          created_at: string
+          id: string
+          owner_id: string
+          stable_id: string
+          stripe_checkout_session_id: string | null
+          stripe_customer_id: string | null
+          stripe_payment_method_id: string | null
+          updated_at: string
+          version: string
+          withdrawn_at: string | null
+          withdrawn_by: string | null
+        }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
       announcement_acknowledgments: {
         Row: {
           announcement_id: string
@@ -1877,6 +1905,11 @@ export type Database = {
       payments: {
         Row: {
           amount: number
+          charge_attempts: number
+          charge_error: string | null
+          charge_started_at: string | null
+          charge_status: string | null
+          charged_at: string | null
           contract_id: string
           created_at: string
           due_date: string
@@ -1894,6 +1927,7 @@ export type Database = {
           payment_method: string | null
           stable_id: string
           status: Database["public"]["Enums"]["payment_status"]
+          stripe_payment_intent_id: string | null
           updated_at: string
         }
         Insert: {
@@ -1915,6 +1949,12 @@ export type Database = {
           payment_method?: string | null
           stable_id: string
           status?: Database["public"]["Enums"]["payment_status"]
+          stripe_payment_intent_id?: string | null
+          charge_attempts?: number
+          charge_error?: string | null
+          charge_started_at?: string | null
+          charge_status?: string | null
+          charged_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -1936,6 +1976,12 @@ export type Database = {
           payment_method?: string | null
           stable_id?: string
           status?: Database["public"]["Enums"]["payment_status"]
+          stripe_payment_intent_id?: string | null
+          charge_attempts?: number
+          charge_error?: string | null
+          charge_started_at?: string | null
+          charge_status?: string | null
+          charged_at?: string | null
           updated_at?: string
         }
         Relationships: [

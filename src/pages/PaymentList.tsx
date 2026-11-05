@@ -13,12 +13,27 @@ import {
   type PaymentListItem,
   type PaymentSummary,
 } from '../features/payments/api'
+import {
+  chargeInvoice,
+  listContractsWithCardAgreement,
+  type ChargeResult,
+} from '../features/payments/charge'
+import { useAuth } from '../lib/AuthContext'
+import { useConfirm } from '../lib/ConfirmContext'
 import { usePreferences } from '../lib/PreferencesContext'
 
 type StatusFilter = 'all' | 'paid' | 'due' | 'overdue'
 
 export default function PaymentList() {
   const { t, formatCurrency, formatDate } = usePreferences()
+  const { profile } = useAuth()
+  const confirm = useConfirm()
+  const [cardContracts, setCardContracts] = useState<Set<string>>(new Set())
+  const [charging, setCharging] = useState(false)
+  const [chargeMessage, setChargeMessage] = useState<{
+    ok: boolean
+    text: string
+  } | null>(null)
   const [payments, setPayments] = useState<PaymentListItem[]>([])
   const [summary, setSummary] = useState<PaymentSummary | null>(null)
   const [loading, setLoading] = useState(true)
@@ -50,6 +65,17 @@ export default function PaymentList() {
       cancelled = true
     }
   }, [])
+
+  const isStableOwner = profile?.role === 'stable_owner'
+
+  // Only owners get the charge button, so nobody else needs this list. A failure
+  // just means no button, and the rest of the page still works.
+  useEffect(() => {
+    if (!isStableOwner) return
+    listContractsWithCardAgreement()
+      .then(setCardContracts)
+      .catch(() => setCardContracts(new Set()))
+  }, [isStableOwner])
 
   const filtered = useMemo(() => {
     const query = search.toLowerCase()
@@ -85,6 +111,65 @@ export default function PaymentList() {
     return payment.invoice_email_sent_at
       ? t('paymentList.emailSent')
       : t('paymentList.emailNotSentYet')
+  }
+
+  function chargeResultMessage(result: ChargeResult): {
+    ok: boolean
+    text: string
+  } {
+    if (result.blocked) {
+      const key = `paymentList.chargeBlocked_${result.blocked}`
+      const text = t(key)
+      return { ok: false, text: text === key ? result.blocked : text }
+    }
+    const suffix = result.testMode ? ` ${t('paymentList.chargeTestMode')}` : ''
+    if (result.outcome === 'succeeded') {
+      return { ok: true, text: t('paymentList.chargeSucceeded') + suffix }
+    }
+    if (result.outcome === 'processing') {
+      return { ok: true, text: t('paymentList.chargeProcessing') + suffix }
+    }
+    if (result.outcome === 'unknown') {
+      return { ok: false, text: t('paymentList.chargeUnknown') }
+    }
+    return {
+      ok: false,
+      text:
+        t('paymentList.chargeFailed', { reason: result.reason ?? '—' }) +
+        suffix,
+    }
+  }
+
+  async function handleCharge(payment: PaymentListItem) {
+    // Checking a charge already under way can't start a second one, so it needs
+    // no confirmation.
+    if (payment.charge_status !== 'processing') {
+      const confirmed = await confirm(
+        t('paymentList.chargeConfirm', {
+          amount: formatCurrency(payment.amount),
+          owner: payment.owner?.full_name ?? '—',
+        }),
+        { confirmLabel: t('paymentList.chargeNow') },
+      )
+      if (!confirmed) return
+    }
+    setCharging(true)
+    setChargeMessage(null)
+    try {
+      const result = await chargeInvoice(payment.id)
+      setChargeMessage(chargeResultMessage(result))
+      const [paymentsData, summaryData] = await Promise.all([
+        listPayments(),
+        getPaymentSummary(),
+      ])
+      setPayments(paymentsData)
+      setSummary(summaryData)
+      setSelected(paymentsData.find((p) => p.id === payment.id) ?? null)
+    } catch (err) {
+      setChargeMessage({ ok: false, text: (err as Error).message })
+    } finally {
+      setCharging(false)
+    }
   }
 
   async function handleMarkPaid(id: string) {
@@ -206,13 +291,24 @@ export default function PaymentList() {
                         {t('paymentList.emailNotDelivered')}
                       </p>
                     )}
+                    {payment.charge_status === 'failed' &&
+                      payment.status !== 'paid' && (
+                        <p className="mt-1 text-xs font-medium text-red-600">
+                          {t('paymentList.chargeFailedShort')}
+                        </p>
+                      )}
+                    {payment.charge_status === 'processing' && (
+                      <p className="mt-1 text-xs font-medium text-amber-700">
+                        {t('paymentList.chargeInProgress')}
+                      </p>
+                    )}
                   </td>
                   <td>
                     {payment.status === 'paid' ? (
                       <span className="text-sm text-slate-400">
                         {t('common.settled')}
                       </span>
-                    ) : (
+                    ) : payment.charge_status === 'processing' ? null : (
                       <button
                         type="button"
                         className="btn-ghost px-3 py-2"
@@ -237,7 +333,10 @@ export default function PaymentList() {
 
       <Modal
         open={selected !== null}
-        onClose={() => setSelected(null)}
+        onClose={() => {
+          setSelected(null)
+          setChargeMessage(null)
+        }}
         title={selected?.invoice_number || t('paymentList.detailsFallback')}
       >
         {selected && (
@@ -308,7 +407,48 @@ export default function PaymentList() {
                 </ul>
               </div>
             )}
-            <div className="border-t border-slate-100 pt-3">
+            {selected.charged_at && (
+              <div>
+                <span className="font-medium text-slate-800">
+                  {t('paymentList.chargedOn')}:
+                </span>{' '}
+                {formatDate(selected.charged_at.slice(0, 10))}
+              </div>
+            )}
+            {selected.charge_status === 'failed' &&
+              selected.status !== 'paid' && (
+                <p className="text-red-600">
+                  {t('paymentList.chargeFailed', {
+                    reason: selected.charge_error ?? '—',
+                  })}
+                </p>
+              )}
+            {chargeMessage && (
+              <p
+                role={chargeMessage.ok ? undefined : 'alert'}
+                className={chargeMessage.ok ? 'text-forest' : 'text-red-600'}
+              >
+                {chargeMessage.text}
+              </p>
+            )}
+            <div className="flex flex-wrap gap-2 border-t border-slate-100 pt-3">
+              {isStableOwner &&
+                selected.status !== 'paid' &&
+                selected.contract &&
+                cardContracts.has(selected.contract.id) && (
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    disabled={charging}
+                    onClick={() => handleCharge(selected)}
+                  >
+                    {charging
+                      ? t('paymentList.charging')
+                      : selected.charge_status === 'processing'
+                        ? t('paymentList.chargeCheck')
+                        : t('paymentList.chargeNow')}
+                  </button>
+                )}
               <button
                 type="button"
                 className="btn-ghost"
