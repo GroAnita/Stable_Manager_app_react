@@ -529,7 +529,7 @@ export async function markAllNotificationsRead(
 }
 
 // ---------------------------------------------------------------------------
-// Rota test section
+// Rota worked out from horse counts
 
 export type OwnerHorseCount = { id: string; full_name: string; horses: number }
 
@@ -552,4 +552,24 @@ export async function listOwnerHorseCounts(): Promise<OwnerHorseCount[]> {
   return [...owners.values()].sort((a, b) =>
     a.full_name.localeCompare(b.full_name, 'nb'),
   )
+}
+
+export async function publishFeedingRota(input: {
+  dateFrom: string
+  dateTo: string
+  plans: { shift_type_id: string; date: string; owner_id: string | null }[]
+  excludedOwnerIds: string[]
+  noticeTitle: string
+  noticeMessage: string
+}): Promise<number> {
+  const { data, error } = await supabase.rpc('publish_feeding_rota', {
+    p_date_from: input.dateFrom,
+    p_date_to: input.dateTo,
+    p_plans: input.plans,
+    p_excluded_owner_ids: input.excludedOwnerIds,
+    p_notice_title: input.noticeTitle,
+    p_notice_message: input.noticeMessage,
+  })
+  if (error) throw error
+  return data
 }

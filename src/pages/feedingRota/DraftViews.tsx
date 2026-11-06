@@ -1,121 +1,148 @@
-import type { DraftDay } from '../../lib/feedingRotaDraft'
+import {
+  draftDayLabel,
+  type DraftDay,
+  type DraftSlot,
+} from '../../lib/feedingRotaDraft'
 
-const SLOT_KEYS = [
-  ['morning'],
-  ['morning', 'evening'],
-  ['morning', 'lunch', 'evening'],
-  ['morning', 'lunch', 'evening', 'night'],
-]
+const STYLES = {
+  gold: 'border-gold/50 bg-gold/20 text-warmbrown',
+  brown: 'border-warmbrown/30 bg-warmbrown/10 text-warmbrown',
+  green: 'border-forest/30 bg-forest/10 text-forest',
+  grey: 'border-slate-300 bg-slate-100 text-slate-700',
+}
 
-const SLOT_STYLES: Record<string, string> = {
-  morning: 'border-gold/50 bg-gold/20 text-warmbrown',
-  lunch: 'border-warmbrown/30 bg-warmbrown/10 text-warmbrown',
-  evening: 'border-forest/30 bg-forest/10 text-forest',
-  night: 'border-slate-300 bg-slate-100 text-slate-700',
+// First feeding of the day is gold and the last green, however many there are.
+function slotStyle(slot: number, slotCount: number): string {
+  if (slotCount === 1) return STYLES.gold
+  if (slot === 0) return STYLES.gold
+  if (slot === slotCount - 1) return STYLES.green
+  return slot % 2 === 1 ? STYLES.brown : STYLES.grey
 }
 
 type ViewProps = {
   days: DraftDay[]
-  feedingsPerDay: number
+  slotLabels: string[]
   ownerName: (id: string) => string
   t: (key: string) => string
   locale: string
+  onPick: (date: string, slot: number) => void
 }
 
 function weeksOf(days: DraftDay[]): DraftDay[][] {
   const weeks: DraftDay[][] = []
-  for (let i = 0; i < days.length; i += 7) weeks.push(days.slice(i, i + 7))
-  return weeks
-}
-
-function dayLabel(dateIso: string, locale: string): string {
-  return new Date(`${dateIso}T00:00:00Z`).toLocaleDateString(locale, {
-    timeZone: 'UTC',
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-  })
+  for (const day of days) {
+    if (!weeks[day.week]) weeks[day.week] = []
+    weeks[day.week].push(day)
+  }
+  return weeks.filter(Boolean)
 }
 
 function OwnerChip({
-  ownerId,
-  slotKey,
+  slot,
+  index,
+  slotLabels,
   ownerName,
   t,
+  onClick,
 }: {
-  ownerId: string | null
-  slotKey: string
+  slot: DraftSlot
+  index: number
+  slotLabels: string[]
   ownerName: (id: string) => string
   t: (key: string) => string
+  onClick: () => void
 }) {
-  const name = ownerId ? ownerName(ownerId) : t('feedingRotaDraft.nobodyFree')
+  const name = slot.ownerId
+    ? ownerName(slot.ownerId)
+    : t('feedingRotaDraft.nobodyFree')
   return (
-    <span
-      title={`${t(`feedingRotaDraft.slot_${slotKey}`)}: ${name}`}
-      className={`block truncate rounded-lg border px-2 py-1 text-xs font-medium ${
-        ownerId ? SLOT_STYLES[slotKey] : 'border-red-200 bg-red-50 text-red-600'
+    <button
+      type="button"
+      disabled={slot.completed}
+      title={`${slotLabels[index]}: ${name}`}
+      onClick={onClick}
+      className={`block w-full truncate rounded-lg border px-2 py-1 text-left text-xs font-medium ${
+        slot.shiftId ? '' : 'border-dashed'
+      } ${slot.completed ? 'opacity-60' : 'hover:opacity-75'} ${
+        slot.ownerId
+          ? slotStyle(index, slotLabels.length)
+          : 'border-red-200 bg-red-50 text-red-600'
       }`}
     >
+      {slot.completed ? '✓ ' : ''}
       {name}
-    </span>
+    </button>
   )
 }
 
 export function SlotLegend({
-  feedingsPerDay,
+  slotLabels,
   t,
 }: {
-  feedingsPerDay: number
+  slotLabels: string[]
   t: (key: string) => string
 }) {
   return (
-    <div className="flex flex-wrap gap-2">
-      {SLOT_KEYS[feedingsPerDay - 1].map((key) => (
+    <div className="flex flex-wrap items-center gap-2">
+      {slotLabels.map((label, index) => (
         <span
-          key={key}
-          className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${SLOT_STYLES[key]}`}
+          key={label}
+          className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${slotStyle(index, slotLabels.length)}`}
         >
-          {t(`feedingRotaDraft.slot_${key}`)}
+          {label}
         </span>
       ))}
+      <span className="rounded-full border border-dashed border-slate-300 px-2.5 py-0.5 text-xs text-slate-500">
+        {t('feedingRotaDraft.notPublished')}
+      </span>
     </div>
   )
 }
 
 export function DraftCalendar({
   days,
-  feedingsPerDay,
+  slotLabels,
   ownerName,
   t,
   locale,
+  onPick,
 }: ViewProps) {
-  const slotKeys = SLOT_KEYS[feedingsPerDay - 1]
   return (
     <div className="space-y-5 overflow-x-auto pb-2">
-      {weeksOf(days).map((week, weekIndex) => (
-        <div key={week[0].date} className="min-w-[52rem]">
+      {weeksOf(days).map((week) => (
+        <div key={week[0].date} style={{ minWidth: `${week.length * 7.5}rem` }}>
           <h3 className="mb-2 text-sm font-semibold text-slate-700">
-            {t('feedingRotaDraft.week')} {weekIndex + 1}
+            {t('feedingRotaDraft.week')} {week[0].week + 1}
           </h3>
-          <div className="grid grid-cols-7 gap-2">
+          <div
+            className="grid gap-2"
+            style={{
+              gridTemplateColumns: `repeat(${week.length}, minmax(0, 1fr))`,
+            }}
+          >
             {week.map((day) => (
               <div
                 key={day.date}
                 className="min-w-0 rounded-xl border border-slate-100 bg-slate-50 p-2"
               >
                 <p className="mb-2 text-xs font-semibold text-slate-600 first-letter:uppercase">
-                  {dayLabel(day.date, locale)}
+                  {draftDayLabel(day.date, locale)}
                 </p>
                 <div className="space-y-1.5">
-                  {day.slots.map((ownerId, slot) => (
-                    <OwnerChip
-                      key={slotKeys[slot]}
-                      ownerId={ownerId}
-                      slotKey={slotKeys[slot]}
-                      ownerName={ownerName}
-                      t={t}
-                    />
-                  ))}
+                  {day.slots.map(
+                    (slot, index) =>
+                      slot && (
+                        <OwnerChip
+                          key={slotLabels[index]}
+                          slot={slot}
+                          index={index}
+                          slotLabels={slotLabels}
+                          ownerName={ownerName}
+                          t={t}
+                          onClick={() => onPick(day.date, index)}
+                        />
+                      ),
+                  )}
                 </div>
               </div>
             ))}
@@ -128,45 +155,50 @@ export function DraftCalendar({
 
 export function DraftList({
   days,
-  feedingsPerDay,
+  slotLabels,
   ownerName,
   t,
   locale,
+  onPick,
 }: ViewProps) {
-  const slotKeys = SLOT_KEYS[feedingsPerDay - 1]
   return (
     <div className="flex gap-3 overflow-x-auto pb-2">
-      {weeksOf(days).map((week, weekIndex) => (
+      {weeksOf(days).map((week) => (
         <div
           key={week[0].date}
           className="w-64 shrink-0 rounded-xl border border-slate-100 p-3"
         >
           <h3 className="mb-2 text-center text-sm font-semibold text-slate-700">
-            {t('feedingRotaDraft.week')} {weekIndex + 1}
+            {t('feedingRotaDraft.week')} {week[0].week + 1}
           </h3>
           <div className="divide-y divide-slate-100">
             {week.map((day) => (
               <div key={day.date} className="py-2">
                 <p className="mb-1.5 text-xs font-semibold text-slate-600 first-letter:uppercase">
-                  {dayLabel(day.date, locale)}
+                  {draftDayLabel(day.date, locale)}
                 </p>
                 <div className="space-y-1">
-                  {day.slots.map((ownerId, slot) => (
-                    <div
-                      key={slotKeys[slot]}
-                      className="grid grid-cols-[3.5rem_minmax(0,1fr)] items-center gap-2"
-                    >
-                      <span className="text-xs text-slate-500">
-                        {t(`feedingRotaDraft.slot_${slotKeys[slot]}`)}
-                      </span>
-                      <OwnerChip
-                        ownerId={ownerId}
-                        slotKey={slotKeys[slot]}
-                        ownerName={ownerName}
-                        t={t}
-                      />
-                    </div>
-                  ))}
+                  {day.slots.map(
+                    (slot, index) =>
+                      slot && (
+                        <div
+                          key={slotLabels[index]}
+                          className="grid grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-2"
+                        >
+                          <span className="truncate text-xs text-slate-500">
+                            {slotLabels[index]}
+                          </span>
+                          <OwnerChip
+                            slot={slot}
+                            index={index}
+                            slotLabels={slotLabels}
+                            ownerName={ownerName}
+                            t={t}
+                            onClick={() => onPick(day.date, index)}
+                          />
+                        </div>
+                      ),
+                  )}
                 </div>
               </div>
             ))}

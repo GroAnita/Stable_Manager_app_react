@@ -53,7 +53,7 @@ const STEPS: Step[] = [
     key: 'feedingRounds',
     titleKey: 'onboardingChecklist.stepFeedingRoundsTitle',
     bodyKey: 'onboardingChecklist.stepFeedingRoundsBody',
-    to: '/feeding-rota',
+    to: '/settings?section=stableRoutine',
   },
   {
     key: 'staff',

@@ -2950,6 +2950,17 @@ export type Database = {
       }
     }
     Functions: {
+      publish_feeding_rota: {
+        Args: {
+          p_date_from: string
+          p_date_to: string
+          p_excluded_owner_ids: string[]
+          p_notice_message: string
+          p_notice_title: string
+          p_plans: Json
+        }
+        Returns: number
+      }
       set_card_agreement_paused: {
         Args: { p_contract_id: string; p_paused: boolean }
         Returns: undefined
