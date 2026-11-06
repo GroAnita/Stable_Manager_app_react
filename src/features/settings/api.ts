@@ -1,3 +1,5 @@
+import { supabaseFunctionError } from '../../lib/supabaseFunctionError'
+import { webOrigin } from '../../lib/platform'
 import { supabase } from '../../lib/supabaseClient'
 import type { Database } from '../../types/supabase'
 
@@ -98,4 +100,46 @@ export async function listSubscriptionPlans(): Promise<SubscriptionPlan[]> {
     .order('sort_order')
   if (error) throw error
   return data
+}
+
+export type StableBilling = {
+  status: string
+  trial_ends_at: string | null
+  current_period_end: string | null
+  cancel_at_period_end: boolean
+  past_due_since: string | null
+  has_subscription: boolean
+  read_only: boolean
+}
+
+export async function getStableBilling(): Promise<StableBilling | null> {
+  const { data, error } = await supabase.rpc('get_stable_billing_state')
+  if (error) throw error
+  return data[0] ?? null
+}
+
+async function invokeBilling<T>(body: Record<string, unknown>): Promise<T> {
+  const { data, error } = await supabase.functions.invoke<T>('stripe-billing', {
+    body: { ...body, returnOrigin: webOrigin() },
+  })
+  if (error) throw await supabaseFunctionError(error)
+  if (!data) throw new Error('Empty response from stripe-billing')
+  return data
+}
+
+export async function startSubscriptionCheckout(plan: string): Promise<string> {
+  const { url } = await invokeBilling<{ url: string }>({
+    action: 'checkout',
+    plan,
+  })
+  return url
+}
+
+export async function openSubscriptionPortal(): Promise<string> {
+  const { url } = await invokeBilling<{ url: string }>({ action: 'portal' })
+  return url
+}
+
+export async function changeSubscriptionPlan(plan: string): Promise<void> {
+  await invokeBilling({ action: 'change_plan', plan })
 }

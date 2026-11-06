@@ -1,9 +1,15 @@
 import { useEffect, useState } from 'react'
 import { Icon } from '../../components/Icon'
+import { Capacitor } from '@capacitor/core'
 import {
+  changeSubscriptionPlan,
+  getStableBilling,
   listSubscriptionPlans,
+  openSubscriptionPortal,
+  startSubscriptionCheckout,
   updateStable,
   type Stable,
+  type StableBilling,
   type SubscriptionPlan,
 } from '../../features/settings/api'
 import {
@@ -22,10 +28,11 @@ const TRIAL_DAYS = 30
 
 function getTrialStatus(
   createdAt: string,
+  trialEndsAt: string | null,
   now: Date = new Date(),
 ): { trialEnd: Date; trialActive: boolean } {
-  const trialEnd = new Date(createdAt)
-  trialEnd.setDate(trialEnd.getDate() + TRIAL_DAYS)
+  const trialEnd = new Date(trialEndsAt ?? createdAt)
+  if (!trialEndsAt) trialEnd.setDate(trialEnd.getDate() + TRIAL_DAYS)
   return { trialEnd, trialActive: trialEnd.getTime() > now.getTime() }
 }
 
@@ -61,6 +68,7 @@ export function SubscriptionPanel({
   const [error, setError] = useState<string | null>(null)
   const confirm = useConfirm()
   const [planChange, setPlanChange] = useState<PlanChange | null>(null)
+  const [billing, setBilling] = useState<StableBilling | null>(null)
   const [planning, setPlanning] = useState<{
     plan: Stable['plan']
     signed: number
@@ -81,13 +89,40 @@ export function SubscriptionPanel({
       .eq('active', true)
       .then(({ count }) => setHorseCount(count ?? 0))
     if (canEdit) {
+      getStableBilling()
+        .then(setBilling)
+        .catch((err: Error) => setError(err.message))
       getPlanChange(stable.id)
         .then(setPlanChange)
         .catch((err: Error) => setError(err.message))
     }
   }, [canEdit, stable.id])
 
-  const { trialEnd, trialActive } = getTrialStatus(stable.created_at)
+  const isTester = billing?.status === 'tester'
+  const isPaying =
+    billing?.has_subscription === true &&
+    (billing.status === 'active' || billing.status === 'past_due')
+  const canBuy = !isTester && !isPaying && !Capacitor.isNativePlatform()
+  const selectedPlan = plans.find((plan) => plan.key === stable.plan)
+  const overHorseLimit =
+    selectedPlan?.horse_max != null &&
+    horseCount !== null &&
+    horseCount > selectedPlan.horse_max
+
+  async function goToStripe(open: () => Promise<string>) {
+    setSaving(true)
+    setError(null)
+    try {
+      window.location.assign(await open())
+    } catch (err) {
+      setError((err as Error).message)
+      setSaving(false)
+    }
+  }
+  const { trialEnd, trialActive } = getTrialStatus(
+    stable.created_at,
+    billing?.trial_ends_at ?? null,
+  )
 
   async function handleSchedule() {
     if (!planning) return
@@ -154,11 +189,30 @@ export function SubscriptionPanel({
     setSaving(true)
     setError(null)
     try {
+      // A paying stable's plan changes in Stripe, and the webhook brings it back here.
+      if (isPaying) {
+        if (Capacitor.isNativePlatform()) {
+          setError(t('settings.billingWebOnly'))
+          return
+        }
+        const name = plans.find((other) => other.key === plan)?.name ?? ''
+        if (
+          !(await confirm(t('settings.billingChangeConfirm', { name }), {
+            confirmLabel: t('settings.billingChange'),
+          }))
+        )
+          return
+        await changeSubscriptionPlan(plan)
+        setMessage(t('settings.billingChanged'))
+        return
+      }
       const updated = await updateStable(stable.id, { plan })
       onChange(updated)
     } catch (err) {
       const { message, details } = err as { message: string; details?: string }
-      if (message.includes('plan_change_needs_schedule')) {
+      if (message.includes('plan_change_through_billing')) {
+        setError(t('settings.billingWebOnly'))
+      } else if (message.includes('plan_change_needs_schedule')) {
         setPlanning({ plan, signed: Number(details ?? 0) })
       } else if (message.includes('plan_change_scheduled')) {
         setError(t('settings.planChangeAlreadyPlanned'))
@@ -267,19 +321,74 @@ export function SubscriptionPanel({
         </div>
       )}
 
-      <div className="mt-6 rounded-2xl bg-forest/10 p-6">
-        <p className="text-sm text-slate-700">
-          {trialActive
-            ? t('settings.trialLastsUntil')
-            : t('settings.trialEnded')}
+      {overHorseLimit && !isTester && (
+        <p className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          {t('settings.billingOverLimit', { count: horseCount ?? 0 })}
         </p>
-        <p className="mt-1 text-3xl font-bold text-forest">
-          {formatDate(trialEnd.toISOString())}
-        </p>
-        <p className="mt-2 text-sm text-slate-600">
-          {trialActive ? t('settings.trialHint') : t('settings.trialEndedHint')}
-        </p>
-      </div>
+      )}
+
+      {isPaying && billing && (
+        <div className="mt-6 space-y-3 rounded-2xl bg-forest/10 p-6">
+          <p className="text-2xl font-bold text-forest">
+            {t(
+              billing.status === 'past_due'
+                ? 'settings.billingPastDue'
+                : 'settings.billingActive',
+            )}
+          </p>
+          {billing.current_period_end && (
+            <p className="text-sm text-slate-600">
+              {t(
+                billing.cancel_at_period_end
+                  ? 'settings.billingEndsOn'
+                  : 'settings.billingNextOn',
+                { date: formatDate(billing.current_period_end.slice(0, 10)) },
+              )}
+            </p>
+          )}
+          {Capacitor.isNativePlatform() ? (
+            <p className="text-sm text-slate-600">
+              {t('settings.billingWebOnly')}
+            </p>
+          ) : (
+            <button
+              type="button"
+              className="btn-ghost"
+              disabled={saving}
+              onClick={() => goToStripe(openSubscriptionPortal)}
+            >
+              {t('settings.billingManage')}
+            </button>
+          )}
+        </div>
+      )}
+
+      {!isPaying && isTester ? (
+        <div className="mt-6 rounded-2xl bg-forest/10 p-6">
+          <p className="text-2xl font-bold text-forest">
+            {t('settings.testerTitle')}
+          </p>
+          <p className="mt-2 text-sm text-slate-600">
+            {t('settings.testerHint')}
+          </p>
+        </div>
+      ) : isPaying ? null : (
+        <div className="mt-6 rounded-2xl bg-forest/10 p-6">
+          <p className="text-sm text-slate-700">
+            {trialActive
+              ? t('settings.trialLastsUntil')
+              : t('settings.trialEnded')}
+          </p>
+          <p className="mt-1 text-3xl font-bold text-forest">
+            {formatDate(trialEnd.toISOString())}
+          </p>
+          <p className="mt-2 text-sm text-slate-600">
+            {trialActive
+              ? t('settings.trialHint')
+              : t('settings.trialEndedHint')}
+          </p>
+        </div>
+      )}
 
       <div className="mt-6">
         <p className="field-label">{t('settings.planLabel')}</p>
@@ -321,6 +430,28 @@ export function SubscriptionPanel({
             )
           })}
         </div>
+        {canEdit && canBuy && (
+          <div className="mt-4 space-y-2">
+            <p className="text-sm text-slate-500">
+              {t('settings.billingBuyHint')}
+            </p>
+            <button
+              type="button"
+              className="btn-primary"
+              disabled={saving}
+              onClick={() =>
+                goToStripe(() => startSubscriptionCheckout(stable.plan))
+              }
+            >
+              {t('settings.billingBuy')}
+            </button>
+          </div>
+        )}
+        {canEdit && !isTester && !isPaying && Capacitor.isNativePlatform() && (
+          <p className="mt-4 text-sm text-slate-500">
+            {t('settings.billingWebOnly')}
+          </p>
+        )}
       </div>
     </div>
   )

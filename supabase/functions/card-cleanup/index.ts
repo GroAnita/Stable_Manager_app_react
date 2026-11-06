@@ -8,6 +8,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'npm:stripe@23.1.0'
 import { endCardAgreement, removeSavedCard } from '../_shared/endAgreement.ts'
 import { sendEmail } from '../_shared/sendEmail.ts'
+import { syncSubscriptionPlan } from '../_shared/subscription.ts'
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -173,6 +174,7 @@ Deno.serve(async (req) => {
         p_stable_id: account.stable_id,
       })
       if (finishError) throw finishError
+      await syncSubscriptionPlan(stripe, admin, account.stable_id)
       switched += 1
     } catch (error) {
       console.error('plan change failed:', error)

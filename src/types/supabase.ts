@@ -2448,6 +2448,23 @@ export type Database = {
           },
         ]
       }
+      stable_billing: {
+        Row: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          past_due_since: string | null
+          stable_id: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          trial_ends_at: string | null
+          updated_at: string
+        }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
       stable_payment_accounts: {
         Row: {
           addon_enabled: boolean
@@ -3146,6 +3163,18 @@ export type Database = {
           p_plan: Database["public"]["Enums"]["stable_plan"]
         }
         Returns: number
+      }
+      get_stable_billing_state: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          status: string
+          trial_ends_at: string | null
+          current_period_end: string | null
+          cancel_at_period_end: boolean
+          past_due_since: string | null
+          has_subscription: boolean
+          read_only: boolean
+        }[]
       }
       publish_feeding_rota: {
         Args: {

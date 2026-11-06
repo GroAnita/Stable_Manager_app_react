@@ -8,6 +8,7 @@ import {
 } from 'react-router-dom'
 import logoDark from '../assets/stalldrift-logo-dark.svg'
 import logoLight from '../assets/stalldrift-logo-light.svg'
+import { BillingBanner } from '../components/BillingBanner'
 import { EmergencyCallButton } from '../components/EmergencyCallButton'
 import { Icon, type IconName } from '../components/Icon'
 import { NotificationBell } from '../components/NotificationBell'
@@ -368,6 +369,11 @@ export default function AppLayout() {
             </div>
           </div>
         </header>
+        {profile?.stable_id &&
+          (profile.role === 'stable_owner' ||
+            profile.role === 'stable_employee') && (
+            <BillingBanner canManage={profile.role === 'stable_owner'} />
+          )}
         <main
           id="main-content"
           tabIndex={-1}
