@@ -107,3 +107,22 @@ export async function notifyPlanChange(): Promise<void> {
   const { error } = await supabase.functions.invoke('plan-change', { body: {} })
   if (error) throw await supabaseFunctionError(error)
 }
+
+export async function getCardSigningEnabled(
+  stableId: string,
+): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('stable_payment_accounts')
+    .select('card_signing_enabled')
+    .eq('stable_id', stableId)
+    .maybeSingle()
+  if (error) throw error
+  return data?.card_signing_enabled ?? false
+}
+
+export async function setCardSigningEnabled(enabled: boolean): Promise<void> {
+  const { error } = await supabase.rpc('set_card_signing_enabled', {
+    p_enabled: enabled,
+  })
+  if (error) throw error
+}

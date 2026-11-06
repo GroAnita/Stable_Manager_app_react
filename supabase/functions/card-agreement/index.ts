@@ -13,7 +13,11 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'npm:stripe@23.1.0'
 import { endCardAgreement } from '../_shared/endAgreement.ts'
 import { sendEmail } from '../_shared/sendEmail.ts'
-import { agreementAsText, buildAgreement } from './agreementText.ts'
+import {
+  AGREEMENT_VERSION,
+  agreementAsText,
+  buildAgreement,
+} from './agreementText.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -131,11 +135,16 @@ Deno.serve(async (req) => {
     if (agreementError) throw agreementError
     let agreementRow = openAgreement
 
+    // A draft of the agreement must never reach real customers, whatever the switch
+    // says, so with live keys it stays closed until the text is final.
+    const draftOnLive =
+      /^(sk|rk)_live_/.test(stripeKey) && /utkast/i.test(AGREEMENT_VERSION)
     const available = Boolean(
       paymentAccount?.addon_enabled &&
       paymentAccount.card_signing_enabled &&
       paymentAccount.charges_enabled &&
-      paymentAccount.stripe_account_id,
+      paymentAccount.stripe_account_id &&
+      !draftOnLive,
     )
     // A boarder must always be able to withdraw, even if signing was switched off.
     if (!available && !agreementRow?.activated_at) {

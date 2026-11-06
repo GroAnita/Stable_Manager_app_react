@@ -3167,6 +3167,10 @@ export type Database = {
         }
         Returns: number
       }
+      set_card_signing_enabled: {
+        Args: { p_enabled: boolean }
+        Returns: undefined
+      }
       set_card_agreement_paused: {
         Args: { p_contract_id: string; p_paused: boolean }
         Returns: undefined
