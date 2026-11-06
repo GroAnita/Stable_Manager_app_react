@@ -42,6 +42,7 @@ export type PaymentListItem = Pick<
   | 'dispute_opened_at'
   | 'credited_amount'
   | 'credited_after_payment'
+  | 'created_at'
 > & {
   owner: Pick<
     Database['public']['Tables']['owners']['Row'],
@@ -103,7 +104,7 @@ export async function listPayments(): Promise<PaymentListItem[]> {
   const { data, error } = await supabase
     .from('payments')
     .select(
-      `id, invoice_number, amount, due_date, paid_date, status, notes,
+      `id, invoice_number, amount, due_date, paid_date, status, notes, created_at,
        invoice_email_required, invoice_email_sent_at, invoice_email_sent_to,
        invoice_email_error, invoice_email_delivery_status, invoice_email_delivered_at,
        charge_status, charge_error, charged_at, charge_attempts,

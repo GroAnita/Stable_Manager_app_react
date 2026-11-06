@@ -19,6 +19,7 @@ import {
   listPriceListItems,
   type PriceListItem,
 } from '../features/priceList/api'
+import { AccountingPanel } from './reports/AccountingPanel'
 import { useAuth } from '../lib/AuthContext'
 import { useConfirm } from '../lib/ConfirmContext'
 import { usePreferences } from '../lib/PreferencesContext'
@@ -468,6 +469,11 @@ export default function Reports() {
             )}
           </div>
         </>
+      )}
+
+
+      {profile?.role === 'stable_owner' && (
+        <AccountingPanel from={from} to={to} payments={payments} />
       )}
 
       <Modal

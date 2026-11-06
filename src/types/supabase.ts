@@ -2115,7 +2115,15 @@ export type Database = {
         }
         Insert: never
         Update: never
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "invoice_lines_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       credit_note_lines: {
         Row: {
