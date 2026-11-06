@@ -431,6 +431,7 @@ export const no: typeof en = {
     yearsAbbrev: 'år',
   },
   horseDetail: {
+    backToHorses: 'Tilbake til hester',
     profile: 'Hesteprofil',
     edit: 'Rediger',
     deleteHorse: 'Slett hest',
@@ -665,6 +666,7 @@ export const no: typeof en = {
     failedToLoad: 'Kunne ikke laste eiere: {error}',
   },
   ownerDetail: {
+    backToOwners: 'Tilbake til eiere',
     profile: 'Eierprofil',
     edit: 'Rediger',
     deleteOwner: 'Slett eier',
@@ -939,6 +941,8 @@ export const no: typeof en = {
     chargeBoarderNotNotified: 'Hesteeieren kunne ikke varsles på e-post, så kortet kan ikke trekkes på nytt ennå.',
     chargeRetryFrom: 'Hesteeieren har fått beskjed. Kortet kan trekkes på nytt fra og med {date}.',
     chargeBlocked_paused: 'Trekk fra kortet til denne hesteeieren er satt på pause.',
+    chargeNoMoreRetries: 'Kortet er forsøkt trukket for mange ganger, så det trekkes ikke på nytt. Hesteeieren har fått beskjed om å betale på annen måte.',
+    chargeBlocked_too_many_failures: 'Kortet er forsøkt trukket for mange ganger for denne fakturaen. Den må betales på annen måte.',
     chargeBlocked_retry_not_notified: 'Hesteeieren er ikke varslet om et nytt forsøk, så kortet kan ikke trekkes på nytt.',
     chargeBlocked_retry_too_soon: 'Hesteeieren er varslet om et nytt forsøk på en senere dato. Det er for tidlig å trekke på nytt.',
     chargeBlocked_already_paid: 'Denne fakturaen er allerede betalt.',

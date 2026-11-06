@@ -130,6 +130,13 @@ export default function OwnerDetail() {
 
   return (
     <div className="page-shell">
+      <Link
+        to="/owners"
+        className="inline-flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-forest"
+      >
+        <Icon name="chevronLeft" className="h-4 w-4" />
+        {t('ownerDetail.backToOwners')}
+      </Link>
       <div className="page-header">
         <div>
           <p className="text-sm tracking-[0.25em] text-slate-400 uppercase">

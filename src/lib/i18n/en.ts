@@ -430,6 +430,7 @@ export const en = {
     yearsAbbrev: 'yrs',
   },
   horseDetail: {
+    backToHorses: 'Back to horses',
     profile: 'Horse profile',
     edit: 'Edit',
     deleteHorse: 'Delete horse',
@@ -664,6 +665,7 @@ export const en = {
     failedToLoad: 'Failed to load owners: {error}',
   },
   ownerDetail: {
+    backToOwners: 'Back to owners',
     profile: 'Owner profile',
     edit: 'Edit',
     deleteOwner: 'Delete owner',
@@ -938,6 +940,8 @@ export const en = {
     chargeBoarderNotNotified: 'The boarder could not be told by email, so the card cannot be charged again yet.',
     chargeRetryFrom: 'The boarder has been told. The card can be charged again from {date}.',
     chargeBlocked_paused: 'Charges to this boarder\'s card are paused.',
+    chargeNoMoreRetries: 'The card has failed too many times, so it won’t be tried again. The boarder has been told to pay another way.',
+    chargeBlocked_too_many_failures: 'The card has failed too many times for this invoice. It must be paid another way.',
     chargeBlocked_retry_not_notified: 'The boarder has not been told about a new attempt, so the card cannot be charged again.',
     chargeBlocked_retry_too_soon: 'The boarder was told about a new attempt on a later date. It is too early to charge again.',
     chargeBlocked_already_paid: 'This invoice is already paid.',

@@ -111,6 +111,13 @@ export default function HorseDetail() {
 
   return (
     <div className="page-shell">
+      <Link
+        to="/horses"
+        className="inline-flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-forest"
+      >
+        <Icon name="chevronLeft" className="h-4 w-4" />
+        {t('horseDetail.backToHorses')}
+      </Link>
       <div className="page-header">
         <div className="flex items-center gap-4">
           <HorseAvatar

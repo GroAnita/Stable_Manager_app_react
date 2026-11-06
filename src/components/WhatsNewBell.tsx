@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import {
   markWhatsNewSeen,
@@ -58,45 +59,52 @@ export function WhatsNewBell() {
           </span>
         )}
       </button>
-      {open && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-50 mt-2 w-80 max-w-[90vw] rounded-2xl border border-slate-200 bg-card p-3 shadow-card">
-            <p className="px-1 text-sm font-semibold text-slate-800">
-              {t('whatsNew.title')}
-            </p>
-            <div className="mt-2 max-h-96 space-y-2 overflow-y-auto">
-              {WHATS_NEW_ENTRIES.map((entry) => (
-                <div
-                  key={entry.id}
-                  className="rounded-xl bg-forest/5 px-3 py-2 text-sm"
-                >
-                  <p className="font-medium text-slate-800">
-                    {t(entry.titleKey)}
-                  </p>
-                  <p className="mt-0.5 text-xs text-slate-600">
-                    {t(entry.bodyKey)}
-                  </p>
-                  <div className="mt-1 flex items-center justify-between gap-2">
-                    <p className="text-xs text-slate-400">
-                      {formatDate(entry.date)}
+      {/* On the page itself, because the header's blur would otherwise position this
+          inside the header instead of on the screen. */}
+      {open &&
+        createPortal(
+          <>
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setOpen(false)}
+            />
+            <div className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-sm -translate-y-1/2 rounded-2xl border border-slate-200 bg-card p-3 shadow-card lg:inset-x-auto lg:top-20 lg:right-6 lg:mx-0 lg:w-80 lg:translate-y-0">
+              <p className="px-1 text-sm font-semibold text-slate-800">
+                {t('whatsNew.title')}
+              </p>
+              <div className="mt-2 max-h-[70vh] space-y-2 overflow-y-auto lg:max-h-96">
+                {WHATS_NEW_ENTRIES.map((entry) => (
+                  <div
+                    key={entry.id}
+                    className="rounded-xl bg-forest/5 px-3 py-2 text-sm"
+                  >
+                    <p className="font-medium text-slate-800">
+                      {t(entry.titleKey)}
                     </p>
-                    {entry.linkTo && (
-                      <Link
-                        to={entry.linkTo}
-                        onClick={() => setOpen(false)}
-                        className="text-xs font-medium text-forest hover:underline"
-                      >
-                        {t('whatsNew.goThere')}
-                      </Link>
-                    )}
+                    <p className="mt-0.5 text-xs text-slate-600">
+                      {t(entry.bodyKey)}
+                    </p>
+                    <div className="mt-1 flex items-center justify-between gap-2">
+                      <p className="text-xs text-slate-400">
+                        {formatDate(entry.date)}
+                      </p>
+                      {entry.linkTo && (
+                        <Link
+                          to={entry.linkTo}
+                          onClick={() => setOpen(false)}
+                          className="text-xs font-medium text-forest hover:underline"
+                        >
+                          {t('whatsNew.goThere')}
+                        </Link>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        </>
-      )}
+          </>,
+          document.body,
+        )}
     </div>
   )
 }
