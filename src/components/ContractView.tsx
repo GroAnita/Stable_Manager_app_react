@@ -11,6 +11,9 @@ import {
 import {
   beddingAmountIncVat,
   currentBillingCycleDays,
+  currentBillingPeriod,
+  scheduleDaysInPeriod,
+  serviceAmountIncVat,
   hayValueIncVat,
 } from '../lib/billing'
 import { usePreferences } from '../lib/PreferencesContext'
@@ -57,7 +60,41 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
   const hayValue = horseIsAway ? 0 : rawHayValue
   const beddingValue = horseIsAway ? 0 : rawBeddingValue
   const rent = horseIsAway ? (emptyBoxRate ?? 0) : contract.monthly_rent
-  const total = Math.round((rent + hayValue + beddingValue) * 100) / 100
+  const period = currentBillingPeriod()
+  const services = [
+    {
+      key: 'mucking',
+      label: t('contractForm.serviceMucking'),
+      schedule: contract.mucking_schedule,
+      item: contract.mucking_item,
+    },
+    {
+      key: 'turnout',
+      label: t('contractForm.serviceTurnout'),
+      schedule: contract.turnout_schedule,
+      item: contract.turnout_item,
+    },
+  ].map((service) => ({
+    ...service,
+    amount: horseIsAway
+      ? 0
+      : serviceAmountIncVat({
+          schedule: service.schedule,
+          price: service.item?.price,
+          unit: service.item?.unit,
+          ...period,
+          vatExempt: Boolean(service.item?.vat_exempt) || !vatRegistered,
+        }),
+    days: scheduleDaysInPeriod(service.schedule, period.startIso, period.endIso),
+  }))
+  const total =
+    Math.round(
+      (rent +
+        hayValue +
+        beddingValue +
+        services.reduce((sum, service) => sum + service.amount, 0)) *
+        100,
+    ) / 100
 
   return (
     <div className="space-y-6">
@@ -242,6 +279,26 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
               <span>{formatCurrency(beddingValue)}</span>
             </div>
           )}
+          {services
+            .filter((service) => service.amount > 0)
+            .map((service) => (
+              <div key={service.key} className="flex justify-between">
+                <span>
+                  {service.label} (
+                  {t(`contractForm.serviceSchedule_${service.schedule}`)})
+                  {service.item && (
+                    <span className="text-slate-400">
+                      {' '}
+                      — {service.item.item}
+                      {vatRegistered && service.item.vat_exempt
+                        ? ` (${t('common.vatExempt')})`
+                        : ''}
+                    </span>
+                  )}
+                </span>
+                <span>{formatCurrency(service.amount)}</span>
+              </div>
+            ))}
           <div className="mt-2 flex justify-between border-t border-slate-200 pt-2 font-semibold text-slate-900">
             <span>{t('contractForm.summaryTotal')}</span>
             <span>{formatCurrency(total)}</span>

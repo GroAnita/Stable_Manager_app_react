@@ -168,3 +168,71 @@ export function invoiceLineTotals(lines: InvoiceTotalsLine[]): {
       })),
   }
 }
+
+export const SERVICE_SCHEDULES = ['none', 'mon_fri', 'mon_sun', 'sat_sun']
+
+// Mirrors public.schedule_days_in_period.
+export function scheduleDaysInPeriod(
+  schedule: string,
+  startIso: string,
+  endIso: string,
+): number {
+  const end = Date.parse(`${endIso}T00:00:00Z`)
+  let count = 0
+  for (
+    let day = Date.parse(`${startIso}T00:00:00Z`);
+    day <= end;
+    day += 86400000
+  ) {
+    const weekday = new Date(day).getUTCDay()
+    if (
+      schedule === 'mon_sun' ||
+      (schedule === 'mon_fri' && weekday >= 1 && weekday <= 5) ||
+      (schedule === 'sat_sun' && (weekday === 0 || weekday === 6))
+    ) {
+      count += 1
+    }
+  }
+  return count
+}
+
+// Mirrors public.contract_service_amount, which decides what's actually invoiced.
+export function serviceAmountIncVat(input: {
+  schedule: string
+  price: number | null | undefined
+  unit: string | null | undefined
+  startIso: string
+  endIso: string
+  vatExempt: boolean
+}): number {
+  if (input.schedule === 'none' || input.price == null) return 0
+  const unit = (input.unit ?? '').toLowerCase()
+  const periodDays =
+    (Date.parse(`${input.endIso}T00:00:00Z`) -
+      Date.parse(`${input.startIso}T00:00:00Z`)) /
+      86400000 +
+    1
+  const net =
+    unit === 'per month'
+      ? input.price
+      : unit === 'per week'
+        ? (input.price * periodDays) / 7
+        : input.price *
+          scheduleDaysInPeriod(input.schedule, input.startIso, input.endIso)
+  const multiplier = input.vatExempt ? 1 : VAT_MULTIPLIER
+  return Math.round(net * multiplier * 100) / 100
+}
+
+// The cycle a due date on the 25th closes, from the 26th of the month before.
+export function billingCyclePeriod(dueDateIso: string): {
+  startIso: string
+  endIso: string
+} {
+  const [year, month] = dueDateIso.split('-').map(Number)
+  const start = new Date(Date.UTC(year, month - 2, 26))
+  return { startIso: start.toISOString().slice(0, 10), endIso: dueDateIso }
+}
+
+export function currentBillingPeriod(referenceDate = new Date()) {
+  return billingCyclePeriod(toIsoDate(currentBillingCycleDueDate(referenceDate)))
+}

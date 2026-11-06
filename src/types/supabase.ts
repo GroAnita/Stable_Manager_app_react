@@ -422,10 +422,14 @@ export type Database = {
           included_hay_kg: number | null
           included_services: string | null
           monthly_rent: number
+          mucking_price_list_item_id: string | null
+          mucking_schedule: string
           notes: string | null
           owner_id: string
           stable_id: string
           stall_id: string | null
+          turnout_price_list_item_id: string | null
+          turnout_schedule: string
           turnout_shelter_id: string | null
           start_date: string
           status: Database["public"]["Enums"]["contract_status"]
@@ -448,10 +452,14 @@ export type Database = {
           included_hay_kg?: number | null
           included_services?: string | null
           monthly_rent?: number
+          mucking_price_list_item_id?: string | null
+          mucking_schedule?: string
           notes?: string | null
           owner_id: string
           stable_id: string
           stall_id?: string | null
+          turnout_price_list_item_id?: string | null
+          turnout_schedule?: string
           turnout_shelter_id?: string | null
           start_date: string
           status?: Database["public"]["Enums"]["contract_status"]
@@ -474,16 +482,34 @@ export type Database = {
           included_hay_kg?: number | null
           included_services?: string | null
           monthly_rent?: number
+          mucking_price_list_item_id?: string | null
+          mucking_schedule?: string
           notes?: string | null
           owner_id?: string
           stable_id?: string
           stall_id?: string | null
+          turnout_price_list_item_id?: string | null
+          turnout_schedule?: string
           turnout_shelter_id?: string | null
           start_date?: string
           status?: Database["public"]["Enums"]["contract_status"]
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "contracts_mucking_price_list_item_id_fkey"
+            columns: ["mucking_price_list_item_id"]
+            isOneToOne: false
+            referencedRelation: "price_list_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_turnout_price_list_item_id_fkey"
+            columns: ["turnout_price_list_item_id"]
+            isOneToOne: false
+            referencedRelation: "price_list_items"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "contracts_bedding_price_list_item_id_fkey"
             columns: ["bedding_price_list_item_id"]

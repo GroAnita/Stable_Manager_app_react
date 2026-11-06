@@ -1,9 +1,11 @@
 import {
   amountIncVat,
+  billingCyclePeriod,
   billingCycleDueDate,
   beddingAmountIncVat,
   daysInBillingCycleFor,
   hayValueIncVat,
+  serviceAmountIncVat,
 } from '../../lib/billing'
 import { supabase } from '../../lib/supabaseClient'
 import type { Database } from '../../types/supabase'
@@ -578,6 +580,49 @@ export async function logFeedingExtra(params: {
       )
     }
 
+    // The monthly job skips a contract with an invoice, so this one bills the same.
+    const servicePeriod = billingCyclePeriod(dueDate)
+    const serviceCharges: { label: string; amount: number; exempt: boolean }[] =
+      []
+    for (const service of [
+      {
+        label: t('contractForm.serviceMucking'),
+        schedule: contract.mucking_schedule,
+        itemId: contract.mucking_price_list_item_id,
+      },
+      {
+        label: t('contractForm.serviceTurnout'),
+        schedule: contract.turnout_schedule,
+        itemId: contract.turnout_price_list_item_id,
+      },
+    ]) {
+      if (alreadyPaid || service.schedule === 'none' || !service.itemId) continue
+      const { data: serviceItem } = await supabase
+        .from('price_list_items')
+        .select('price, unit, vat_exempt')
+        .eq('id', service.itemId)
+        .maybeSingle()
+      const exempt = (serviceItem?.vat_exempt ?? false) || !vatRegistered
+      const serviceAmount = serviceAmountIncVat({
+        schedule: service.schedule,
+        price: serviceItem?.price,
+        unit: serviceItem?.unit,
+        ...servicePeriod,
+        vatExempt: exempt,
+      })
+      if (serviceAmount > 0) {
+        serviceCharges.push({
+          label: `${service.label} (${t(`contractForm.serviceSchedule_${service.schedule}`)})`,
+          amount: serviceAmount,
+          exempt,
+        })
+      }
+    }
+    const servicesTotal = serviceCharges.reduce(
+      (sum, service) => sum + service.amount,
+      0,
+    )
+
     const sequence = (await countPaymentsDueOn(dueDate)) + 1
     const boardLines: string[] = []
     if (baseRent)
@@ -609,12 +654,25 @@ export async function logFeedingExtra(params: {
         ),
       )
 
+    for (const service of serviceCharges) {
+      const vatNote = !vatRegistered
+        ? ''
+        : service.exempt
+          ? ` (${t('common.vatExempt').toLowerCase()})`
+          : ` (${t('contractForm.serviceInclVat')})`
+      boardLines.push(
+        `${service.label}${vatNote} — ${service.amount.toFixed(2)}`,
+      )
+    }
+
     const created = await createPayment({
       contract_id: contract.id,
       owner_id: contract.owner_id,
       stable_id: stableId,
       amount:
-        Math.round((baseRent + hayCharge + beddingCharge + amount) * 100) / 100,
+        Math.round(
+          (baseRent + hayCharge + beddingCharge + servicesTotal + amount) * 100,
+        ) / 100,
       due_date: dueDate,
       status: 'due',
       invoice_number: `INV-${dueDate.slice(0, 7).replace('-', '')}-${String(sequence).padStart(3, '0')}${alreadyPaid ? '-EXTRA' : ''}`,

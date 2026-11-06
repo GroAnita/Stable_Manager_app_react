@@ -1,11 +1,12 @@
 import { useVatRegistered } from '../lib/useVatRegistered'
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type FormEvent, Fragment } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   createContract,
   getContract,
   getEmptyBoxRate,
   listBeddingItems,
+  listServiceItems,
   listBoardingItems,
   listHayItems,
   updateContract,
@@ -18,6 +19,9 @@ import { getStable } from '../features/settings/api'
 import {
   beddingAmountIncVat,
   currentBillingCycleDays,
+  currentBillingPeriod,
+  SERVICE_SCHEDULES,
+  serviceAmountIncVat,
   hayValueIncVat,
 } from '../lib/billing'
 import { getBillingRules, type BillingRules } from '../features/payments/connect'
@@ -55,6 +59,10 @@ type FormState = {
   included_hay_kg: string
   bedding_price_list_item_id: string
   bedding_quantity: string
+  mucking_schedule: string
+  mucking_price_list_item_id: string
+  turnout_schedule: string
+  turnout_price_list_item_id: string
   additional_services: string
   notes: string
   contract_terms: string
@@ -78,6 +86,10 @@ const emptyForm: FormState = {
   included_hay_kg: '',
   bedding_price_list_item_id: '',
   bedding_quantity: '',
+  mucking_schedule: 'none',
+  mucking_price_list_item_id: '',
+  turnout_schedule: 'none',
+  turnout_price_list_item_id: '',
   additional_services: '',
   notes: '',
   contract_terms: '',
@@ -101,6 +113,8 @@ export default function ContractForm() {
   const [boardingItems, setBoardingItems] = useState<PriceListItemOption[]>([])
   const [hayItems, setHayItems] = useState<PriceListItemOption[]>([])
   const [beddingItems, setBeddingItems] = useState<PriceListItemOption[]>([])
+  const [muckingItems, setMuckingItems] = useState<PriceListItemOption[]>([])
+  const [turnoutItems, setTurnoutItems] = useState<PriceListItemOption[]>([])
   const [emptyBoxRate, setEmptyBoxRate] = useState<number | null>(null)
   const [loading, setLoading] = useState(isEdit)
   const [saving, setSaving] = useState(false)
@@ -154,6 +168,12 @@ export default function ContractForm() {
     listBeddingItems()
       .then(setBeddingItems)
       .catch((err: Error) => setError(err.message))
+    listServiceItems('Mucking')
+      .then(setMuckingItems)
+      .catch((err: Error) => setError(err.message))
+    listServiceItems('Turnout')
+      .then(setTurnoutItems)
+      .catch((err: Error) => setError(err.message))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -183,6 +203,10 @@ export default function ContractForm() {
           bedding_quantity: contract.bedding_quantity
             ? contract.bedding_quantity.toString()
             : '',
+          mucking_schedule: contract.mucking_schedule,
+          mucking_price_list_item_id: contract.mucking_price_list_item_id ?? '',
+          turnout_schedule: contract.turnout_schedule,
+          turnout_price_list_item_id: contract.turnout_price_list_item_id ?? '',
           additional_services: contract.additional_services ?? '',
           notes: contract.notes ?? '',
           contract_terms: contract.contract_terms ?? '',
@@ -260,8 +284,47 @@ export default function ContractForm() {
   const rent = horseIsAway
     ? (emptyBoxRate ?? 0)
     : Number(form.monthly_rent) || 0
+  const servicePeriod = currentBillingPeriod()
+  const serviceRows = (
+    [
+      {
+        key: 'mucking',
+        label: t('contractForm.serviceMucking'),
+        schedule: form.mucking_schedule,
+        itemId: form.mucking_price_list_item_id,
+        items: muckingItems,
+      },
+      {
+        key: 'turnout',
+        label: t('contractForm.serviceTurnout'),
+        schedule: form.turnout_schedule,
+        itemId: form.turnout_price_list_item_id,
+        items: turnoutItems,
+      },
+    ] as const
+  ).map((row) => {
+    const item = row.items.find((option) => option.id === row.itemId)
+    return {
+      ...row,
+      amount: horseIsAway
+        ? 0
+        : serviceAmountIncVat({
+            schedule: row.schedule,
+            price: item?.price,
+            unit: item?.unit,
+            ...servicePeriod,
+            vatExempt: Boolean(item?.vat_exempt) || !vatRegistered,
+          }),
+    }
+  })
   const total =
-    Math.round((rent + effectiveHayValue + effectiveBeddingAmount) * 100) / 100
+    Math.round(
+      (rent +
+        effectiveHayValue +
+        effectiveBeddingAmount +
+        serviceRows.reduce((sum, row) => sum + row.amount, 0)) *
+        100,
+    ) / 100
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -331,6 +394,16 @@ export default function ContractForm() {
         bedding_quantity: form.bedding_quantity
           ? Number(form.bedding_quantity)
           : 0,
+        mucking_schedule: form.mucking_schedule,
+        mucking_price_list_item_id:
+          form.mucking_schedule === 'none'
+            ? null
+            : form.mucking_price_list_item_id || null,
+        turnout_schedule: form.turnout_schedule,
+        turnout_price_list_item_id:
+          form.turnout_schedule === 'none'
+            ? null
+            : form.turnout_price_list_item_id || null,
         additional_services: form.additional_services || null,
         notes: form.notes || null,
         contract_terms: form.contract_terms || null,
@@ -770,6 +843,79 @@ export default function ContractForm() {
         </label>
         <div />
 
+        {serviceRows.map((row) => (
+          <Fragment key={row.key}>
+            <label>
+              <span className="field-label">{row.label}</span>
+              <select
+                className="field"
+                disabled={horseIsAway}
+                value={row.schedule}
+                onChange={(e) =>
+                  updateField(
+                    row.key === 'mucking'
+                      ? 'mucking_schedule'
+                      : 'turnout_schedule',
+                    e.target.value,
+                  )
+                }
+              >
+                {SERVICE_SCHEDULES.map((value) => (
+                  <option key={value} value={value}>
+                    {t(`contractForm.serviceSchedule_${value}`)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div>
+              <span className="field-label">
+                {t('contractForm.serviceItem')}
+              </span>
+              {row.items.length ? (
+                <select
+                  required={row.schedule !== 'none'}
+                  className="field"
+                  disabled={horseIsAway || row.schedule === 'none'}
+                  value={row.itemId}
+                  onChange={(e) =>
+                    updateField(
+                      row.key === 'mucking'
+                        ? 'mucking_price_list_item_id'
+                        : 'turnout_price_list_item_id',
+                      e.target.value,
+                    )
+                  }
+                >
+                  <option value="">
+                    {t('contractForm.selectServiceItem')}
+                  </option>
+                  {row.items.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.item}
+                      {item.unit ? ` (${unitLabel(t, item.unit)})` : ''}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <p className="field flex items-center text-sm text-slate-400">
+                  {t('contractForm.noServiceItems')}
+                </p>
+              )}
+              {row.amount > 0 && (
+                <span className="mt-1 block text-xs text-slate-400">
+                  {t(
+                    vatRegistered
+                      ? 'contractForm.serviceEstimateVat'
+                      : 'contractForm.serviceEstimate',
+                    { amount: formatCurrency(row.amount) },
+                  )}
+                </span>
+              )}
+            </div>
+            <div />
+          </Fragment>
+        ))}
+
         <label className="md:col-span-2 xl:col-span-3">
           <span className="field-label">
             {t('contractForm.additionalServices')}
@@ -839,6 +985,17 @@ export default function ContractForm() {
                 <span>{formatCurrency(effectiveBeddingAmount)}</span>
               </div>
             )}
+            {serviceRows
+              .filter((row) => row.amount > 0)
+              .map((row) => (
+                <div key={row.key} className="flex justify-between">
+                  <span>
+                    {row.label} (
+                    {t(`contractForm.serviceSchedule_${row.schedule}`)})
+                  </span>
+                  <span>{formatCurrency(row.amount)}</span>
+                </div>
+              ))}
             <div className="mt-2 flex justify-between border-t border-slate-200 pt-2 font-semibold text-slate-900">
               <span>{t('contractForm.summaryTotal')}</span>
               <span>{formatCurrency(total)}</span>

@@ -36,6 +36,7 @@ const EXTRA_CATEGORIES = [
   'Bedding',
   'Straw',
   'Mucking',
+  'Turnout',
   'Veterinary',
   'Farrier',
   'Other',

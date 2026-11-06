@@ -14,6 +14,8 @@ import {
 import {
   beddingAmountIncVat,
   currentBillingCycleDays,
+  currentBillingPeriod,
+  serviceAmountIncVat,
   hayValueIncVat,
 } from '../lib/billing'
 import { useConfirm } from '../lib/ConfirmContext'
@@ -51,7 +53,29 @@ function totalMonthlyPrice(
           contract.bedding_item.vat_exempt || !vatRegistered,
         )
       : 0
-  return Math.round((Number(contract.monthly_rent) + hay + bedding) * 100) / 100
+  const { startIso, endIso } = currentBillingPeriod()
+  const service = (
+    schedule: string,
+    item: ContractListItem['mucking_item'],
+  ) =>
+    serviceAmountIncVat({
+      schedule,
+      price: item?.price,
+      unit: item?.unit,
+      startIso,
+      endIso,
+      vatExempt: Boolean(item?.vat_exempt) || !vatRegistered,
+    })
+  return (
+    Math.round(
+      (Number(contract.monthly_rent) +
+        hay +
+        bedding +
+        service(contract.mucking_schedule, contract.mucking_item) +
+        service(contract.turnout_schedule, contract.turnout_item)) *
+        100,
+    ) / 100
+  )
 }
 
 export default function ContractList() {

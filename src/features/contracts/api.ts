@@ -19,6 +19,8 @@ export type ContractListItem = Pick<
   | 'start_date'
   | 'end_date'
   | 'status'
+  | 'mucking_schedule'
+  | 'turnout_schedule'
 > & {
   horse: Pick<
     Database['public']['Tables']['horses']['Row'],
@@ -35,6 +37,14 @@ export type ContractListItem = Pick<
   bedding_item: Pick<
     Database['public']['Tables']['price_list_items']['Row'],
     'price' | 'vat_exempt'
+  > | null
+  mucking_item: Pick<
+    Database['public']['Tables']['price_list_items']['Row'],
+    'price' | 'unit' | 'vat_exempt'
+  > | null
+  turnout_item: Pick<
+    Database['public']['Tables']['price_list_items']['Row'],
+    'price' | 'unit' | 'vat_exempt'
   > | null
 }
 
@@ -64,10 +74,13 @@ export async function listContracts(): Promise<ContractListItem[]> {
     .from('contracts')
     .select(
       `id, monthly_rent, included_hay_kg, bedding_quantity, start_date, end_date, status,
+       mucking_schedule, turnout_schedule,
        horse:horses(id, name, away),
        owner:owners(id, full_name),
        hay_item:price_list_items!contracts_hay_price_list_item_id_fkey(price, vat_exempt),
-       bedding_item:price_list_items!contracts_bedding_price_list_item_id_fkey(price, vat_exempt)`,
+       bedding_item:price_list_items!contracts_bedding_price_list_item_id_fkey(price, vat_exempt),
+       mucking_item:price_list_items!contracts_mucking_price_list_item_id_fkey(price, unit, vat_exempt),
+       turnout_item:price_list_items!contracts_turnout_price_list_item_id_fkey(price, unit, vat_exempt)`,
     )
     .order('end_date')
   if (error) throw error
@@ -117,6 +130,8 @@ export type ContractDetail = Contract & {
   boarding_item: PriceListItemOption | null
   hay_item: PriceListItemOption | null
   bedding_item: PriceListItemOption | null
+  mucking_item: PriceListItemOption | null
+  turnout_item: PriceListItemOption | null
   stable: Pick<
     Database['public']['Tables']['stables']['Row'],
     | 'name'
@@ -142,6 +157,8 @@ export async function getContractDetail(id: string): Promise<ContractDetail> {
        boarding_item:price_list_items!contracts_boarding_price_list_item_id_fkey(id, item, unit, price, vat_exempt),
        hay_item:price_list_items!contracts_hay_price_list_item_id_fkey(id, item, unit, price, vat_exempt),
        bedding_item:price_list_items!contracts_bedding_price_list_item_id_fkey(id, item, unit, price, vat_exempt),
+       mucking_item:price_list_items!contracts_mucking_price_list_item_id_fkey(id, item, unit, price, vat_exempt),
+       turnout_item:price_list_items!contracts_turnout_price_list_item_id_fkey(id, item, unit, price, vat_exempt),
        stable:stables(name, address, city, postal_code, phone, email, org_number, default_contract_terms)`,
     )
     .eq('id', id)
@@ -219,6 +236,18 @@ export async function listBeddingItems(): Promise<PriceListItemOption[]> {
     .from('price_list_items')
     .select('id, item, unit, price, vat_exempt')
     .in('category', ['Bedding', 'Straw'])
+    .order('item')
+  if (error) throw error
+  return data
+}
+
+export async function listServiceItems(
+  category: 'Mucking' | 'Turnout',
+): Promise<PriceListItemOption[]> {
+  const { data, error } = await supabase
+    .from('price_list_items')
+    .select('id, item, unit, price, vat_exempt')
+    .eq('category', category)
     .order('item')
   if (error) throw error
   return data

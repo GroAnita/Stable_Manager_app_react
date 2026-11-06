@@ -43,6 +43,7 @@ const CATEGORY_OPTIONS = [
   'Bedding',
   'Straw',
   'Mucking',
+  'Turnout',
   'Other',
 ]
 
