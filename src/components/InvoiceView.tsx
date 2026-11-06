@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Badge } from './Badge'
+import { CreditNoteView } from './CreditNoteView'
 import { Icon } from './Icon'
 import { Modal } from './Modal'
 import { getPaymentDetail, type PaymentDetail } from '../features/payments/api'
+import { listCreditNotes, type CreditNote } from '../features/payments/creditNotes'
 import {
   formatBankAccountNumber,
+  invoiceAmountDue,
   invoiceLineTotals,
   parseInvoiceLineItems,
 } from '../lib/billing'
@@ -176,6 +179,29 @@ export function InvoiceFields({ payment }: { payment: PaymentDetail }) {
                 {formatCurrency(payment.amount)}
               </td>
             </tr>
+            {Number(payment.credited_amount) > 0 && (
+              <>
+                <tr>
+                  <td colSpan={showVat ? 2 : 1} className="pt-1 text-slate-600">
+                    {t('invoice.credited')}
+                  </td>
+                  <td className="pt-1 text-right text-slate-600">
+                    −{formatCurrency(payment.credited_amount)}
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    colSpan={showVat ? 2 : 1}
+                    className="pt-1 font-semibold text-slate-900"
+                  >
+                    {t('invoice.amountDue')}
+                  </td>
+                  <td className="pt-1 text-right font-semibold text-slate-900">
+                    {formatCurrency(invoiceAmountDue(payment))}
+                  </td>
+                </tr>
+              </>
+            )}
           </tfoot>
         </table>
       ) : (
@@ -225,6 +251,9 @@ export function InvoiceFields({ payment }: { payment: PaymentDetail }) {
                 : t('invoice.paidByCard')}
             </p>
           )}
+          {payment.paymentMode === 'fullyCredited' && (
+            <p>{t('invoice.fullyCredited')}</p>
+          )}
           {payment.paymentMode === 'cardChargePlanned' && (
             <p>
               {t('invoice.cardChargePlanned', {
@@ -270,18 +299,21 @@ export function InvoiceView({
   paymentId: string | null
   onClose: () => void
 }) {
-  const { t } = usePreferences()
+  const { t, formatCurrency, formatDate } = usePreferences()
   const [payment, setPayment] = useState<PaymentDetail | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [creditNotes, setCreditNotes] = useState<CreditNote[]>([])
+  const [viewingCreditNote, setViewingCreditNote] = useState<string | null>(null)
   const loading = paymentId !== null && payment?.id !== paymentId && !error
 
   useEffect(() => {
     if (!paymentId) return
     let cancelled = false
-    getPaymentDetail(paymentId)
-      .then((data) => {
+    Promise.all([getPaymentDetail(paymentId), listCreditNotes(paymentId)])
+      .then(([data, notes]) => {
         if (!cancelled) {
           setPayment(data)
+          setCreditNotes(notes)
           setError(null)
         }
       })
@@ -328,11 +360,34 @@ export function InvoiceView({
               </button>
             </div>
             <InvoiceFields payment={payment} />
+            {creditNotes.length > 0 && (
+              <div className="mt-6 space-y-2 border-t border-slate-100 pt-4 text-sm">
+                <p className="font-medium text-slate-700">
+                  {t('creditNote.list')}
+                </p>
+                {creditNotes.map((note) => (
+                  <button
+                    key={note.id}
+                    type="button"
+                    className="block text-left text-forest hover:underline"
+                    onClick={() => setViewingCreditNote(note.id)}
+                  >
+                    {note.credit_note_number} · {formatDate(note.issued_on)} · −
+                    {formatCurrency(note.amount_gross)}
+                  </button>
+                ))}
+              </div>
+            )}
           </>
         )}
       </Modal>
 
-      {payment && payment.id === paymentId && (
+      <CreditNoteView
+        creditNoteId={viewingCreditNote}
+        onClose={() => setViewingCreditNote(null)}
+      />
+
+      {payment && payment.id === paymentId && !viewingCreditNote && (
         <div className="print-area hidden print:block">
           <InvoiceFields payment={payment} />
         </div>

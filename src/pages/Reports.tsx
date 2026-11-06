@@ -119,7 +119,7 @@ export default function Reports() {
     () =>
       payments
         .filter((p) => p.due_date >= from && p.due_date <= to)
-        .reduce((sum, p) => sum + p.amount, 0),
+        .reduce((sum, p) => sum + p.amount - (p.credited_amount ?? 0), 0),
     [payments, from, to],
   )
   const { collected, stripeFees, returned } = useMemo(

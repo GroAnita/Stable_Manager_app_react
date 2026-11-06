@@ -40,6 +40,8 @@ export type PaymentListItem = Pick<
   | 'dispute_lost_at'
   | 'dispute_fee'
   | 'dispute_opened_at'
+  | 'credited_amount'
+  | 'credited_after_payment'
 > & {
   owner: Pick<
     Database['public']['Tables']['owners']['Row'],
@@ -106,7 +108,8 @@ export async function listPayments(): Promise<PaymentListItem[]> {
        invoice_email_error, invoice_email_delivery_status, invoice_email_delivered_at,
        charge_status, charge_error, charged_at, charge_attempts,
        charge_failure_notified_attempt, charge_retry_not_before, charge_failure_count,
-       stripe_fee, stripe_net, refunded_amount, refunded_at, dispute_status, dispute_reason,
+       stripe_fee, stripe_net, refunded_amount, refunded_at, credited_amount, credited_after_payment,
+       dispute_status, dispute_reason,
        dispute_amount, dispute_evidence_due_by, dispute_lost_at, dispute_fee, dispute_opened_at,
        owner:owners(id, full_name),
        contract:contracts(id, horse:horses(id, name))`,
@@ -127,7 +130,11 @@ export async function markPaymentPaid(id: string): Promise<void> {
   if (error) throw error
 }
 
-export type InvoicePaymentMode = 'paidByCard' | 'cardChargePlanned' | 'manual'
+export type InvoicePaymentMode =
+  | 'paidByCard'
+  | 'cardChargePlanned'
+  | 'manual'
+  | 'fullyCredited'
 
 // What the invoice should tell the boarder about paying. Bank details stay unless
 // a card charge is really going to happen, so nobody is left without a way to pay.
@@ -136,10 +143,12 @@ export function invoicePaymentMode(input: {
   chargeStatus: string | null
   agreementActive: boolean
   agreementPaused: boolean
+  fullyCredited?: boolean
 }): InvoicePaymentMode {
   if (input.status === 'paid') {
     return input.chargeStatus === 'succeeded' ? 'paidByCard' : 'manual'
   }
+  if (input.fullyCredited) return 'fullyCredited'
   if (
     input.agreementActive &&
     !input.agreementPaused &&
@@ -218,6 +227,7 @@ export async function getPaymentDetail(id: string): Promise<PaymentDetail> {
       chargeStatus: data.charge_status,
       agreementActive: agreement !== null,
       agreementPaused: agreement?.paused_at != null,
+      fullyCredited: Number(data.amount) - Number(data.credited_amount) <= 0,
     }),
   }
 }

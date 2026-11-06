@@ -236,3 +236,15 @@ export function billingCyclePeriod(dueDateIso: string): {
 export function currentBillingPeriod(referenceDate = new Date()) {
   return billingCyclePeriod(toIsoDate(currentBillingCycleDueDate(referenceDate)))
 }
+
+// What's left to pay on an invoice after any credit notes.
+export function invoiceAmountDue(payment: {
+  amount: number
+  credited_amount?: number | null
+}): number {
+  return (
+    Math.round(
+      (Number(payment.amount) - Number(payment.credited_amount ?? 0)) * 100,
+    ) / 100
+  )
+}

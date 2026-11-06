@@ -1956,7 +1956,10 @@ export type Database = {
           charge_status: string | null
           charged_at: string | null
           contract_id: string
+          corrects_payment_id: string | null
           created_at: string
+          credited_after_payment: number
+          credited_amount: number
           due_date: string
           id: string
           invoice_email_delivered_at: string | null
@@ -1979,7 +1982,10 @@ export type Database = {
         Insert: {
           amount: number
           contract_id: string
+          corrects_payment_id?: string | null
           created_at?: string
+          credited_after_payment?: number
+          credited_amount?: number
           due_date: string
           id?: string
           invoice_email_delivered_at?: string | null
@@ -2023,7 +2029,10 @@ export type Database = {
         Update: {
           amount?: number
           contract_id?: string
+          corrects_payment_id?: string | null
           created_at?: string
+          credited_after_payment?: number
+          credited_amount?: number
           due_date?: string
           id?: string
           invoice_email_delivered_at?: string | null
@@ -2107,6 +2116,67 @@ export type Database = {
         Insert: never
         Update: never
         Relationships: []
+      }
+      credit_note_lines: {
+        Row: {
+          amount_gross: number
+          amount_net: number
+          credit_note_id: string
+          description: string
+          id: string
+          invoice_line_id: string
+          position: number
+          vat_amount: number
+          vat_code: string
+          vat_rate: number
+        }
+        Insert: never
+        Update: never
+        Relationships: [
+          {
+            foreignKeyName: "credit_note_lines_credit_note_id_fkey"
+            columns: ["credit_note_id"]
+            isOneToOne: false
+            referencedRelation: "credit_notes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      credit_notes: {
+        Row: {
+          amount_gross: number
+          amount_net: number
+          created_at: string
+          created_by: string | null
+          credit_note_number: string
+          email_sent_at: string | null
+          email_sent_to: string | null
+          id: string
+          invoice_was_paid: boolean
+          issued_on: string
+          payment_id: string
+          reason: string
+          stable_id: string
+          vat_amount: number
+        }
+        Insert: never
+        Update: never
+        Relationships: [
+          {
+            foreignKeyName: "credit_notes_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credit_notes_stable_id_fkey"
+            columns: ["stable_id"]
+            isOneToOne: false
+            referencedRelation: "stables"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       price_list_items: {
         Row: {
@@ -3002,6 +3072,22 @@ export type Database = {
       }
     }
     Functions: {
+      create_additional_invoice: {
+        Args: {
+          p_amount_gross: number
+          p_description: string
+          p_due_date: string
+          p_payment_id: string
+          p_period_end: string
+          p_period_start: string
+          p_vat_code: string
+        }
+        Returns: string
+      }
+      create_credit_note: {
+        Args: { p_lines: Json; p_payment_id: string; p_reason: string }
+        Returns: string
+      }
       publish_feeding_rota: {
         Args: {
           p_date_from: string

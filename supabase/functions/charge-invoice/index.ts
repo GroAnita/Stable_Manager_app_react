@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
     const { data: paymentRow, error: paymentError } = await admin
       .from('payments')
       .select(
-        `id, stable_id, contract_id, status, amount, due_date, invoice_number,
+        `id, stable_id, contract_id, status, amount, credited_amount, due_date, invoice_number,
          charge_status, charge_retry_not_before, charge_failure_count, charge_error, stripe_payment_intent_id, stripe_checkout_session_id,
          invoice_email_delivery_status, invoice_email_delivered_at, invoice_email_sent_to,
          owner:owners(email)`,
@@ -116,6 +116,10 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: 'Card payments are not active' }, 409)
     }
     const stripeAccount: string = paymentAccount.stripe_account_id
+    const amountDue =
+      Math.round(
+        (Number(payment.amount) - Number(payment.credited_amount ?? 0)) * 100,
+      ) / 100
     const stripe = new Stripe(stripeKey)
 
     async function reportIntent(intent: Stripe.PaymentIntent) {
@@ -195,7 +199,7 @@ Deno.serve(async (req) => {
       // A stuck claim is handled by claim_invoice_charge below.
       chargeStatus:
         payment.charge_status === 'processing' ? null : payment.charge_status,
-      amount: Number(payment.amount),
+      amount: amountDue,
       dueDate: payment.due_date,
       agreementActive: Boolean(agreement?.activated_at),
       hasCard: Boolean(
@@ -232,7 +236,7 @@ Deno.serve(async (req) => {
     try {
       intent = await stripe.paymentIntents.create(
         {
-          amount: toMinorUnits(Number(payment.amount)),
+          amount: toMinorUnits(amountDue),
           currency: 'nok',
           customer: agreement!.stripe_customer_id,
           payment_method: agreement!.stripe_payment_method_id,

@@ -19,7 +19,7 @@ export async function notifyChargeFailure(
     .select(
       `charge_status, charge_attempts, charge_failure_notified_attempt,
        charge_failure_count, charge_error,
-       amount, invoice_number,
+       amount, credited_amount, invoice_number,
        owner:owners(email),
        stable:stables(name, email, phone)`,
     )
@@ -53,7 +53,7 @@ export async function notifyChargeFailure(
 
   const email = buildChargeFailureEmail({
     invoiceNumber: row.invoice_number,
-    amount: Number(row.amount),
+    amount: Number(row.amount) - Number(row.credited_amount ?? 0),
     retryOn,
     stableEmail: row.stable?.email ?? null,
     stablePhone: row.stable?.phone ?? null,

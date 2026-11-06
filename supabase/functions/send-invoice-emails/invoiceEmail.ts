@@ -4,6 +4,8 @@
 export type InvoiceEmailInput = {
   invoiceNumber: string | null
   amount: number
+  // Taken off by credit notes before this email went out.
+  creditedAmount?: number
   dueDate: string
   notes: string | null
   ownerName: string | null
@@ -77,7 +79,10 @@ export function buildInvoiceEmail(input: InvoiceEmailInput): {
   text: string
 } {
   const lines = parseLines(input.notes, input.amount)
-  const total = formatKroner(input.amount)
+  const credited = input.creditedAmount ?? 0
+  const total = formatKroner(input.amount - credited)
+  const creditedLine =
+    credited > 0 ? `Kreditert: −${formatKroner(credited)}` : null
   const dueDate = formatDate(input.dueDate)
   const contact = [input.stableEmail, input.stablePhone]
     .filter(Boolean)
@@ -114,6 +119,7 @@ export function buildInvoiceEmail(input: InvoiceEmailInput): {
     '',
     ...lines.map((line) => `${line.description}: ${formatKroner(line.amount)}`),
     '',
+    ...(creditedLine ? [creditedLine] : []),
     `Å betale: ${total} (NOK)`,
     ...(vatLine ? [vatLine] : []),
     '',
@@ -136,6 +142,11 @@ export function buildInvoiceEmail(input: InvoiceEmailInput): {
     </tr>`,
       )
       .join('\n    ')}
+    ${
+      creditedLine
+        ? `<tr><td colspan="2" style="padding: 8px 0;">${escapeHtml(creditedLine)}</td></tr>`
+        : ''
+    }
     <tr>
       <td style="padding: 8px 0; font-weight: bold;">Å betale (NOK)</td>
       <td style="padding: 8px 0; font-weight: bold; text-align: right; white-space: nowrap;">${escapeHtml(total)}</td>

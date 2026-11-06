@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
     const { data: paymentRow, error: paymentError } = await admin
       .from('payments')
       .select(
-        `id, stable_id, contract_id, status, amount, invoice_number, charge_status,
+        `id, stable_id, contract_id, status, amount, credited_amount, invoice_number, charge_status,
          stripe_checkout_session_id,
          owner:owners(user_id, email),
          stable:stables(name)`,
@@ -152,7 +152,12 @@ Deno.serve(async (req) => {
     }
 
     // Stripe takes amounts in øre.
-    const amount = Math.round(Number(payment.amount) * 100)
+    const amount = Math.round(
+      (Number(payment.amount) - Number(payment.credited_amount ?? 0)) * 100,
+    )
+    if (amount <= 0) {
+      return jsonResponse({ error: 'The invoice is fully credited' }, 409)
+    }
     if (amount < 300) {
       return jsonResponse(
         { error: 'The amount is too low to pay by card' },

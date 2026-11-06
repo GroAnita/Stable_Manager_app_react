@@ -1,3 +1,4 @@
+import { invoiceAmountDue } from '../lib/billing'
 import { useCallback, useEffect, useState } from 'react'
 import { Browser } from '@capacitor/browser'
 import { Capacitor } from '@capacitor/core'
@@ -175,7 +176,16 @@ export default function MyContract() {
                   <tr key={payment.id}>
                     <td>{payment.invoice_number ?? '—'}</td>
                     <td>{formatDate(payment.due_date)}</td>
-                    <td>{formatCurrency(payment.amount)}</td>
+                    <td>
+                      {formatCurrency(payment.amount)}
+                      {payment.credited_amount > 0 && (
+                        <p className="mt-1 text-xs text-slate-500">
+                          {t('myContract.creditedAmount', {
+                            amount: formatCurrency(payment.credited_amount),
+                          })}
+                        </p>
+                      )}
+                    </td>
                     <td>
                       <Badge status={payment.status} />
                       {payment.refunded_amount > 0 && (
@@ -188,7 +198,8 @@ export default function MyContract() {
                     </td>
                     {canPay && (
                       <td>
-                        {payment.status !== 'paid' && (
+                        {payment.status !== 'paid' &&
+                          invoiceAmountDue(payment) > 0 && (
                           <button
                             type="button"
                             className="btn-secondary"

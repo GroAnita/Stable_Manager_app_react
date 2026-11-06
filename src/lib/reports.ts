@@ -67,6 +67,8 @@ type PaymentMoney = {
   stripe_fee: number | null
   refunded_amount: number
   refunded_at: string | null
+  credited_amount?: number
+  credited_after_payment?: number
   dispute_amount: number | null
   dispute_lost_at: string | null
   dispute_fee: number | null
@@ -88,7 +90,11 @@ export function paymentMoneyTotals(
   let returned = 0
   for (const payment of payments) {
     if (payment.status === 'paid' && inRange(payment.paid_date)) {
-      collected += payment.amount
+      // Only what was actually paid: anything credited first was never collected.
+      collected +=
+        payment.amount -
+        ((payment.credited_amount ?? 0) -
+          (payment.credited_after_payment ?? 0))
       stripeFees += payment.stripe_fee ?? 0
     }
     if (inRange(payment.dispute_opened_at)) {

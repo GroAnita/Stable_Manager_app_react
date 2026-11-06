@@ -10,6 +10,7 @@ export const NOTICE_DAYS = 7
 
 export type ChargeBlocker =
   | 'already_paid'
+  | 'fully_credited'
   | 'charge_in_progress'
   | 'no_agreement'
   | 'no_card'
@@ -26,6 +27,7 @@ export type ChargeBlocker =
 export type ChargeCheck = {
   status: string
   chargeStatus: string | null
+  // What's left to pay after any credit notes.
   amount: number
   dueDate: string
   agreementActive: boolean
@@ -52,6 +54,7 @@ function daysBetween(fromIso: string, toIso: string): number {
 
 export function chargeBlocker(check: ChargeCheck): ChargeBlocker | null {
   if (check.status === 'paid') return 'already_paid'
+  if (check.amount <= 0) return 'fully_credited'
   if (check.chargeStatus === 'processing') return 'charge_in_progress'
   if (check.chargeStatus === 'succeeded') return 'already_paid'
   if (!check.agreementActive) return 'no_agreement'

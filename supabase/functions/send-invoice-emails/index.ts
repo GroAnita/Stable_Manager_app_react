@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
   const { data: payments, error } = await admin
     .from('payments')
     .select(
-      `id, invoice_number, amount, due_date, notes,
+      `id, invoice_number, amount, credited_amount, due_date, notes,
        owner:owners(full_name, email),
        invoice_email_sent_to, invoice_email_delivery_status,
        contract:contracts(card_agreement_accepted_at, horse:horses(name)),
@@ -81,6 +81,9 @@ Deno.serve(async (req) => {
       ? (row.owner?.email ?? null)
       : (testRecipient ?? null)
 
+    // A fully credited invoice has nothing to notify about.
+    if (Number(row.amount) - Number(row.credited_amount ?? 0) <= 0) continue
+
     // After a failed delivery, only try again once the address has been changed.
     if (
       row.invoice_email_delivery_status &&
@@ -96,6 +99,7 @@ Deno.serve(async (req) => {
       const email = buildInvoiceEmail({
         invoiceNumber: row.invoice_number,
         amount: Number(row.amount),
+        creditedAmount: Number(row.credited_amount ?? 0),
         dueDate: row.due_date,
         notes: row.notes,
         ownerName: row.owner?.full_name ?? null,

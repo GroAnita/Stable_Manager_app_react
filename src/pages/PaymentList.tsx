@@ -1,3 +1,5 @@
+import { invoiceAmountDue } from '../lib/billing'
+import { CreditNotePanel } from './paymentList/CreditNotePanel'
 import { useEffect, useMemo, useState } from 'react'
 import { Badge } from '../components/Badge'
 import { Card } from '../components/Card'
@@ -182,6 +184,22 @@ export default function PaymentList() {
     }
   }
 
+  // A credit note changes what's left to pay, in the list and the open invoice.
+  function refreshPayments() {
+    Promise.all([listPayments(), getPaymentSummary()])
+      .then(([paymentsData, summaryData]) => {
+        setPayments(paymentsData)
+        setSummary(summaryData)
+        setSelected((current) =>
+          current
+            ? (paymentsData.find((payment) => payment.id === current.id) ??
+              current)
+            : current,
+        )
+      })
+      .catch((err: Error) => setError(err.message))
+  }
+
   async function handleTogglePause(contractId: string, paused: boolean) {
     setChargeMessage(null)
     try {
@@ -302,7 +320,16 @@ export default function PaymentList() {
                   <td>{payment.invoice_number ?? '—'}</td>
                   <td>{payment.contract?.horse?.name ?? '—'}</td>
                   <td>{payment.owner?.full_name ?? '—'}</td>
-                  <td>{formatCurrency(payment.amount)}</td>
+                  <td>
+                    {formatCurrency(payment.amount)}
+                    {payment.credited_amount > 0 && (
+                      <p className="mt-1 text-xs text-slate-500">
+                        {t('paymentList.creditedAmount', {
+                          amount: formatCurrency(payment.credited_amount),
+                        })}
+                      </p>
+                    )}
+                  </td>
                   <td>{formatDate(payment.due_date)}</td>
                   <td>
                     <Badge status={payment.status} />
@@ -344,7 +371,11 @@ export default function PaymentList() {
                       <span className="text-sm text-slate-400">
                         {t('common.settled')}
                       </span>
-                    ) : payment.charge_status === 'processing' ? null : (
+                    ) : payment.charge_status === 'processing' ? null : invoiceAmountDue(payment) <= 0 ? (
+                      <span className="text-sm text-slate-400">
+                        {t('paymentList.fullyCredited')}
+                      </span>
+                    ) : (
                       <button
                         type="button"
                         className="btn-ghost px-3 py-2"
@@ -530,6 +561,7 @@ export default function PaymentList() {
             <div className="flex flex-wrap gap-2 border-t border-slate-100 pt-3">
               {isStableOwner &&
                 selected.status !== 'paid' &&
+                invoiceAmountDue(selected) > 0 &&
                 selected.contract &&
                 cardContracts.has(selected.contract.id) &&
                 !cardContracts.get(selected.contract.id)?.paused && (
@@ -579,6 +611,12 @@ export default function PaymentList() {
                 {t('paymentList.viewInvoice')}
               </button>
             </div>
+            <CreditNotePanel
+              key={selected.id}
+              payment={selected}
+              canCreate={isStableOwner}
+              onChanged={refreshPayments}
+            />
           </div>
         )}
       </Modal>
