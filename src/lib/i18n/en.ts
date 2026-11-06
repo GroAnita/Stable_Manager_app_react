@@ -101,7 +101,10 @@ export const en = {
     setNewPasswordTitle: 'Set a new password',
     setNewPasswordSubtitle: 'Choose a new password for your account.',
     savePassword: 'Save password',
-    passwordUpdated: 'Password updated. You can now sign in.',
+    accountExists: 'This email already has an account, so no new password was created. Choose “Forgot password” below to create one.',
+    wrongLogin: 'Wrong email or password. If this is your first time, or you’ve forgotten it, choose “Forgot password” to create a new one.',
+    continueToApp: 'Continue',
+    passwordUpdated: 'Your password is saved, and you’re signed in.',
     invalidResetLink:
       'This reset link is invalid or has expired. Request a new one below.',
     marketingHeadline: 'Everything your stable needs, in one place',

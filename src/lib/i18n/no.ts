@@ -104,7 +104,10 @@ export const no: typeof en = {
     setNewPasswordTitle: 'Sett et nytt passord',
     setNewPasswordSubtitle: 'Velg et nytt passord for kontoen din.',
     savePassword: 'Lagre passord',
-    passwordUpdated: 'Passordet er oppdatert. Du kan nå logge inn.',
+    accountExists: 'Denne e-postadressen har allerede en konto, så det ble ikke laget et nytt passord. Velg «Glemt passord» under for å lage et passord.',
+    wrongLogin: 'Feil e-post eller passord. Er det første gang du logger inn, eller husker du det ikke? Velg «Glemt passord» for å lage et nytt.',
+    continueToApp: 'Gå videre',
+    passwordUpdated: 'Passordet er lagret, og du er logget inn.',
     invalidResetLink:
       'Denne lenken er ugyldig eller har utløpt. Be om en ny nedenfor.',
     marketingHeadline: 'Alt stallen din trenger, på ett sted',

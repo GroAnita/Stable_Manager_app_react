@@ -5,9 +5,11 @@ import logoDark from '../assets/stalldrift-logo-dark.svg'
 import { Icon, type IconName } from '../components/Icon'
 import {
   requestPasswordReset,
+  isWrongLoginError,
   signIn,
   signInWithGoogle,
   signUp,
+  signUpFoundExistingAccount,
 } from '../lib/authService'
 import { useAuth } from '../lib/AuthContext'
 import { usePreferences } from '../lib/PreferencesContext'
@@ -82,7 +84,10 @@ export default function Auth() {
         navigate('/dashboard')
       } else if (mode === 'signup') {
         const result = await signUp({ email, password, fullName })
-        if (result.session) {
+        if (signUpFoundExistingAccount(result)) {
+          setError(t('auth.accountExists'))
+          setMode('login')
+        } else if (result.session) {
           navigate('/dashboard')
         } else {
           setInfo(t('auth.confirmEmail'))
@@ -93,7 +98,9 @@ export default function Auth() {
         setInfo(t('auth.resetLinkSent'))
       }
     } catch (err) {
-      setError((err as Error).message)
+      setError(
+        isWrongLoginError(err) ? t('auth.wrongLogin') : (err as Error).message,
+      )
     } finally {
       setSubmitting(false)
     }
@@ -154,7 +161,11 @@ export default function Auth() {
           className="pointer-events-none absolute -right-16 -bottom-16 h-96 w-96 text-white/10"
         />
         <div className="relative flex w-full justify-center">
-          <img src={logoDark} alt={t('common.appName')} className="h-32 w-auto" />
+          <img
+            src={logoDark}
+            alt={t('common.appName')}
+            className="h-32 w-auto"
+          />
         </div>
         <div className="relative mt-10 max-w-md">
           <h1 className="text-3xl font-semibold text-white">
@@ -222,6 +233,9 @@ export default function Auth() {
                   <input
                     required
                     type={showPassword ? 'text' : 'password'}
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
                     minLength={6}
                     className="field pr-10"
                     value={password}
@@ -294,7 +308,11 @@ export default function Auth() {
                   disabled={googleSubmitting || submitting}
                   className="btn-ghost w-full"
                 >
-                  <svg className="h-4 w-4" viewBox="0 0 48 48" aria-hidden="true">
+                  <svg
+                    className="h-4 w-4"
+                    viewBox="0 0 48 48"
+                    aria-hidden="true"
+                  >
                     <path
                       fill="#FFC107"
                       d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"

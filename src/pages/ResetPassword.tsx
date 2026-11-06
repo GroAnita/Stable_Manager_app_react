@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Icon } from '../components/Icon'
-import { signOut, updatePassword } from '../lib/authService'
+import { updatePassword } from '../lib/authService'
 import { useAuth } from '../lib/AuthContext'
 import { usePreferences } from '../lib/PreferencesContext'
 
@@ -25,8 +25,9 @@ export default function ResetPassword() {
     setSubmitting(true)
     setError(null)
     try {
+      // Stays signed in: the link already proved who this is, and signing out again
+      // sends people invited by email to a login they've never used.
       await updatePassword(password)
-      await signOut()
       setDone(true)
     } catch (err) {
       setError((err as Error).message)
@@ -59,9 +60,16 @@ export default function ResetPassword() {
             <button
               type="button"
               className="btn-primary w-full"
-              onClick={() => navigate('/auth', { replace: true })}
+              onClick={() =>
+                navigate(
+                  sessionStorage.getItem('pendingInviteToken')
+                    ? `/invite/${sessionStorage.getItem('pendingInviteToken')}`
+                    : '/dashboard',
+                  { replace: true },
+                )
+              }
             >
-              {t('auth.backToSignIn')}
+              {t('auth.continueToApp')}
             </button>
           </div>
         ) : !session ? (
@@ -83,6 +91,9 @@ export default function ResetPassword() {
                 <input
                   required
                   type={showPassword ? 'text' : 'password'}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   minLength={6}
                   className="field pr-10"
                   value={password}
@@ -110,6 +121,9 @@ export default function ResetPassword() {
               <input
                 required
                 type={showPassword ? 'text' : 'password'}
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 minLength={6}
                 className="field"
                 value={confirmPassword}

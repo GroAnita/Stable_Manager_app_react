@@ -13,7 +13,7 @@ export async function signIn({
   password: string
 }) {
   const { data, error } = await supabase.auth.signInWithPassword({
-    email,
+    email: email.trim(),
     password,
   })
   if (error) throw error
@@ -30,12 +30,24 @@ export async function signUp({
   fullName: string
 }) {
   const { data, error } = await supabase.auth.signUp({
-    email,
+    email: email.trim(),
     password,
     options: { data: { full_name: fullName } },
   })
   if (error) throw error
   return data
+}
+
+// Supabase doesn't reveal that an email is taken: it answers as if the sign-up worked,
+// but sets no password, and the only sign is a user with no identities.
+export function signUpFoundExistingAccount(data: {
+  user: { identities?: unknown[] | null } | null
+}): boolean {
+  return data.user?.identities?.length === 0
+}
+
+export function isWrongLoginError(error: unknown): boolean {
+  return /invalid login credentials/i.test(String((error as Error)?.message))
 }
 
 export async function signInWithGoogle() {
@@ -69,7 +81,7 @@ export async function signOut() {
 }
 
 export async function requestPasswordReset(email: string) {
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+  const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
     redirectTo: `${webOrigin()}/reset-password`,
   })
   if (error) throw error
