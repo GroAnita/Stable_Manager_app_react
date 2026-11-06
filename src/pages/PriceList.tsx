@@ -28,6 +28,8 @@ const UNIT_OPTIONS = [
   'Other',
 ]
 
+const VAT_CODES = ['standard', 'exempt', 'none']
+
 const CATEGORY_OPTIONS = [
   'Boarding',
   'EmptyBox',
@@ -50,7 +52,7 @@ type FormState = {
   unit: string
   price: string
   notes: string
-  vat_exempt: boolean
+  vat_code: string
 }
 
 type AddDraft = {
@@ -64,7 +66,7 @@ const emptyForm: FormState = {
   unit: '',
   price: '',
   notes: '',
-  vat_exempt: false,
+  vat_code: 'standard',
 }
 
 function toFormState(item: PriceListItem): FormState {
@@ -74,7 +76,7 @@ function toFormState(item: PriceListItem): FormState {
     unit: item.unit ?? '',
     price: item.price.toString(),
     notes: item.notes ?? '',
-    vat_exempt: item.vat_exempt,
+    vat_code: item.vat_code,
   }
 }
 
@@ -162,20 +164,21 @@ function ItemFields({
         />
       </label>
       {vatRegistered && (
-        <label className="flex items-start gap-2">
-          <input
-            type="checkbox"
-            className="mt-1"
-            checked={form.vat_exempt}
-            onChange={(e) => onChange('vat_exempt', e.target.checked)}
-          />
-          <span>
-            <span className="block text-sm font-medium text-slate-700">
-              {t('priceList.vatExempt')}
-            </span>
-            <span className="block text-xs text-slate-400">
-              {t('priceList.vatExemptHint')}
-            </span>
+        <label>
+          <span className="field-label">{t('priceList.vatCode')}</span>
+          <select
+            className="field"
+            value={form.vat_code}
+            onChange={(e) => onChange('vat_code', e.target.value)}
+          >
+            {VAT_CODES.map((value) => (
+              <option key={value} value={value}>
+                {t(`priceList.vatCode_${value}`)}
+              </option>
+            ))}
+          </select>
+          <span className="mt-1 block text-xs text-slate-400">
+            {t('priceList.vatCodeHint')}
           </span>
         </label>
       )}
@@ -264,7 +267,7 @@ export default function PriceList() {
           unit: form.unit || null,
           price: Number(form.price) || 0,
           notes: form.notes || null,
-          vat_exempt: form.vat_exempt,
+          vat_code: form.vat_code,
           stable_id: stableId,
         })),
       )
@@ -302,7 +305,7 @@ export default function PriceList() {
         unit: editForm.unit || null,
         price: Number(editForm.price) || 0,
         notes: editForm.notes || null,
-        vat_exempt: editForm.vat_exempt,
+        vat_code: editForm.vat_code,
       })
       setEditing(null)
       refetch()
@@ -405,12 +408,12 @@ export default function PriceList() {
                   <td>{formatCurrency(item.price)}</td>
                   {vatRegistered && (
                     <td>
-                      {item.vat_exempt ? (
-                        <span className="text-emerald-600">
-                          {t('common.vatExempt')}
-                        </span>
-                      ) : (
+                      {item.vat_code === 'standard' ? (
                         formatCurrency(item.price * 1.25)
+                      ) : (
+                        <span className="text-emerald-600">
+                          {t(`priceList.vatCode_${item.vat_code}`)}
+                        </span>
                       )}
                     </td>
                   )}

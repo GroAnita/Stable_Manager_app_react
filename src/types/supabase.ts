@@ -2062,6 +2062,26 @@ export type Database = {
           },
         ]
       }
+      invoice_lines: {
+        Row: {
+          amount_gross: number
+          amount_net: number
+          created_at: string
+          description: string
+          id: string
+          payment_id: string
+          period_end: string | null
+          period_start: string | null
+          position: number
+          stable_id: string
+          vat_amount: number
+          vat_code: string
+          vat_rate: number
+        }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
       price_list_items: {
         Row: {
           category: string | null
@@ -2073,6 +2093,7 @@ export type Database = {
           stable_id: string
           unit: string | null
           updated_at: string
+          vat_code: string
           vat_exempt: boolean
         }
         Insert: {
@@ -2085,6 +2106,7 @@ export type Database = {
           stable_id: string
           unit?: string | null
           updated_at?: string
+          vat_code?: string
           vat_exempt?: boolean
         }
         Update: {
@@ -2097,6 +2119,7 @@ export type Database = {
           stable_id?: string
           unit?: string | null
           updated_at?: string
+          vat_code?: string
           vat_exempt?: boolean
         }
         Relationships: [

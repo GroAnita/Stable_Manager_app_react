@@ -129,3 +129,42 @@ export function formatBankAccountNumber(value: string): string {
   if (digits.length !== 11) return value
   return `${digits.slice(0, 4)}.${digits.slice(4, 6)}.${digits.slice(6)}`
 }
+
+export type InvoiceTotalsLine = {
+  amount_net: number
+  vat_amount: number
+  vat_rate: number
+}
+
+// Totals for an invoice's lines, with VAT per rate as the invoice has to show it.
+export function invoiceLineTotals(lines: InvoiceTotalsLine[]): {
+  net: number
+  vat: number
+  vatByRate: { rate: number; net: number; vat: number }[]
+} {
+  const toOre = (amount: number) => Math.round(Number(amount) * 100)
+  const byRate = new Map<number, { net: number; vat: number }>()
+  let net = 0
+  let vat = 0
+  for (const line of lines) {
+    const rate = Number(line.vat_rate)
+    const lineNet = toOre(line.amount_net)
+    const lineVat = toOre(line.vat_amount)
+    net += lineNet
+    vat += lineVat
+    const current = byRate.get(rate) ?? { net: 0, vat: 0 }
+    byRate.set(rate, { net: current.net + lineNet, vat: current.vat + lineVat })
+  }
+  return {
+    net: net / 100,
+    vat: vat / 100,
+    vatByRate: [...byRate.entries()]
+      .filter(([rate]) => rate > 0)
+      .sort(([a], [b]) => b - a)
+      .map(([rate, sums]) => ({
+        rate,
+        net: sums.net / 100,
+        vat: sums.vat / 100,
+      })),
+  }
+}

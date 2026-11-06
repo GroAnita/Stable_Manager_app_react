@@ -12,6 +12,9 @@ export type InvoiceEmailInput = {
   cardChargePlanned: boolean
   stableName: string
   stableOrgNumber: string | null
+  stableVatRegistered?: boolean
+  // VAT included in the amount, from the invoice's lines. Older invoices have none.
+  vatTotal?: number | null
   stableEmail: string | null
   stablePhone: string | null
 }
@@ -80,7 +83,7 @@ export function buildInvoiceEmail(input: InvoiceEmailInput): {
     .filter(Boolean)
     .join(' / ')
   const sender = input.stableOrgNumber
-    ? `${input.stableName} (org.nr. ${input.stableOrgNumber})`
+    ? `${input.stableName} (org.nr. ${input.stableOrgNumber}${input.stableVatRegistered ? ' MVA' : ''})`
     : input.stableName
   const invoiceLabel = input.invoiceNumber
     ? `Faktura ${input.invoiceNumber}`
@@ -88,6 +91,10 @@ export function buildInvoiceEmail(input: InvoiceEmailInput): {
   const complaint = contact
     ? `Hvis du mener fakturaen er feil, kontakt stallen: ${contact}.`
     : 'Hvis du mener fakturaen er feil, kontakt stallen.'
+  const vatLine =
+    input.stableVatRegistered && input.vatTotal
+      ? `Herav mva: ${formatKroner(input.vatTotal)}`
+      : null
   const dateLabel = input.cardChargePlanned
     ? 'Planlagt trekkdato'
     : 'Forfallsdato'
@@ -108,6 +115,7 @@ export function buildInvoiceEmail(input: InvoiceEmailInput): {
     ...lines.map((line) => `${line.description}: ${formatKroner(line.amount)}`),
     '',
     `Å betale: ${total} (NOK)`,
+    ...(vatLine ? [vatLine] : []),
     '',
     ...(chargeNote ? [chargeNote, ''] : []),
     complaint,
@@ -133,6 +141,7 @@ export function buildInvoiceEmail(input: InvoiceEmailInput): {
       <td style="padding: 8px 0; font-weight: bold; text-align: right; white-space: nowrap;">${escapeHtml(total)}</td>
     </tr>
   </table>
+  ${vatLine ? `<p style="color: #64748b;">${escapeHtml(vatLine)}</p>` : ''}
   ${chargeNote ? `<p>${escapeHtml(chargeNote)}</p>` : ''}
   <p style="color: #64748b; font-size: 14px;">${escapeHtml(complaint)}</p>
 </body>

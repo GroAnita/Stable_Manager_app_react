@@ -161,6 +161,7 @@ export type PaymentDetail = Payment & {
     id: string
     horse: Pick<Database['public']['Tables']['horses']['Row'], 'id' | 'name'> | null
   } | null
+  lines: Database['public']['Tables']['invoice_lines']['Row'][]
   stable: Pick<
     Database['public']['Tables']['stables']['Row'],
     | 'name'
@@ -202,8 +203,16 @@ export async function getPaymentDetail(id: string): Promise<PaymentDetail> {
     .maybeSingle()
   if (agreementError) throw agreementError
 
+  const { data: lines, error: linesError } = await supabase
+    .from('invoice_lines')
+    .select('*')
+    .eq('payment_id', id)
+    .order('position')
+  if (linesError) throw linesError
+
   return {
     ...data,
+    lines,
     paymentMode: invoicePaymentMode({
       status: data.status,
       chargeStatus: data.charge_status,

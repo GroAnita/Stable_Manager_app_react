@@ -56,7 +56,8 @@ Deno.serve(async (req) => {
        owner:owners(full_name, email),
        invoice_email_sent_to, invoice_email_delivery_status,
        contract:contracts(card_agreement_accepted_at, horse:horses(name)),
-       stable:stables(name, org_number, email, phone)`,
+       stable:stables(name, org_number, vat_registered, email, phone),
+       invoice_lines(vat_amount)`,
     )
     .eq('invoice_email_required', true)
     .or(
@@ -102,6 +103,14 @@ Deno.serve(async (req) => {
         cardChargePlanned: Boolean(row.contract?.card_agreement_accepted_at),
         stableName: row.stable?.name ?? 'Stallen',
         stableOrgNumber: row.stable?.org_number ?? null,
+        stableVatRegistered: Boolean(row.stable?.vat_registered),
+        vatTotal:
+          (row.invoice_lines ?? []).reduce(
+            // deno-lint-ignore no-explicit-any
+            (sum: number, line: any) =>
+              sum + Math.round(Number(line.vat_amount) * 100),
+            0,
+          ) / 100,
         stableEmail: row.stable?.email ?? null,
         stablePhone: row.stable?.phone ?? null,
       })

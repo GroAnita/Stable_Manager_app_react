@@ -5,6 +5,7 @@ import { Modal } from './Modal'
 import { getPaymentDetail, type PaymentDetail } from '../features/payments/api'
 import {
   formatBankAccountNumber,
+  invoiceLineTotals,
   parseInvoiceLineItems,
 } from '../lib/billing'
 import { usePreferences } from '../lib/PreferencesContext'
@@ -14,6 +15,9 @@ export function InvoiceFields({ payment }: { payment: PaymentDetail }) {
   const stable = payment.stable
   const owner = payment.owner
   const lineItems = parseInvoiceLineItems(payment.notes, payment.amount)
+  const lines = payment.lines
+  const showVat = lines.length > 0 && Boolean(stable?.vat_registered)
+  const totals = invoiceLineTotals(lines)
 
   return (
     <div className="space-y-6">
@@ -96,6 +100,85 @@ export function InvoiceFields({ payment }: { payment: PaymentDetail }) {
         </div>
       </div>
 
+      {lines.length > 0 ? (
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-slate-200 text-left text-slate-500">
+              <th className="py-2 font-medium">{t('invoice.description')}</th>
+              {showVat && (
+                <th className="py-2 text-right font-medium">
+                  {t('invoice.vat')}
+                </th>
+              )}
+              <th className="py-2 text-right font-medium">
+                {t('invoice.amount')}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {lines.map((line) => (
+              <tr key={line.id} className="border-b border-slate-100">
+                <td className="py-2 text-slate-700">
+                  {line.description}
+                  {line.period_start && line.period_end && (
+                    <span className="block text-xs text-slate-400">
+                      {line.period_start === line.period_end
+                        ? formatDate(line.period_start)
+                        : `${formatDate(line.period_start)} – ${formatDate(line.period_end)}`}
+                    </span>
+                  )}
+                </td>
+                {showVat && (
+                  <td className="py-2 text-right text-slate-500">
+                    {t(`invoice.vatCode_${line.vat_code}`)}
+                  </td>
+                )}
+                <td className="py-2 text-right text-slate-700">
+                  {formatCurrency(line.amount_gross)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            {showVat && (
+              <>
+                <tr>
+                  <td colSpan={2} className="pt-3 text-slate-600">
+                    {t('invoice.totalNet')}
+                  </td>
+                  <td className="pt-3 text-right text-slate-600">
+                    {formatCurrency(totals.net)}
+                  </td>
+                </tr>
+                {totals.vatByRate.map((row) => (
+                  <tr key={row.rate}>
+                    <td colSpan={2} className="pt-1 text-slate-600">
+                      {t('invoice.vatOfAmount', {
+                        rate: row.rate,
+                        amount: formatCurrency(row.net),
+                      })}
+                    </td>
+                    <td className="pt-1 text-right text-slate-600">
+                      {formatCurrency(row.vat)}
+                    </td>
+                  </tr>
+                ))}
+              </>
+            )}
+            <tr>
+              <td
+                colSpan={showVat ? 2 : 1}
+                className="pt-3 font-semibold text-slate-900"
+              >
+                {t('invoice.total')}
+              </td>
+              <td className="pt-3 text-right font-semibold text-slate-900">
+                {formatCurrency(payment.amount)}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      ) : (
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-slate-200 text-left text-slate-500">
@@ -126,6 +209,7 @@ export function InvoiceFields({ payment }: { payment: PaymentDetail }) {
           </tr>
         </tfoot>
       </table>
+      )}
 
       {stable && (
         <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">
