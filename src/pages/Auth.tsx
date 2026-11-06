@@ -30,6 +30,7 @@ export default function Auth() {
   const [mode, setMode] = useState<Mode>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -75,6 +76,11 @@ export default function Auth() {
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
+    if (mode === 'signup' && password !== confirmPassword) {
+      setError(t('auth.passwordsDontMatch'))
+      setInfo(null)
+      return
+    }
     setSubmitting(true)
     setError(null)
     setInfo(null)
@@ -257,6 +263,22 @@ export default function Auth() {
                     />
                   </button>
                 </div>
+              </label>
+            )}
+            {mode === 'signup' && (
+              <label>
+                <span className="field-label">{t('auth.confirmPassword')}</span>
+                <input
+                  required
+                  type={showPassword ? 'text' : 'password'}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  minLength={6}
+                  className="field"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
               </label>
             )}
             {mode === 'login' && (
