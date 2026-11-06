@@ -66,6 +66,9 @@ Deno.serve(async (req) => {
       .maybeSingle()
     if (billingError) throw billingError
     if (!billing) return jsonResponse({ ignored: true })
+    // Testers can't subscribe, so this can only be an old subscription, and it mustn't
+    // take away a free account.
+    if (billing.status === 'tester') return jsonResponse({ ignored: true })
     // A newer subscription has taken over from this old one.
     if (
       billing.stripe_subscription_id &&

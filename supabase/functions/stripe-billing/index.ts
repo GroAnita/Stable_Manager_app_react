@@ -187,6 +187,9 @@ Deno.serve(async (req) => {
       customer: customerId,
       locale: 'nb',
       allowed_payment_method_types: ['card'],
+      // Nestun Digital is the seller, so Stripe's Managed Payments stays off even
+      // though it's on by default for the account.
+      managed_payments: { enabled: false },
       line_items: [
         { quantity: 1, price: await ensurePrice(stripe, admin, planRow.key) },
       ],
