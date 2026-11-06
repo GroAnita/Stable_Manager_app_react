@@ -2,7 +2,7 @@
 // specific is filled in from the stable, boarder and contract. Change VERSION
 // whenever the wording changes, because each acceptance is stored with it.
 
-export const AGREEMENT_VERSION = '1.1-utkast, 6. november 2026'
+export const AGREEMENT_VERSION = '1.1, 6. november 2026'
 
 export type AgreementFields = {
   stableName: string
