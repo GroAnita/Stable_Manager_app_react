@@ -1600,6 +1600,8 @@ export const en = {
     billingBankAccountHint: '11 digits. Spaces are removed when you save.',
     billingPaymentTermsDays: 'Payment terms (days)',
     billingFooterText: 'Text at the bottom of the invoice',
+    billingPrivacyUrl: 'Link to the stable’s privacy statement',
+    billingPrivacyUrlHint: 'Shown in the card agreement. Without a link, it says the horse owner can get it by contacting the stable.',
     billingSave: 'Save invoice settings',
     comingSoon: 'Coming soon',
     comingSoonHint:

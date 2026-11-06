@@ -2544,6 +2544,7 @@ export type Database = {
           phone: string | null
           plan: Database["public"]["Enums"]["stable_plan"]
           postal_code: string | null
+          privacy_policy_url: string | null
           stable_type: Database["public"]["Enums"]["stable_type"]
           stripe_customer_id: string | null
           updated_at: string
@@ -2568,6 +2569,7 @@ export type Database = {
           phone?: string | null
           plan?: Database["public"]["Enums"]["stable_plan"]
           postal_code?: string | null
+          privacy_policy_url?: string | null
           stable_type?: Database["public"]["Enums"]["stable_type"]
           stripe_customer_id?: string | null
           updated_at?: string
@@ -2592,6 +2594,7 @@ export type Database = {
           phone?: string | null
           plan?: Database["public"]["Enums"]["stable_plan"]
           postal_code?: string | null
+          privacy_policy_url?: string | null
           stable_type?: Database["public"]["Enums"]["stable_type"]
           stripe_customer_id?: string | null
           updated_at?: string
@@ -3309,6 +3312,7 @@ export type Database = {
           phone: string | null
           plan: Database["public"]["Enums"]["stable_plan"]
           postal_code: string | null
+          privacy_policy_url: string | null
           stable_type: Database["public"]["Enums"]["stable_type"]
           stripe_customer_id: string | null
           updated_at: string

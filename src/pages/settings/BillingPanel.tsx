@@ -17,6 +17,7 @@ type FormState = {
   bank_account_number: string
   payment_terms_days: string
   invoice_footer_text: string
+  privacy_policy_url: string
 }
 
 function toFormState(stable: Stable): FormState {
@@ -33,6 +34,7 @@ function toFormState(stable: Stable): FormState {
     bank_account_number: stable.bank_account_number ?? '',
     payment_terms_days: String(stable.payment_terms_days),
     invoice_footer_text: stable.invoice_footer_text ?? '',
+    privacy_policy_url: stable.privacy_policy_url ?? '',
   }
 }
 
@@ -121,6 +123,7 @@ export function BillingPanel({
           ? paymentTermsDays
           : 14,
         invoice_footer_text: form.invoice_footer_text || null,
+        privacy_policy_url: form.privacy_policy_url.trim() || null,
       })
       onChange(updated)
       setForm(toFormState(updated))
@@ -350,6 +353,21 @@ export function BillingPanel({
           value={form.invoice_footer_text}
           onChange={(e) => updateField('invoice_footer_text', e.target.value)}
         />
+      </label>
+
+      <label className="mt-5 block">
+        <span className="field-label">{t('settings.billingPrivacyUrl')}</span>
+        <input
+          type="url"
+          disabled={!canEdit}
+          className="field"
+          placeholder="https://"
+          value={form.privacy_policy_url}
+          onChange={(e) => updateField('privacy_policy_url', e.target.value)}
+        />
+        <span className="mt-1 block text-xs text-slate-400">
+          {t('settings.billingPrivacyUrlHint')}
+        </span>
       </label>
 
       {canEdit && (

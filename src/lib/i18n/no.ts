@@ -1599,6 +1599,8 @@ export const no: typeof en = {
     billingBankAccountHint: '11 sifre. Mellomrom fjernes når du lagrer.',
     billingPaymentTermsDays: 'Betalingsbetingelser (dager)',
     billingFooterText: 'Tekst nederst på fakturaen',
+    billingPrivacyUrl: 'Lenke til stallens personvernerklæring',
+    billingPrivacyUrlHint: 'Vises i kortavtalen. Uten lenke står det at hesteeieren får den ved å kontakte stallen.',
     billingSave: 'Lagre fakturainnstillinger',
     comingSoon: 'Kommer snart',
     comingSoonHint:

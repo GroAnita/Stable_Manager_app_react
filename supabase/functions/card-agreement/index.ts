@@ -92,7 +92,7 @@ Deno.serve(async (req) => {
         `id, stable_id, owner_id, status, start_date, charge_day,
          owner:owners(id, user_id, full_name, email),
          horse:horses(name),
-         stable:stables(name, org_number, email, phone)`,
+         stable:stables(name, org_number, email, phone, privacy_policy_url)`,
       )
       .eq('id', contractId)
       .maybeSingle()
@@ -390,6 +390,10 @@ Hvis du ikke har byttet kort selv, ta kontakt med stallen med en gang${stableEma
       horseName: row.horse?.name ?? '',
       contractStartDate: row.start_date,
       chargeDay,
+      today: new Date().toLocaleDateString('sv-SE', {
+        timeZone: 'Europe/Oslo',
+      }),
+      stablePrivacyPolicyUrl: row.stable?.privacy_policy_url ?? null,
     })
     // Invoices are the notice this agreement promises, so an address is required.
     const missingEmail = !ownerEmail
