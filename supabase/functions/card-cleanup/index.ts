@@ -111,5 +111,82 @@ Deno.serve(async (req) => {
     }
   }
 
-  return jsonResponse({ ended, removed, failed })
+  // Stables moving to a plan without card payments today. Anything that fails is
+  // shown to the stable owner and tried again the next night.
+  const today = new Date().toLocaleDateString('sv-SE', {
+    timeZone: 'Europe/Oslo',
+  })
+  const { data: switching, error: switchingError } = await admin
+    .from('stable_payment_accounts')
+    .select(
+      'stable_id, stripe_account_id, scheduled_plan_on, stable:stables(name, email)',
+    )
+    .in('plan_change_status', ['scheduled', 'failed'])
+    .lte('scheduled_plan_on', today)
+  if (switchingError)
+    return jsonResponse({ error: switchingError.message }, 500)
+
+  let switched = 0
+  // deno-lint-ignore no-explicit-any
+  for (const account of (switching ?? []) as any[]) {
+    try {
+      const { data: charging, error: chargingError } = await admin
+        .from('payments')
+        .select('id')
+        .eq('stable_id', account.stable_id)
+        .eq('charge_status', 'processing')
+        .limit(1)
+      if (chargingError) throw chargingError
+      if (charging?.length) throw new Error('charge_in_progress')
+
+      const { data: agreements, error: agreementsError } = await admin
+        .from('card_agreements')
+        .select(
+          `id, contract_id, stripe_payment_method_id, pending_card_session_id, activated_at,
+           contract:contracts(owner:owners(email), horse:horses(name))`,
+        )
+        .eq('stable_id', account.stable_id)
+        .is('withdrawn_at', null)
+      if (agreementsError) throw agreementsError
+
+      // deno-lint-ignore no-explicit-any
+      for (const agreement of (agreements ?? []) as any[]) {
+        await endCardAgreement(
+          stripe,
+          admin,
+          agreement,
+          account.stripe_account_id ?? undefined,
+          null,
+        )
+        if (agreement.activated_at) {
+          await sendEmail({
+            to: agreement.contract?.owner?.email ?? null,
+            stableName: account.stable?.name ?? '',
+            replyTo: account.stable?.email ?? null,
+            subject: `Automatisk betaling til ${account.stable?.name ?? 'stallen'} er avsluttet`,
+            text: `Stallen bruker ikke lenger kortbetaling gjennom Stalldrift, så automatisk betaling for ${agreement.contract?.horse?.name ?? 'hesten din'} er avsluttet, og kortet ditt blir ikke trukket mer. Stallplassen fortsetter som før. Du får en siste faktura for overgangen, og fakturaene betales nå på den måten som står på dem.`,
+          })
+        }
+      }
+
+      const { error: finishError } = await admin.rpc('finish_plan_change', {
+        p_stable_id: account.stable_id,
+      })
+      if (finishError) throw finishError
+      switched += 1
+    } catch (error) {
+      console.error('plan change failed:', error)
+      const { error: saveError } = await admin
+        .from('stable_payment_accounts')
+        .update({
+          plan_change_status: 'failed',
+          plan_change_error: (error as Error).message ?? 'plan_change_failed',
+        })
+        .eq('stable_id', account.stable_id)
+      if (saveError)
+        console.error('saving plan change failure failed:', saveError)
+    }
+  }
+
+  return jsonResponse({ ended, removed, failed, switched })
 })

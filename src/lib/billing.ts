@@ -248,3 +248,17 @@ export function invoiceAmountDue(payment: {
     ) / 100
   )
 }
+
+// The 1st of a month at least 8 days ahead, so boarders get notice of a plan change.
+export function planChangeDates(todayIso: string, count = 3): string[] {
+  const [year, month, day] = todayIso.split('-').map(Number)
+  const earliest = Date.UTC(year, month - 1, day + 8)
+  const dates: string[] = []
+  for (let offset = 1; dates.length < count; offset += 1) {
+    const candidate = Date.UTC(year, month - 1 + offset, 1)
+    if (candidate >= earliest) {
+      dates.push(new Date(candidate).toISOString().slice(0, 10))
+    }
+  }
+  return dates
+}

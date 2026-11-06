@@ -1,3 +1,4 @@
+import type { Database } from '../../types/supabase'
 import { supabaseFunctionError } from '../../lib/supabaseFunctionError'
 import { supabase } from '../../lib/supabaseClient'
 import { webOrigin } from '../../lib/platform'
@@ -61,4 +62,48 @@ export async function startStripeOnboarding(): Promise<string> {
   if (error) throw await supabaseFunctionError(error)
   if (!data) throw new Error('Empty response from stripe-connect')
   return data.url
+}
+
+export type PlanChange = {
+  scheduled_plan: string | null
+  scheduled_plan_on: string | null
+  plan_change_status: string | null
+  plan_change_error: string | null
+}
+
+export async function getPlanChange(
+  stableId: string,
+): Promise<PlanChange | null> {
+  const { data, error } = await supabase
+    .from('stable_payment_accounts')
+    .select(
+      'scheduled_plan, scheduled_plan_on, plan_change_status, plan_change_error',
+    )
+    .eq('stable_id', stableId)
+    .maybeSingle()
+  if (error) throw error
+  return data
+}
+
+export async function schedulePlanChange(
+  plan: Database['public']['Enums']['stable_plan'],
+  on: string,
+): Promise<number> {
+  const { data, error } = await supabase.rpc('schedule_plan_change', {
+    p_plan: plan,
+    p_on: on,
+  })
+  if (error) throw error
+  return data
+}
+
+export async function cancelPlanChange(): Promise<void> {
+  const { error } = await supabase.rpc('cancel_plan_change')
+  if (error) throw error
+}
+
+// Tells boarders with automatic payment about the plan, or that it's off again.
+export async function notifyPlanChange(): Promise<void> {
+  const { error } = await supabase.functions.invoke('plan-change', { body: {} })
+  if (error) throw await supabaseFunctionError(error)
 }

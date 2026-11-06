@@ -2456,6 +2456,11 @@ export type Database = {
           charges_enabled: boolean
           created_at: string
           payouts_enabled: boolean
+          plan_change_completed_at: string | null
+          plan_change_error: string | null
+          plan_change_status: string | null
+          scheduled_plan: Database["public"]["Enums"]["stable_plan"] | null
+          scheduled_plan_on: string | null
           stable_id: string
           stripe_account_id: string | null
           updated_at: string
@@ -2467,6 +2472,11 @@ export type Database = {
           charges_enabled?: boolean
           created_at?: string
           payouts_enabled?: boolean
+          plan_change_completed_at?: string | null
+          plan_change_error?: string | null
+          plan_change_status?: string | null
+          scheduled_plan?: Database["public"]["Enums"]["stable_plan"] | null
+          scheduled_plan_on?: string | null
           stable_id: string
           stripe_account_id?: string | null
           updated_at?: string
@@ -2478,6 +2488,11 @@ export type Database = {
           charges_enabled?: boolean
           created_at?: string
           payouts_enabled?: boolean
+          plan_change_completed_at?: string | null
+          plan_change_error?: string | null
+          plan_change_status?: string | null
+          scheduled_plan?: Database["public"]["Enums"]["stable_plan"] | null
+          scheduled_plan_on?: string | null
           stable_id?: string
           stripe_account_id?: string | null
           updated_at?: string
@@ -3120,6 +3135,17 @@ export type Database = {
       give_contract_notice: {
         Args: { p_contract_id: string; p_end_date?: string | null }
         Returns: string
+      }
+      cancel_plan_change: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      schedule_plan_change: {
+        Args: {
+          p_on: string
+          p_plan: Database["public"]["Enums"]["stable_plan"]
+        }
+        Returns: number
       }
       publish_feeding_rota: {
         Args: {

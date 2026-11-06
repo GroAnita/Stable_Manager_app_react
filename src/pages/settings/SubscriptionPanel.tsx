@@ -6,6 +6,15 @@ import {
   type Stable,
   type SubscriptionPlan,
 } from '../../features/settings/api'
+import {
+  cancelPlanChange,
+  getPlanChange,
+  notifyPlanChange,
+  schedulePlanChange,
+  type PlanChange,
+} from '../../features/payments/connect'
+import { planChangeDates } from '../../lib/billing'
+import { useConfirm } from '../../lib/ConfirmContext'
 import { usePreferences } from '../../lib/PreferencesContext'
 import { supabase } from '../../lib/supabaseClient'
 
@@ -50,6 +59,17 @@ export function SubscriptionPanel({
   const [horseCount, setHorseCount] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const confirm = useConfirm()
+  const [planChange, setPlanChange] = useState<PlanChange | null>(null)
+  const [planning, setPlanning] = useState<{
+    plan: Stable['plan']
+    signed: number
+  } | null>(null)
+  const switchDates = planChangeDates(
+    new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' }),
+  )
+  const [switchDate, setSwitchDate] = useState(switchDates[0])
+  const [message, setMessage] = useState<string | null>(null)
 
   useEffect(() => {
     listSubscriptionPlans()
@@ -60,9 +80,69 @@ export function SubscriptionPanel({
       .select('*', { count: 'exact', head: true })
       .eq('active', true)
       .then(({ count }) => setHorseCount(count ?? 0))
-  }, [])
+    if (canEdit) {
+      getPlanChange(stable.id)
+        .then(setPlanChange)
+        .catch((err: Error) => setError(err.message))
+    }
+  }, [canEdit, stable.id])
 
   const { trialEnd, trialActive } = getTrialStatus(stable.created_at)
+
+  async function handleSchedule() {
+    if (!planning) return
+    if (
+      !(await confirm(
+        t('settings.planChangeConfirm', {
+          count: planning.signed,
+          date: formatDate(switchDate),
+        }),
+        { confirmLabel: t('settings.planChangeSchedule') },
+      ))
+    )
+      return
+    setSaving(true)
+    setError(null)
+    setMessage(null)
+    try {
+      await schedulePlanChange(planning.plan, switchDate)
+      setPlanning(null)
+      setPlanChange(await getPlanChange(stable.id))
+      await notifyPlanChange()
+      setMessage(t('settings.planChangeScheduled'))
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleCancelSchedule() {
+    if (
+      !(await confirm(t('settings.planChangeCancelConfirm'), {
+        confirmLabel: t('settings.planChangeCancel'),
+      }))
+    )
+      return
+    setSaving(true)
+    setError(null)
+    setMessage(null)
+    try {
+      await cancelPlanChange()
+      setPlanChange(await getPlanChange(stable.id))
+      await notifyPlanChange()
+      setMessage(t('settings.planChangeCancelled'))
+    } catch (err) {
+      const text = (err as Error).message
+      setError(
+        text.includes('plan_change_too_late')
+          ? t('settings.planChangeTooLate')
+          : text,
+      )
+    } finally {
+      setSaving(false)
+    }
+  }
 
   // A stable already on a hidden plan still sees the plan it's on.
   const shownPlans = plans.filter(
@@ -78,8 +158,10 @@ export function SubscriptionPanel({
       onChange(updated)
     } catch (err) {
       const { message, details } = err as { message: string; details?: string }
-      if (message.includes('plan_has_card_agreements')) {
-        setError(t('settings.planHasAgreements', { count: details ?? '' }))
+      if (message.includes('plan_change_needs_schedule')) {
+        setPlanning({ plan, signed: Number(details ?? 0) })
+      } else if (message.includes('plan_change_scheduled')) {
+        setError(t('settings.planChangeAlreadyPlanned'))
       } else if (message.includes('plan_not_available')) {
         setError(t('settings.planNotAvailable'))
       } else {
@@ -110,6 +192,79 @@ export function SubscriptionPanel({
         <p role="alert" className="mt-4 text-sm text-red-600">
           {error}
         </p>
+      )}
+
+      {message && <p className="mt-4 text-sm text-forest">{message}</p>}
+
+      {planChange?.plan_change_status === 'scheduled' &&
+        planChange.scheduled_plan_on && (
+          <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+            <p className="font-medium">
+              {t('settings.planChangePlanned', {
+                date: formatDate(planChange.scheduled_plan_on),
+              })}
+            </p>
+            <p className="mt-1">{t('settings.planChangePlannedHint')}</p>
+            <button
+              type="button"
+              className="btn-ghost mt-3"
+              disabled={saving}
+              onClick={handleCancelSchedule}
+            >
+              {t('settings.planChangeCancel')}
+            </button>
+          </div>
+        )}
+
+      {planChange?.plan_change_status === 'failed' && (
+        <p
+          role="alert"
+          className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-600"
+        >
+          {t('settings.planChangeFailed')}
+        </p>
+      )}
+
+      {planning && (
+        <div className="mt-4 space-y-3 rounded-2xl border border-slate-200 p-4 text-sm">
+          <p className="font-medium text-slate-900">
+            {t('settings.planChangeTitle')}
+          </p>
+          <p className="text-slate-600">
+            {t('settings.planChangeHint', { count: planning.signed })}
+          </p>
+          <label className="block max-w-xs">
+            <span className="field-label">{t('settings.planChangeDate')}</span>
+            <select
+              className="field"
+              value={switchDate}
+              onChange={(e) => setSwitchDate(e.target.value)}
+            >
+              {switchDates.map((date) => (
+                <option key={date} value={date}>
+                  {formatDate(date)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="btn-primary"
+              disabled={saving}
+              onClick={handleSchedule}
+            >
+              {t('settings.planChangeSchedule')}
+            </button>
+            <button
+              type="button"
+              className="btn-ghost"
+              onClick={() => setPlanning(null)}
+            >
+              {t('common.cancel')}
+            </button>
+          </div>
+        </div>
       )}
 
       <div className="mt-6 rounded-2xl bg-forest/10 p-6">
