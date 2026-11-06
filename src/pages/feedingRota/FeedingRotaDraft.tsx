@@ -10,6 +10,7 @@ import {
   listShiftTypes,
   publishFeedingRota,
   reassignShift,
+  removeFeedingRota,
   type OwnerHorseCount,
   type OwnerUnavailability,
   type ShiftType,
@@ -48,6 +49,8 @@ export function FeedingRotaDraft({
   const [message, setMessage] = useState<string | null>(null)
   const [excluded, setExcluded] = useState<string[]>([])
   const [weeks, setWeeks] = useState(6)
+  // Separate from weeks so the box can be empty while someone is typing.
+  const [weeksText, setWeeksText] = useState('6')
   const [rotaDays, setRotaDays] = useState<RotaDayOption>('monSun')
   const [startDate, setStartDate] = useState(() =>
     nextMonday(new Date().toISOString().slice(0, 10)),
@@ -64,6 +67,9 @@ export function FeedingRotaDraft({
   } | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [publishing, setPublishing] = useState(false)
+  const [removableCount, setRemovableCount] = useState(0)
+  const [removeOpen, setRemoveOpen] = useState(false)
+  const [removing, setRemoving] = useState(false)
   const [reloadCount, setReloadCount] = useState(0)
 
   useEffect(() => {
@@ -116,6 +122,16 @@ export function FeedingRotaDraft({
                 },
               ]
         })
+        const today = new Date().toISOString().slice(0, 10)
+        setRemovableCount(
+          live.filter(
+            (shift) =>
+              shift.date >= today &&
+              !shift.completed_at &&
+              !shift.let_out_at &&
+              !shift.let_in_at,
+          ).length,
+        )
         setPublished(slots)
         setPublishedNames(
           new Map(
@@ -162,17 +178,20 @@ export function FeedingRotaDraft({
   const pickedSlot = picking && pickedDay?.slots[picking.slot]
 
   function handleDistribute() {
-    setMessage(null)
-    setDays(
-      buildFeedingRotaDraft({
-        owners: included,
-        startDate,
-        weeks,
-        slotCount: shiftTypes.length,
-        rotaDays,
-        unavailability,
-        published,
-      }),
+    const next = buildFeedingRotaDraft({
+      owners: included,
+      startDate,
+      weeks,
+      slotCount: shiftTypes.length,
+      rotaDays,
+      unavailability,
+      published,
+    })
+    setDays(next)
+    setMessage(
+      unpublishedSlots(next).length === 0
+        ? t('feedingRotaDraft.allPublished')
+        : null,
     )
   }
 
@@ -228,6 +247,32 @@ export function FeedingRotaDraft({
     }
   }
 
+  async function handleRemove() {
+    setRemoving(true)
+    setError(null)
+    try {
+      const removed = await removeFeedingRota({
+        dateFrom: startDate,
+        dateTo: rotaEndDate(startDate, weeks),
+        noticeTitle: t('feedingRotaDraft.removeNoticeTitle'),
+        noticeMessage: t('feedingRotaDraft.removeNoticeMessage'),
+      })
+      setMessage(t('feedingRotaDraft.removed', { count: removed }))
+      setReloadCount((count) => count + 1)
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setRemoveOpen(false)
+      setRemoving(false)
+    }
+  }
+
+  function handleWeeksChange(text: string) {
+    setWeeksText(text)
+    const value = Number(text)
+    if (Number.isInteger(value) && value >= 1 && value <= 12) setWeeks(value)
+  }
+
   return (
     <div className="panel space-y-6 p-6">
       <div>
@@ -251,10 +296,9 @@ export function FeedingRotaDraft({
             min={1}
             max={12}
             className="field"
-            value={weeks}
-            onChange={(e) =>
-              setWeeks(Math.min(12, Math.max(1, Number(e.target.value) || 1)))
-            }
+            value={weeksText}
+            onChange={(e) => handleWeeksChange(e.target.value)}
+            onBlur={() => setWeeksText(String(weeks))}
           />
         </label>
         <label>
@@ -364,6 +408,15 @@ export function FeedingRotaDraft({
         >
           {t('feedingRotaDraft.publish')}
         </button>
+        {removableCount > 0 && (
+          <button
+            type="button"
+            className="btn-ghost text-red-600"
+            onClick={() => setRemoveOpen(true)}
+          >
+            {t('feedingRotaDraft.remove')}
+          </button>
+        )}
         {message && <p className="text-sm text-forest">{message}</p>}
       </div>
 
@@ -518,6 +571,19 @@ export function FeedingRotaDraft({
         }
         onConfirm={handlePublish}
         onCancel={() => setConfirmOpen(false)}
+      />
+
+      <ConfirmDialog
+        open={removeOpen}
+        title={t('feedingRotaDraft.remove')}
+        message={t('feedingRotaDraft.removeConfirm', { count: removableCount })}
+        confirmLabel={
+          removing
+            ? t('feedingRotaDraft.removing')
+            : t('feedingRotaDraft.remove')
+        }
+        onConfirm={handleRemove}
+        onCancel={() => setRemoveOpen(false)}
       />
     </div>
   )

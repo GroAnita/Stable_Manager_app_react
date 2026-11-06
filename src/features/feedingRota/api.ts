@@ -573,3 +573,19 @@ export async function publishFeedingRota(input: {
   if (error) throw error
   return data
 }
+
+export async function removeFeedingRota(input: {
+  dateFrom: string
+  dateTo: string
+  noticeTitle: string
+  noticeMessage: string
+}): Promise<number> {
+  const { data, error } = await supabase.rpc('remove_feeding_rota', {
+    p_date_from: input.dateFrom,
+    p_date_to: input.dateTo,
+    p_notice_title: input.noticeTitle,
+    p_notice_message: input.noticeMessage,
+  })
+  if (error) throw error
+  return data
+}

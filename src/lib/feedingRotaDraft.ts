@@ -54,10 +54,13 @@ export function rotaEndDate(startDate: string, weeks: number): string {
   return addDays(startDate, weeks * 7 - 1)
 }
 
-// Shares feedings out in proportion to how many horses each owner has. Each feeding
-// goes to whoever is furthest behind their share, avoiding anyone already feeding
-// that day unless there's no one else. Published shifts stay as they are and count
-// towards each owner's share. With planNew off, only published shifts are returned.
+// Shares feedings out in proportion to how many horses each owner has, and evenly
+// across the feeding times, so nobody gets only mornings. Each feeding goes to
+// whoever is furthest behind on both, with a little chance added so each rota comes
+// out different. Nobody feeds twice in a day unless their share of the horses needs
+// it, or there's no one else. Published shifts stay as they are and count towards
+// each owner's share.
+// With planNew off, only published shifts are returned.
 export function buildFeedingRotaDraft(input: {
   owners: DraftOwner[]
   startDate: string
@@ -67,22 +70,32 @@ export function buildFeedingRotaDraft(input: {
   unavailability?: DraftUnavailability[]
   published?: PublishedSlot[]
   planNew?: boolean
+  random?: () => number
 }): DraftDay[] {
   const owners = input.owners.filter((owner) => owner.horses > 0)
   const unavailability = input.unavailability ?? []
   const published = input.published ?? []
   const planNew = input.planNew ?? true
+  const random = input.random ?? Math.random
   const weekdays = ROTA_DAY_OPTIONS[input.rotaDays ?? 'monSun']
   const counts = new Map(owners.map((owner) => [owner.id, 0]))
-  const lastUsed = new Map(owners.map((owner) => [owner.id, -1]))
+  const totalHorses = owners.reduce((sum, owner) => sum + owner.horses, 0)
+  const dailyLimit = (owner: DraftOwner) =>
+    Math.ceil((input.slotCount * owner.horses) / totalHorses)
+  const slotCounts = new Map(
+    owners.map((owner) => [owner.id, Array<number>(input.slotCount).fill(0)]),
+  )
+  function countFeeding(ownerId: string, slot: number) {
+    const perSlot = slotCounts.get(ownerId)
+    if (!perSlot) return
+    counts.set(ownerId, (counts.get(ownerId) ?? 0) + 1)
+    perSlot[slot] += 1
+  }
   for (const shift of published) {
-    if (shift.ownerId && counts.has(shift.ownerId)) {
-      counts.set(shift.ownerId, (counts.get(shift.ownerId) ?? 0) + 1)
-    }
+    if (shift.ownerId) countFeeding(shift.ownerId, shift.slot)
   }
 
   const days: DraftDay[] = []
-  let slotNumber = 0
 
   for (let dayIndex = 0; dayIndex < input.weeks * 7; dayIndex++) {
     const date = addDays(input.startDate, dayIndex)
@@ -103,51 +116,55 @@ export function buildFeedingRotaDraft(input: {
     const today = lockedToday.flatMap((shift) =>
       shift.ownerId ? [shift.ownerId] : [],
     )
-    const slots: (DraftSlot | null)[] = []
+    const slots: (DraftSlot | null)[] = Array(input.slotCount).fill(null)
 
-    for (let slot = 0; slot < input.slotCount; slot++) {
+    // Filled in a random order, because whichever feeding goes first would otherwise
+    // keep getting the owners with the most horses.
+    const fillOrder = Array.from({ length: input.slotCount }, (_, slot) => slot)
+    for (let i = fillOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1))
+      ;[fillOrder[i], fillOrder[j]] = [fillOrder[j], fillOrder[i]]
+    }
+
+    for (const slot of fillOrder) {
       const locked = lockedToday.find((shift) => shift.slot === slot)
       if (locked) {
-        slots.push({
+        slots[slot] = {
           ownerId: locked.ownerId,
           shiftId: locked.shiftId,
           completed: locked.completed,
-        })
+        }
         continue
       }
-      if (!chosen) {
-        slots.push(null)
-        continue
-      }
+      if (!chosen) continue
 
-      const notToday = free.filter((owner) => !today.includes(owner.id))
-      const candidates = notToday.length > 0 ? notToday : free
+      const withinLimit = free.filter(
+        (owner) =>
+          today.filter((id) => id === owner.id).length < dailyLimit(owner),
+      )
+      const candidates = withinLimit.length > 0 ? withinLimit : free
       let picked: DraftOwner | null = null
       let pickedScore = Infinity
       for (const owner of candidates) {
-        const score = ((counts.get(owner.id) ?? 0) + 1) / owner.horses
-        const tied = Math.abs(score - pickedScore) < 1e-9
-        if (
-          !picked ||
-          (!tied && score < pickedScore) ||
-          (tied &&
-            (lastUsed.get(owner.id) ?? -1) < (lastUsed.get(picked.id) ?? -1))
-        ) {
+        const total = counts.get(owner.id) ?? 0
+        const atThisTime = slotCounts.get(owner.id)?.[slot] ?? 0
+        const score =
+          (total + 1 + input.slotCount * (atThisTime + 1) + random()) /
+          owner.horses
+        if (score < pickedScore) {
           picked = owner
           pickedScore = score
         }
       }
       if (picked) {
-        counts.set(picked.id, (counts.get(picked.id) ?? 0) + 1)
-        lastUsed.set(picked.id, slotNumber)
+        countFeeding(picked.id, slot)
         today.push(picked.id)
       }
-      slots.push({
+      slots[slot] = {
         ownerId: picked?.id ?? null,
         shiftId: null,
         completed: false,
-      })
-      slotNumber++
+      }
     }
     days.push({ date, week: Math.floor(dayIndex / 7), slots })
   }
