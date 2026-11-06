@@ -186,6 +186,19 @@ export function SubscriptionPanel({
 
   async function handleSelect(plan: Stable['plan']) {
     if (!canEdit || plan === stable.plan || saving) return
+    const target = plans.find((other) => other.key === plan)
+    // Card payments start when the stable has paid, so this goes straight to Stripe.
+    if (target?.includes_payments && canBuy) {
+      if (
+        await confirm(
+          t('settings.billingPaymentPlanConfirm', { name: target.name }),
+          { confirmLabel: t('settings.billingBuy') },
+        )
+      ) {
+        await goToStripe(() => startSubscriptionCheckout(plan))
+      }
+      return
+    }
     setSaving(true)
     setError(null)
     try {
@@ -210,7 +223,9 @@ export function SubscriptionPanel({
       onChange(updated)
     } catch (err) {
       const { message, details } = err as { message: string; details?: string }
-      if (message.includes('plan_change_through_billing')) {
+      if (message.includes('payment_plan_needs_subscription')) {
+        setError(t('settings.billingPaymentPlanNeedsSubscription'))
+      } else if (message.includes('plan_change_through_billing')) {
         setError(t('settings.billingWebOnly'))
       } else if (message.includes('plan_change_needs_schedule')) {
         setPlanning({ plan, signed: Number(details ?? 0) })

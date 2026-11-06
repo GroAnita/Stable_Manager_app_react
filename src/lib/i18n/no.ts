@@ -1546,6 +1546,8 @@ export const no: typeof en = {
     testerTitle: 'Testkonto',
     testerHint: 'Du tester Stalldrift, så det er gratis og uten sluttdato. Vi sier fra i god tid hvis dette endres.',
     billingBuy: 'Start abonnement',
+    billingPaymentPlanConfirm: 'Kortbetaling krever et aktivt abonnement. Starter du {name}, er prøveperioden over, og du betaler fra i dag. Kortbetaling åpnes når betalingen har gått gjennom.',
+    billingPaymentPlanNeedsSubscription: 'Kortbetaling krever et aktivt abonnement. Velg det på ndstalldrift.no, eller kontakt Stalldrift hvis du er testkunde.',
     billingBuyHint: 'Velg abonnement over, og betal på Stripes side. Du belastes ikke før prøveperioden er over.',
     billingActive: 'Abonnementet er aktivt',
     billingPastDue: 'Betalingen feilet',

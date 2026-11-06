@@ -1546,6 +1546,8 @@ export const en = {
     testerTitle: 'Test account',
     testerHint: 'You’re testing Stalldrift, so it’s free with no end date. We’ll tell you in good time if this changes.',
     billingBuy: 'Start subscription',
+    billingPaymentPlanConfirm: 'Card payments need an active subscription. If you start {name}, your trial ends and you pay from today. Card payments open when the payment has gone through.',
+    billingPaymentPlanNeedsSubscription: 'Card payments need an active subscription. Choose it at ndstalldrift.no, or contact Stalldrift if you’re a test customer.',
     billingBuyHint: 'Choose a plan above, and pay on Stripe’s page. You aren’t charged until the trial is over.',
     billingActive: 'Your subscription is active',
     billingPastDue: 'The payment failed',

@@ -148,6 +148,10 @@ Deno.serve(async (req) => {
         ],
         metadata: { ...subscription.metadata, plan: planRow.key },
         proration_behavior: 'create_prorations',
+        // Card payments need a stable that has paid, so moving to them ends a trial.
+        ...(planRow.includes_payments && subscription.status === 'trialing'
+          ? { trial_end: 'now' as const }
+          : {}),
       })
       return jsonResponse({ changed: true })
     }
@@ -180,7 +184,10 @@ Deno.serve(async (req) => {
       if (saveError) throw saveError
     }
 
-    const trialEnd = trialEndForCheckout(billing.trial_ends_at, Date.now())
+    // Card payments need a stable that has paid, so they end the trial today.
+    const trialEnd = planRow.includes_payments
+      ? null
+      : trialEndForCheckout(billing.trial_ends_at, Date.now())
     const metadata = { stable_id: stableId, plan: planRow.key }
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
