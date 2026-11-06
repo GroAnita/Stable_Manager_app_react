@@ -127,7 +127,7 @@ export default function Auth() {
 
   return (
     <main className="relative flex min-h-screen flex-col bg-cream lg:flex-row">
-      <div className="absolute top-4 right-4 z-10 flex gap-2">
+      <div className="absolute top-[calc(1rem+env(safe-area-inset-top))] right-4 z-10 flex gap-2">
         <button
           type="button"
           aria-label="English"
@@ -146,7 +146,7 @@ export default function Auth() {
         </button>
       </div>
 
-      <div className="relative flex flex-col items-center overflow-hidden bg-primary px-6 py-10 text-center lg:hidden">
+      <div className="relative flex flex-col items-center overflow-hidden bg-primary px-6 pt-[calc(2.5rem+env(safe-area-inset-top))] pb-10 text-center lg:hidden">
         <Icon
           name="horse"
           className="pointer-events-none absolute -right-10 -bottom-10 h-40 w-40 text-white/10"

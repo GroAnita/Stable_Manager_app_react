@@ -126,6 +126,9 @@
   }
   html,
   body {
+    /* Keeps content clear of the notch when an iPhone is turned sideways. */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
     @apply overflow-x-hidden;
   }
   body {

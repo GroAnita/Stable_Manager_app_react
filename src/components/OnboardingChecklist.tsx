@@ -128,7 +128,7 @@ export function OnboardingChecklist({
         type="button"
         onClick={expand}
         aria-label={t('onboardingChecklist.expandLabel')}
-        className="fixed right-4 bottom-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-forest text-white shadow-soft hover:bg-forest/90"
+        className="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-40 flex h-14 w-14 items-center justify-center rounded-full bg-forest text-white shadow-soft hover:bg-forest/90"
       >
         <svg
           aria-hidden="true"
@@ -163,7 +163,7 @@ export function OnboardingChecklist({
   }
 
   return (
-    <div className="fixed right-4 bottom-4 z-40 w-[calc(100vw-2rem)] max-w-sm">
+    <div className="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-40 w-[calc(100vw-2rem)] max-w-sm">
       <div className="panel max-h-[75vh] overflow-y-auto p-5">
         <div className="flex items-start justify-between gap-2">
           <h2 className="text-lg font-semibold text-slate-900">

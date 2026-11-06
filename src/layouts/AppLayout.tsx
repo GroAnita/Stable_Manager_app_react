@@ -212,7 +212,7 @@ export default function AppLayout() {
         />
       )}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-72 shrink-0 flex-col gap-6 overflow-y-auto border-r border-white/70 bg-cream px-5 py-6 transition-transform duration-300 lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-72 shrink-0 flex-col gap-6 overflow-y-auto border-r border-white/70 bg-cream px-5 pt-[calc(1.5rem+env(safe-area-inset-top))] pb-[calc(1.5rem+env(safe-area-inset-bottom))] transition-transform duration-300 lg:static lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -307,7 +307,7 @@ export default function AppLayout() {
         </div>
       </aside>
       <div className="flex min-h-screen flex-1 flex-col lg:min-w-0">
-        <header className="flex flex-col gap-3 border-b border-white/70 bg-cream/90 px-4 py-4 backdrop-blur lg:flex-row lg:items-center lg:py-5 lg:px-6">
+        <header className="flex flex-col gap-3 border-b border-white/70 bg-cream/90 px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-4 backdrop-blur lg:flex-row lg:items-center lg:pt-5 lg:pb-5 lg:px-6">
           <div className="order-1 flex items-center justify-center gap-3 lg:order-2 lg:flex-1">
             {profile?.stable?.name && (
               <>
@@ -377,7 +377,7 @@ export default function AppLayout() {
         <main
           id="main-content"
           tabIndex={-1}
-          className="flex-1 overflow-x-hidden px-4 py-6 md:px-6"
+          className="flex-1 overflow-x-hidden px-4 pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:px-6"
         >
           <Suspense
             fallback={

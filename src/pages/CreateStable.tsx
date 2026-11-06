@@ -61,7 +61,7 @@ export default function CreateStable() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-cream px-4 py-10">
+    <main className="flex min-h-screen items-center justify-center bg-cream px-4 pt-[calc(2.5rem+env(safe-area-inset-top))] pb-[calc(2.5rem+env(safe-area-inset-bottom))]">
       <div className="panel w-full max-w-lg p-6">
         <h1 className="text-2xl font-semibold text-slate-900">
           {t('onboarding.title')}

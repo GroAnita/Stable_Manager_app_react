@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import {
   listNotifications,
   markAllNotificationsRead,
@@ -72,60 +73,67 @@ export function NotificationBell() {
           </span>
         )}
       </button>
-      {open && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-50 mt-2 w-80 max-w-[90vw] rounded-2xl border border-slate-200 bg-card p-3 shadow-card">
-            <div className="flex items-center justify-between gap-2 px-1">
-              <p className="text-sm font-semibold text-slate-800">
-                {t('feedingRota.notificationsTitle')}
-              </p>
-              {unread.length > 0 && (
-                <button
-                  type="button"
-                  className="text-xs font-medium text-forest hover:underline"
-                  onClick={handleMarkAllRead}
-                >
-                  {t('feedingRota.markAllRead')}
-                </button>
-              )}
-            </div>
-            <div className="mt-2 max-h-80 space-y-1 overflow-y-auto">
-              {notifications.length === 0 ? (
-                <p className="px-1 py-3 text-sm text-slate-500">
-                  {t('feedingRota.noNotifications')}
+      {/* On the page itself, because the header's blur would otherwise position
+          this inside the header instead of on the screen. */}
+      {open &&
+        createPortal(
+          <>
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setOpen(false)}
+            />
+            <div className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-sm -translate-y-1/2 rounded-2xl border border-slate-200 bg-card p-3 shadow-card lg:inset-x-auto lg:top-20 lg:right-6 lg:mx-0 lg:w-80 lg:translate-y-0">
+              <div className="flex items-center justify-between gap-2 px-1">
+                <p className="text-sm font-semibold text-slate-800">
+                  {t('feedingRota.notificationsTitle')}
                 </p>
-              ) : (
-                notifications.map((n) => (
+                {unread.length > 0 && (
                   <button
-                    key={n.id}
                     type="button"
-                    onClick={() => handleMarkRead(n.id)}
-                    className={`w-full rounded-xl px-3 py-2 text-left text-sm ${
-                      n.is_read
-                        ? 'text-slate-500'
-                        : 'bg-forest/5 text-slate-800'
-                    }`}
+                    className="text-xs font-medium text-forest hover:underline"
+                    onClick={handleMarkAllRead}
                   >
-                    <p className="font-medium">{n.title}</p>
-                    {n.message && (
-                      <p className="mt-0.5 text-xs text-slate-500">
-                        {n.message}
-                      </p>
-                    )}
-                    <p className="mt-0.5 text-xs text-slate-400">
-                      {formatDate(n.created_at)}
-                    </p>
+                    {t('feedingRota.markAllRead')}
                   </button>
-                ))
-              )}
+                )}
+              </div>
+              <div className="mt-2 max-h-[70vh] space-y-1 overflow-y-auto lg:max-h-80">
+                {notifications.length === 0 ? (
+                  <p className="px-1 py-3 text-sm text-slate-500">
+                    {t('feedingRota.noNotifications')}
+                  </p>
+                ) : (
+                  notifications.map((n) => (
+                    <button
+                      key={n.id}
+                      type="button"
+                      onClick={() => handleMarkRead(n.id)}
+                      className={`w-full rounded-xl px-3 py-2 text-left text-sm ${
+                        n.is_read
+                          ? 'text-slate-500'
+                          : 'bg-forest/5 text-slate-800'
+                      }`}
+                    >
+                      <p className="font-medium">{n.title}</p>
+                      {n.message && (
+                        <p className="mt-0.5 text-xs text-slate-500">
+                          {n.message}
+                        </p>
+                      )}
+                      <p className="mt-0.5 text-xs text-slate-400">
+                        {formatDate(n.created_at)}
+                      </p>
+                    </button>
+                  ))
+                )}
+              </div>
+              <p className="mt-2 border-t border-slate-100 px-1 pt-2 text-xs text-slate-400">
+                {t('feedingRota.pushComingSoon')}
+              </p>
             </div>
-            <p className="mt-2 border-t border-slate-100 px-1 pt-2 text-xs text-slate-400">
-              {t('feedingRota.pushComingSoon')}
-            </p>
-          </div>
-        </>
-      )}
+          </>,
+          document.body,
+        )}
     </div>
   )
 }
