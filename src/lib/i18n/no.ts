@@ -1584,6 +1584,7 @@ export const no: typeof en = {
     navAccount: 'Min konto og tofaktor',
     navLanguageAppearance: 'Språk og utseende',
     navSupport: 'Support',
+    backToSettings: 'Tilbake til innstillinger',
     supportTitle: 'Kontakt support',
     supportSubtitle:
       'Har du et spørsmål eller har funnet en feil? Vi hjelper deg gjerne.',

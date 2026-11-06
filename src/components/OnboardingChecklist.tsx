@@ -23,7 +23,7 @@ const STEPS: Step[] = [
     key: 'invoiceDetails',
     titleKey: 'onboardingChecklist.stepInvoiceDetailsTitle',
     bodyKey: 'onboardingChecklist.stepInvoiceDetailsBody',
-    to: '/settings',
+    to: '/settings?section=stableInfo',
   },
   {
     key: 'stalls',

@@ -1584,6 +1584,7 @@ export const en = {
     navAccount: 'My account & two-factor',
     navLanguageAppearance: 'Language & appearance',
     navSupport: 'Support',
+    backToSettings: 'Back to settings',
     supportTitle: 'Contact support',
     supportSubtitle: "Have a question or found a bug? We're happy to help.",
     supportEmailButton: 'Email support',

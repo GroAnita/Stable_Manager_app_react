@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { Capacitor } from '@capacitor/core'
 import { AnalyticsConsentToggle } from '../components/AnalyticsConsentToggle'
 import { Icon, type IconName } from '../components/Icon'
@@ -181,11 +181,12 @@ export default function Settings() {
   const { session, refreshProfile } = useAuth()
   const { t, language, setLanguage, currency, setCurrency, theme, setTheme } =
     usePreferences()
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const location = useLocation()
+  const navigate = useNavigate()
   const sectionParam = searchParams.get('section')
-  const [section, setSection] = useState<SettingsSection>(
-    isSettingsSection(sectionParam) ? sectionParam : 'stableInfo',
-  )
+  // On a phone, no section in the address means the menu is showing.
+  const sectionOpen = isSettingsSection(sectionParam)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [stable, setStable] = useState<Stable | null>(null)
   const [form, setForm] = useState<FormState | null>(null)
@@ -239,17 +240,32 @@ export default function Settings() {
     }),
   })).filter((group) => group.items.length > 0)
 
-  useEffect(() => {
-    if (!loading && isEmployee && !EMPLOYEE_ALLOWED_SECTIONS.includes(section)) {
-      setSection('fireSafety')
-    }
-  }, [loading, isEmployee, section])
+  let section: SettingsSection = isSettingsSection(sectionParam)
+    ? sectionParam
+    : 'stableInfo'
+  if (isEmployee && !EMPLOYEE_ALLOWED_SECTIONS.includes(section)) {
+    section = 'fireSafety'
+  } else if (section === 'payments' && !canUsePayments) {
+    section = 'stableInfo'
+  }
 
   useEffect(() => {
-    if (!loading && section === 'payments' && !canUsePayments) {
-      setSection('stableInfo')
+    window.scrollTo(0, 0)
+  }, [sectionParam])
+
+  function openSection(key: SettingsSection) {
+    setSearchParams({ section: key }, { state: { fromMenu: true } })
+  }
+
+  function backToMenu() {
+    // Step back when we came from the menu, so the phone's own back doesn't
+    // return to the section afterwards. Links from elsewhere have no menu behind them.
+    if ((location.state as { fromMenu?: boolean } | null)?.fromMenu) {
+      navigate(-1)
+    } else {
+      navigate('/settings', { replace: true })
     }
-  }, [loading, section, canUsePayments])
+  }
 
   function handleStableChange(updated: Stable) {
     // The plan decides whether card payments are on.
@@ -311,7 +327,7 @@ export default function Settings() {
 
   return (
     <div className="page-shell">
-      <div>
+      <div className={sectionOpen ? 'hidden lg:block' : undefined}>
         <h1 className="text-3xl font-semibold text-slate-900">
           {t('settings.title')}
         </h1>
@@ -325,7 +341,11 @@ export default function Settings() {
       )}
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-        <nav className="flex shrink-0 flex-col gap-4 lg:w-64">
+        <nav
+          className={`shrink-0 flex-col gap-4 lg:flex lg:w-64 ${
+            sectionOpen ? 'hidden' : 'flex'
+          }`}
+        >
           {visibleSettingsNav.map((group) => (
             <div key={group.groupKey}>
               <p className="px-3 text-xs font-semibold tracking-wide text-slate-400 uppercase">
@@ -336,10 +356,10 @@ export default function Settings() {
                   <button
                     key={item.key}
                     type="button"
-                    onClick={() => setSection(item.key)}
+                    onClick={() => openSection(item.key)}
                     className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-sm font-medium ${
                       section === item.key
-                        ? 'bg-forest/10 text-forest'
+                        ? 'text-ink/70 hover:bg-card lg:bg-forest/10 lg:text-forest lg:hover:bg-forest/10'
                         : 'text-ink/70 hover:bg-card'
                     }`}
                   >
@@ -350,6 +370,10 @@ export default function Settings() {
                         {t(item.badgeKey)}
                       </span>
                     )}
+                    <Icon
+                      name="chevronRight"
+                      className="h-4 w-4 shrink-0 text-slate-400 lg:hidden"
+                    />
                   </button>
                 ))}
               </div>
@@ -357,8 +381,21 @@ export default function Settings() {
           ))}
         </nav>
 
-        <div className="min-w-0 flex-1 space-y-6">
-          {!isEmployee && section === 'stableInfo' &&
+        <div
+          className={`min-w-0 flex-1 space-y-6 ${
+            sectionOpen ? '' : 'hidden lg:block'
+          }`}
+        >
+          <button
+            type="button"
+            onClick={backToMenu}
+            className="inline-flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-forest lg:hidden"
+          >
+            <Icon name="chevronLeft" className="h-4 w-4" />
+            {t('settings.backToSettings')}
+          </button>
+          {!isEmployee &&
+            section === 'stableInfo' &&
             (stable && form ? (
               <form onSubmit={handleSubmit} className="panel p-6">
                 <h2 className="section-title">
@@ -442,9 +479,7 @@ export default function Settings() {
                     />
                   </label>
                   <label className="md:col-span-2">
-                    <span className="field-label">
-                      {t('settings.address')}
-                    </span>
+                    <span className="field-label">{t('settings.address')}</span>
                     <input
                       disabled={!canEdit}
                       className="field"
@@ -544,12 +579,16 @@ export default function Settings() {
             <ComingSoonPanel labelKey="settings.navIntegrations" />
           )}
 
-          {!isEmployee && section === 'staffAccess' && canEdit && profile?.stable_id && session && (
-            <StaffAccessPanel
-              stableId={profile.stable_id}
-              createdBy={session.user.id}
-            />
-          )}
+          {!isEmployee &&
+            section === 'staffAccess' &&
+            canEdit &&
+            profile?.stable_id &&
+            session && (
+              <StaffAccessPanel
+                stableId={profile.stable_id}
+                createdBy={session.user.id}
+              />
+            )}
           {!isEmployee && section === 'staffAccess' && !canEdit && (
             <div className="panel p-6 text-sm text-slate-500">
               {t('settings.onlyOwnerCanEdit')}
@@ -589,9 +628,7 @@ export default function Settings() {
               <h2 className="section-title">{t('settings.preferences')}</h2>
               <div className="mt-5 grid gap-5 md:grid-cols-2">
                 <label>
-                  <span className="field-label">
-                    {t('settings.language')}
-                  </span>
+                  <span className="field-label">{t('settings.language')}</span>
                   <select
                     className="field"
                     value={language}
@@ -602,9 +639,7 @@ export default function Settings() {
                   </select>
                 </label>
                 <label>
-                  <span className="field-label">
-                    {t('settings.currency')}
-                  </span>
+                  <span className="field-label">{t('settings.currency')}</span>
                   <select
                     className="field"
                     value={currency}
