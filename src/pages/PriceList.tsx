@@ -13,6 +13,7 @@ import { useConfirm } from '../lib/ConfirmContext'
 import { usePreferences } from '../lib/PreferencesContext'
 import { unitLabel } from '../lib/reports'
 import { getCurrentStableId } from '../lib/stableContext'
+import { useVatRegistered } from '../lib/useVatRegistered'
 
 const UNIT_OPTIONS = [
   'per month',
@@ -97,6 +98,7 @@ function ItemFields({
   autoFocus?: boolean
 }) {
   const { t } = usePreferences()
+  const vatRegistered = useVatRegistered()
   return (
     <div className="grid gap-4">
       <label>
@@ -159,28 +161,31 @@ function ItemFields({
           onChange={(e) => onChange('notes', e.target.value)}
         />
       </label>
-      <label className="flex items-start gap-2">
-        <input
-          type="checkbox"
-          className="mt-1"
-          checked={form.vat_exempt}
-          onChange={(e) => onChange('vat_exempt', e.target.checked)}
-        />
-        <span>
-          <span className="block text-sm font-medium text-slate-700">
-            {t('priceList.vatExempt')}
+      {vatRegistered && (
+        <label className="flex items-start gap-2">
+          <input
+            type="checkbox"
+            className="mt-1"
+            checked={form.vat_exempt}
+            onChange={(e) => onChange('vat_exempt', e.target.checked)}
+          />
+          <span>
+            <span className="block text-sm font-medium text-slate-700">
+              {t('priceList.vatExempt')}
+            </span>
+            <span className="block text-xs text-slate-400">
+              {t('priceList.vatExemptHint')}
+            </span>
           </span>
-          <span className="block text-xs text-slate-400">
-            {t('priceList.vatExemptHint')}
-          </span>
-        </span>
-      </label>
+        </label>
+      )}
     </div>
   )
 }
 
 export default function PriceList() {
   const { t, formatCurrency } = usePreferences()
+  const vatRegistered = useVatRegistered()
   const confirm = useConfirm()
   const [items, setItems] = useState<PriceListItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -331,6 +336,11 @@ export default function PriceList() {
           <p className="mt-2 text-sm text-slate-500">
             {t('priceList.subtitle')}
           </p>
+          {!vatRegistered && (
+            <p className="mt-1 text-sm text-slate-500">
+              {t('priceList.notVatRegistered')}
+            </p>
+          )}
         </div>
         <button
           type="button"
@@ -381,7 +391,7 @@ export default function PriceList() {
                 <th>{t('priceList.category')}</th>
                 <th>{t('priceList.unit')}</th>
                 <th>{t('priceList.price')}</th>
-                <th>{t('priceList.priceIncVat')}</th>
+                {vatRegistered && <th>{t('priceList.priceIncVat')}</th>}
                 <th>{t('priceList.notes')}</th>
                 <th>{t('priceList.actions')}</th>
               </tr>
@@ -393,15 +403,17 @@ export default function PriceList() {
                   <td>{categoryLabel(t, item.category)}</td>
                   <td>{unitLabel(t, item.unit)}</td>
                   <td>{formatCurrency(item.price)}</td>
-                  <td>
-                    {item.vat_exempt ? (
-                      <span className="text-emerald-600">
-                        {t('common.vatExempt')}
-                      </span>
-                    ) : (
-                      formatCurrency(item.price * 1.25)
-                    )}
-                  </td>
+                  {vatRegistered && (
+                    <td>
+                      {item.vat_exempt ? (
+                        <span className="text-emerald-600">
+                          {t('common.vatExempt')}
+                        </span>
+                      ) : (
+                        formatCurrency(item.price * 1.25)
+                      )}
+                    </td>
+                  )}
                   <td>{item.notes ?? '—'}</td>
                   <td>
                     <button

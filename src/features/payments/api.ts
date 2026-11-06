@@ -28,6 +28,7 @@ export type PaymentListItem = Pick<
   | 'charge_attempts'
   | 'charge_failure_notified_attempt'
   | 'charge_retry_not_before'
+  | 'charge_failure_count'
   | 'stripe_fee'
   | 'stripe_net'
   | 'refunded_amount'
@@ -104,7 +105,7 @@ export async function listPayments(): Promise<PaymentListItem[]> {
        invoice_email_required, invoice_email_sent_at, invoice_email_sent_to,
        invoice_email_error, invoice_email_delivery_status, invoice_email_delivered_at,
        charge_status, charge_error, charged_at, charge_attempts,
-       charge_failure_notified_attempt, charge_retry_not_before,
+       charge_failure_notified_attempt, charge_retry_not_before, charge_failure_count,
        stripe_fee, stripe_net, refunded_amount, refunded_at, dispute_status, dispute_reason,
        dispute_amount, dispute_evidence_due_by, dispute_lost_at, dispute_fee, dispute_opened_at,
        owner:owners(id, full_name),

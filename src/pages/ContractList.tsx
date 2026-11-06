@@ -1,3 +1,4 @@
+import { useVatRegistered } from '../lib/useVatRegistered'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Badge } from '../components/Badge'
@@ -28,7 +29,10 @@ const FILTER_KEYS: { value: Filter; key: string }[] = [
   { value: 'cancelled', key: 'contractList.filterCancelled' },
 ]
 
-function totalMonthlyPrice(contract: ContractListItem): number {
+function totalMonthlyPrice(
+  contract: ContractListItem,
+  vatRegistered: boolean,
+): number {
   const cycleDays = currentBillingCycleDays()
   const hay =
     contract.included_hay_kg && contract.hay_item
@@ -36,7 +40,7 @@ function totalMonthlyPrice(contract: ContractListItem): number {
           contract.hay_item.price,
           contract.included_hay_kg,
           cycleDays,
-          contract.hay_item.vat_exempt,
+          contract.hay_item.vat_exempt || !vatRegistered,
         )
       : 0
   const bedding =
@@ -44,7 +48,7 @@ function totalMonthlyPrice(contract: ContractListItem): number {
       ? beddingAmountIncVat(
           contract.bedding_item.price,
           contract.bedding_quantity,
-          contract.bedding_item.vat_exempt,
+          contract.bedding_item.vat_exempt || !vatRegistered,
         )
       : 0
   return Math.round((Number(contract.monthly_rent) + hay + bedding) * 100) / 100
@@ -52,6 +56,7 @@ function totalMonthlyPrice(contract: ContractListItem): number {
 
 export default function ContractList() {
   const { t, formatCurrency, formatDate } = usePreferences()
+  const vatRegistered = useVatRegistered()
   const confirm = useConfirm()
   const [contracts, setContracts] = useState<ContractListItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -161,7 +166,7 @@ export default function ContractList() {
             <ContractCard
               key={contract.id}
               contract={contract}
-              monthlyTotal={totalMonthlyPrice(contract)}
+              monthlyTotal={totalMonthlyPrice(contract, vatRegistered)}
               onView={() => setViewingId(contract.id)}
               onDelete={() => handleDelete(contract)}
             />
@@ -187,7 +192,7 @@ export default function ContractList() {
                 <tr key={contract.id}>
                   <td>{contract.horse?.name ?? '—'}</td>
                   <td>{contract.owner?.full_name ?? '—'}</td>
-                  <td>{formatCurrency(totalMonthlyPrice(contract))}</td>
+                  <td>{formatCurrency(totalMonthlyPrice(contract, vatRegistered))}</td>
                   <td>{formatDate(contract.end_date)}</td>
                   <td>
                     <Badge status={contract.status} />

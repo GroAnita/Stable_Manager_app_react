@@ -1,3 +1,4 @@
+import { useVatRegistered } from '../../lib/useVatRegistered'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { Icon } from '../../components/Icon'
@@ -173,6 +174,7 @@ export function FeedingExtras({
     }
   }
 
+  const vatRegistered = useVatRegistered()
   const selectedExtraItem = extraItems.find(
     (item) => item.id === extraForm.priceListItemId,
   )
@@ -180,7 +182,7 @@ export function FeedingExtras({
     ? amountIncVat(
         selectedExtraItem.price,
         Number(extraForm.quantity) || 0,
-        selectedExtraItem.vat_exempt,
+        selectedExtraItem.vat_exempt || !vatRegistered,
       )
     : 0
   const extraDate = extraForm.date || todayIso()
@@ -307,7 +309,11 @@ export function FeedingExtras({
                         <option key={item.id} value={item.id}>
                           {item.item} (
                           {formatCurrency(
-                            amountIncVat(item.price, 1, item.vat_exempt),
+                            amountIncVat(
+                              item.price,
+                              1,
+                              item.vat_exempt || !vatRegistered,
+                            ),
                           )}
                           {item.unit ? ` / ${unitLabel(t, item.unit)}` : ''})
                         </option>
@@ -343,9 +349,11 @@ export function FeedingExtras({
             </label>
             <p className="text-sm text-slate-500">
               {t(
-                selectedExtraItem?.vat_exempt
-                  ? 'horseDetail.extraEstimatedChargeExempt'
-                  : 'horseDetail.extraEstimatedCharge',
+                !vatRegistered
+                  ? 'horseDetail.extraEstimatedChargePlain'
+                  : selectedExtraItem?.vat_exempt
+                    ? 'horseDetail.extraEstimatedChargeExempt'
+                    : 'horseDetail.extraEstimatedCharge',
               )}{' '}
               <span className="font-medium text-slate-800">
                 {formatCurrency(estimatedExtraAmount)}

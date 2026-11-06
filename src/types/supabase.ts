@@ -1925,6 +1925,7 @@ export type Database = {
           charge_failure_notified_attempt: number | null
           charge_retry_not_before: string | null
           charge_error: string | null
+          charge_failure_count: number
           charge_started_at: string | null
           charge_status: string | null
           charged_at: string | null
@@ -1987,6 +1988,7 @@ export type Database = {
           charge_failure_notified_attempt?: number | null
           charge_retry_not_before?: string | null
           charge_error?: string | null
+          charge_failure_count?: number
           charge_started_at?: string | null
           charge_status?: string | null
           charged_at?: string | null
@@ -2030,6 +2032,7 @@ export type Database = {
           charge_failure_notified_attempt?: number | null
           charge_retry_not_before?: string | null
           charge_error?: string | null
+          charge_failure_count?: number
           charge_started_at?: string | null
           charge_status?: string | null
           charged_at?: string | null

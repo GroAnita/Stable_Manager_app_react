@@ -1,6 +1,11 @@
 // Decides whether an invoice may be charged to a card. Kept separate from the
 // function so it has no Deno or network dependency.
 
+import {
+  isHardDecline,
+  MAX_CHARGE_FAILURES,
+} from '../_shared/chargeFailureEmail.ts'
+
 export const NOTICE_DAYS = 7
 
 export type ChargeBlocker =
@@ -9,6 +14,8 @@ export type ChargeBlocker =
   | 'no_agreement'
   | 'no_card'
   | 'paused'
+  | 'too_many_failures'
+  | 'card_refused'
   | 'retry_not_notified'
   | 'retry_too_soon'
   | 'email_not_delivered'
@@ -25,6 +32,8 @@ export type ChargeCheck = {
   hasCard: boolean
   paused: boolean
   retryNotBefore: string | null
+  failureCount: number
+  chargeError: string | null
   deliveryStatus: string | null
   deliveredAt: string | null
   sentTo: string | null
@@ -64,6 +73,8 @@ export function chargeBlocker(check: ChargeCheck): ChargeBlocker | null {
     if (check.today < check.dueDate) return 'not_due_yet'
     // The boarder must have been told the amount and date of a new attempt.
     if (check.chargeStatus === 'failed') {
+      if (check.failureCount >= MAX_CHARGE_FAILURES) return 'too_many_failures'
+      if (isHardDecline(check.chargeError)) return 'card_refused'
       if (!check.retryNotBefore) return 'retry_not_notified'
       if (check.today < check.retryNotBefore) return 'retry_too_soon'
     }

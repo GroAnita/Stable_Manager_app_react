@@ -5,7 +5,10 @@ export type Stable = Database['public']['Tables']['stables']['Row']
 export type StableUpdate = Database['public']['Tables']['stables']['Update']
 export type StableType = Database['public']['Enums']['stable_type']
 export type Profile = Database['public']['Tables']['profiles']['Row'] & {
-  stable: Pick<Stable, 'name' | 'logo_url' | 'enabled_features'> | null
+  stable: Pick<
+    Stable,
+    'name' | 'logo_url' | 'enabled_features' | 'vat_registered'
+  > | null
 }
 
 export async function getMyProfile(): Promise<Profile> {
@@ -15,7 +18,7 @@ export async function getMyProfile(): Promise<Profile> {
   if (!user) throw new Error('Not signed in.')
   const { data, error } = await supabase
     .from('profiles')
-    .select('*, stable:stables(name, logo_url, enabled_features)')
+    .select('*, stable:stables(name, logo_url, enabled_features, vat_registered)')
     .eq('id', user.id)
     .single()
   if (error) throw error

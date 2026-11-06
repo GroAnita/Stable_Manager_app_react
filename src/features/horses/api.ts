@@ -504,7 +504,18 @@ export async function logFeedingExtra(params: {
     }
   }
 
-  const amount = amountIncVat(item.price ?? 0, quantity, item.vat_exempt)
+  const { data: stableVat, error: stableVatError } = await supabase
+    .from('stables')
+    .select('vat_registered')
+    .eq('id', contract.stable_id)
+    .single()
+  if (stableVatError) throw stableVatError
+  const vatRegistered = stableVat.vat_registered
+  const amount = amountIncVat(
+    item.price ?? 0,
+    quantity,
+    item.vat_exempt || !vatRegistered,
+  )
   const dueDate = billingCycleDueDate(date)
   const invoiceLine = t('horseDetail.extraInvoiceLine', {
     item: item.item,
@@ -542,7 +553,7 @@ export async function logFeedingExtra(params: {
         .select('price, vat_exempt')
         .eq('id', contract.hay_price_list_item_id)
         .maybeSingle()
-      hayVatExempt = hayItem?.vat_exempt ?? false
+      hayVatExempt = (hayItem?.vat_exempt ?? false) || !vatRegistered
       hayCharge = hayValueIncVat(
         hayItem?.price ?? 0,
         contract.included_hay_kg ?? 0,
@@ -559,7 +570,7 @@ export async function logFeedingExtra(params: {
         .select('price, vat_exempt')
         .eq('id', contract.bedding_price_list_item_id)
         .maybeSingle()
-      beddingVatExempt = beddingItem?.vat_exempt ?? false
+      beddingVatExempt = (beddingItem?.vat_exempt ?? false) || !vatRegistered
       beddingCharge = beddingAmountIncVat(
         beddingItem?.price ?? 0,
         contract.bedding_quantity ?? 0,
@@ -578,18 +589,22 @@ export async function logFeedingExtra(params: {
     if (hayCharge)
       boardLines.push(
         t(
-          hayVatExempt
-            ? 'horseDetail.extraMonthlyHayLineExempt'
-            : 'horseDetail.extraMonthlyHayLine',
+          !vatRegistered
+            ? 'horseDetail.extraMonthlyHayLinePlain'
+            : hayVatExempt
+              ? 'horseDetail.extraMonthlyHayLineExempt'
+              : 'horseDetail.extraMonthlyHayLine',
           { amount: formatCurrency(hayCharge) },
         ),
       )
     if (beddingCharge)
       boardLines.push(
         t(
-          beddingVatExempt
-            ? 'horseDetail.extraMonthlyBeddingLineExempt'
-            : 'horseDetail.extraMonthlyBeddingLine',
+          !vatRegistered
+            ? 'horseDetail.extraMonthlyBeddingLinePlain'
+            : beddingVatExempt
+              ? 'horseDetail.extraMonthlyBeddingLineExempt'
+              : 'horseDetail.extraMonthlyBeddingLine',
           { amount: formatCurrency(beddingCharge) },
         ),
       )

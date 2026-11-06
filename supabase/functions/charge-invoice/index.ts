@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
       .from('payments')
       .select(
         `id, stable_id, contract_id, status, amount, due_date, invoice_number,
-         charge_status, charge_retry_not_before, stripe_payment_intent_id, stripe_checkout_session_id,
+         charge_status, charge_retry_not_before, charge_failure_count, charge_error, stripe_payment_intent_id, stripe_checkout_session_id,
          invoice_email_delivery_status, invoice_email_delivered_at, invoice_email_sent_to,
          owner:owners(email)`,
       )
@@ -203,6 +203,8 @@ Deno.serve(async (req) => {
       ),
       paused: Boolean(agreement?.paused_at),
       retryNotBefore: payment.charge_retry_not_before,
+      failureCount: payment.charge_failure_count,
+      chargeError: payment.charge_error,
       deliveryStatus: payment.invoice_email_delivery_status,
       deliveredAt: payment.invoice_email_delivered_at,
       sentTo: payment.invoice_email_sent_to,

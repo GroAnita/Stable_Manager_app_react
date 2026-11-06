@@ -503,12 +503,14 @@ export default function PaymentList() {
                   {t('paymentList.chargeFailed', {
                     reason: selected.charge_error ?? '—',
                   })}{' '}
-                  {selected.charge_failure_notified_attempt ===
-                    selected.charge_attempts && selected.charge_retry_not_before
-                    ? t('paymentList.chargeRetryFrom', {
-                        date: formatDate(selected.charge_retry_not_before),
-                      })
-                    : t('paymentList.chargeBoarderNotNotified')}
+                  {selected.charge_failure_notified_attempt !==
+                  selected.charge_attempts
+                    ? t('paymentList.chargeBoarderNotNotified')
+                    : selected.charge_retry_not_before
+                      ? t('paymentList.chargeRetryFrom', {
+                          date: formatDate(selected.charge_retry_not_before),
+                        })
+                      : t('paymentList.chargeNoMoreRetries')}
                 </p>
               )}
             {selected.contract &&

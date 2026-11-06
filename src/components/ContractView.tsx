@@ -1,3 +1,4 @@
+import { useVatRegistered } from '../lib/useVatRegistered'
 import { useEffect, useState } from 'react'
 import { Badge } from './Badge'
 import { Icon } from './Icon'
@@ -34,6 +35,7 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
     }
   }, [horseIsAway, contract.stable_id])
 
+  const vatRegistered = useVatRegistered()
   const cycleDays = currentBillingCycleDays()
   const rawHayValue =
     contract.hay_item && contract.included_hay_kg
@@ -41,7 +43,7 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
           contract.hay_item.price,
           contract.included_hay_kg,
           cycleDays,
-          contract.hay_item.vat_exempt,
+          contract.hay_item.vat_exempt || !vatRegistered,
         )
       : 0
   const rawBeddingValue =
@@ -49,7 +51,7 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
       ? beddingAmountIncVat(
           contract.bedding_item.price,
           contract.bedding_quantity,
-          contract.bedding_item.vat_exempt,
+          contract.bedding_item.vat_exempt || !vatRegistered,
         )
       : 0
   const hayValue = horseIsAway ? 0 : rawHayValue
@@ -188,7 +190,7 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
                 <span className="text-slate-400">
                   {' '}
                   — {contract.boarding_item.item}
-                  {contract.boarding_item.vat_exempt
+                  {vatRegistered && contract.boarding_item.vat_exempt
                     ? ` (${t('common.vatExempt')})`
                     : ''}
                 </span>
@@ -212,7 +214,7 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
                   <span className="text-slate-400">
                     {' '}
                     — {contract.hay_item.item}
-                    {contract.hay_item.vat_exempt
+                    {vatRegistered && contract.hay_item.vat_exempt
                       ? ` (${t('common.vatExempt')})`
                       : ''}
                   </span>
@@ -231,7 +233,7 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
                   <span className="text-slate-400">
                     {' '}
                     — {contract.bedding_item.item}
-                    {contract.bedding_item.vat_exempt
+                    {vatRegistered && contract.bedding_item.vat_exempt
                       ? ` (${t('common.vatExempt')})`
                       : ''}
                   </span>
