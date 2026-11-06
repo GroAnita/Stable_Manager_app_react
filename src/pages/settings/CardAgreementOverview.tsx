@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react'
-import { listCardAgreementOverview } from '../../features/payments/cardAgreement'
+import {
+  listCardAgreementOverview,
+  withdrawCardAgreement,
+} from '../../features/payments/cardAgreement'
+import { useConfirm } from '../../lib/ConfirmContext'
 import type {
   OverviewLine,
   OverviewStatus,
@@ -28,11 +32,34 @@ export function CardAgreementOverview() {
   const [lines, setLines] = useState<OverviewLine[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  const confirm = useConfirm()
+  const [stopping, setStopping] = useState<string | null>(null)
+
   useEffect(() => {
     listCardAgreementOverview()
       .then(setLines)
       .catch((err: Error) => setError(err.message))
   }, [])
+
+  async function handleStop(line: OverviewLine) {
+    if (
+      !(await confirm(
+        t('settings.paymentsStopConfirm', { name: line.ownerName }),
+        { confirmLabel: t('settings.paymentsStop') },
+      ))
+    )
+      return
+    setStopping(line.id)
+    setError(null)
+    try {
+      await withdrawCardAgreement(line.id)
+      setLines(await listCardAgreementOverview())
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setStopping(null)
+    }
+  }
 
   const signed = lines?.filter(
     (line) => line.status === 'active' || line.status === 'paused',
@@ -76,6 +103,7 @@ export function CardAgreementOverview() {
                   <th>{t('settings.paymentsSignedCard')}</th>
                   <th>{t('settings.paymentsSignedChargeDay')}</th>
                   <th>{t('settings.paymentsSignedDate')}</th>
+                  <th />
                 </tr>
               </thead>
               <tbody>
@@ -92,6 +120,12 @@ export function CardAgreementOverview() {
                         >
                           {t(`settings.paymentsSignedStatus_${line.status}`)}
                         </span>
+                        {line.status === 'withdrawn' &&
+                          line.agreement?.card_removal_error && (
+                            <p className="mt-1 text-xs text-amber-700">
+                              {t('settings.paymentsCardNotRemoved')}
+                            </p>
+                          )}
                       </td>
                       <td className="whitespace-nowrap">{cardLabel(line)}</td>
                       <td>
@@ -105,6 +139,18 @@ export function CardAgreementOverview() {
                         {inForce && line.agreement
                           ? formatDate(line.agreement.accepted_at.slice(0, 10))
                           : '—'}
+                      </td>
+                      <td>
+                        {inForce && (
+                          <button
+                            type="button"
+                            className="btn-ghost whitespace-nowrap px-3 py-1.5"
+                            disabled={stopping === line.id}
+                            onClick={() => handleStop(line)}
+                          >
+                            {t('settings.paymentsStop')}
+                          </button>
+                        )}
                       </td>
                     </tr>
                   )

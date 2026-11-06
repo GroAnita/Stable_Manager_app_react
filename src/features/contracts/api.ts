@@ -1,4 +1,5 @@
 import { supabase } from '../../lib/supabaseClient'
+import { supabaseFunctionError } from '../../lib/supabaseFunctionError'
 import type { Database } from '../../types/supabase'
 
 export type Contract = Database['public']['Tables']['contracts']['Row']
@@ -21,6 +22,7 @@ export type ContractListItem = Pick<
   | 'status'
   | 'mucking_schedule'
   | 'turnout_schedule'
+  | 'notice_given_at'
 > & {
   horse: Pick<
     Database['public']['Tables']['horses']['Row'],
@@ -74,7 +76,7 @@ export async function listContracts(): Promise<ContractListItem[]> {
     .from('contracts')
     .select(
       `id, monthly_rent, included_hay_kg, bedding_quantity, start_date, end_date, status,
-       mucking_schedule, turnout_schedule,
+       mucking_schedule, turnout_schedule, notice_given_at,
        horse:horses(id, name, away),
        owner:owners(id, full_name),
        hay_item:price_list_items!contracts_hay_price_list_item_id_fkey(price, vat_exempt),
@@ -251,4 +253,52 @@ export async function listServiceItems(
     .order('item')
   if (error) throw error
   return data
+}
+
+export function noticeEndDatePreview(
+  noticeMonths: number,
+  today = new Date(),
+): string {
+  const [year, month, day] = today
+    .toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' })
+    .split('-')
+    .map(Number)
+  const lastDay = new Date(
+    Date.UTC(year, month - 1 + noticeMonths + 1, 0),
+  ).getUTCDate()
+  return new Date(
+    Date.UTC(year, month - 1 + noticeMonths, Math.min(day, lastDay)),
+  )
+    .toISOString()
+    .slice(0, 10)
+}
+
+export async function giveContractNotice(
+  contractId: string,
+  endDate: string | null,
+): Promise<string> {
+  const { data, error } = await supabase.rpc('give_contract_notice', {
+    p_contract_id: contractId,
+    p_end_date: endDate,
+  })
+  if (error) throw error
+  return data
+}
+
+export async function cancelContractNotice(contractId: string): Promise<void> {
+  const { error } = await supabase.rpc('cancel_contract_notice', {
+    p_contract_id: contractId,
+  })
+  if (error) throw error
+}
+
+export async function sendContractNoticeEmail(
+  contractId: string,
+): Promise<boolean> {
+  const { data, error } = await supabase.functions.invoke<{ sent: boolean }>(
+    'contract-notice',
+    { body: { contractId } },
+  )
+  if (error) throw await supabaseFunctionError(error)
+  return data?.sent ?? false
 }

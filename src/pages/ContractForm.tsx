@@ -1,3 +1,5 @@
+import { ContractNoticePanel } from '../components/ContractNoticePanel'
+import { useAuth } from '../lib/AuthContext'
 import { useVatRegistered } from '../lib/useVatRegistered'
 import { useEffect, useMemo, useState, type FormEvent, Fragment } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -10,6 +12,7 @@ import {
   listBoardingItems,
   listHayItems,
   updateContract,
+  type Contract,
   type ContractInsert,
   type PriceListItemOption,
 } from '../features/contracts/api'
@@ -54,6 +57,7 @@ type FormState = {
   start_date: string
   end_date: string
   charge_day: string
+  notice_months: string
   status: ContractStatus
   hay_price_list_item_id: string
   included_hay_kg: string
@@ -81,6 +85,7 @@ const emptyForm: FormState = {
   start_date: '',
   end_date: '',
   charge_day: '',
+  notice_months: '',
   status: 'active',
   hay_price_list_item_id: '',
   included_hay_kg: '',
@@ -103,6 +108,8 @@ export default function ContractForm() {
 
   const [billingRules, setBillingRules] = useState<BillingRules | null>(null)
   const [chargeDayLocked, setChargeDayLocked] = useState(false)
+  const [loadedContract, setLoadedContract] = useState<Contract | null>(null)
+  const { profile } = useAuth()
   const [form, setForm] = useState<FormState>(emptyForm)
   const [horses, setHorses] = useState<HorseOption[]>([])
   const [owners, setOwners] = useState<OwnerOption[]>([])
@@ -184,6 +191,7 @@ export default function ContractForm() {
       .then((contract) => {
         if (cancelled) return
         setChargeDayLocked(contract.card_agreement_accepted_at !== null)
+        setLoadedContract(contract)
         setForm({
           horse_id: contract.horse_id,
           owner_id: contract.owner_id,
@@ -196,6 +204,7 @@ export default function ContractForm() {
           start_date: contract.start_date,
           end_date: contract.end_date ?? '',
           charge_day: contract.charge_day?.toString() ?? '',
+          notice_months: contract.notice_months?.toString() ?? '',
           status: contract.status as ContractStatus,
           hay_price_list_item_id: contract.hay_price_list_item_id ?? '',
           included_hay_kg: contract.included_hay_kg?.toString() ?? '',
@@ -385,6 +394,7 @@ export default function ContractForm() {
         ...(billingRules?.addonEnabled
           ? { charge_day: Number(form.charge_day) || billingRules.chargeDay }
           : {}),
+        notice_months: form.notice_months ? Number(form.notice_months) : null,
         status: form.status,
         hay_price_list_item_id: form.hay_price_list_item_id || null,
         included_hay_kg: form.included_hay_kg
@@ -668,6 +678,21 @@ export default function ContractForm() {
             value={form.deposit}
             onChange={(e) => updateField('deposit', e.target.value)}
           />
+        </label>
+        <label>
+          <span className="field-label">{t('contractForm.noticeMonths')}</span>
+          <input
+            type="number"
+            min="0"
+            max="24"
+            step="1"
+            className="field"
+            value={form.notice_months}
+            onChange={(e) => updateField('notice_months', e.target.value)}
+          />
+          <span className="mt-1 block text-xs text-slate-400">
+            {t('contractForm.noticeMonthsHint')}
+          </span>
         </label>
         <label>
           <span className="field-label">{t('contractForm.status')}</span>
@@ -1026,6 +1051,25 @@ export default function ContractForm() {
           )}
         </div>
       </form>
+      {isEdit && loadedContract && profile?.role === 'stable_owner' && (
+        <div className="panel p-6">
+          <ContractNoticePanel
+            contract={loadedContract}
+            role="stableOwner"
+            onChanged={() => {
+              getContract(loadedContract.id)
+                .then((contract) => {
+                  setLoadedContract(contract)
+                  setForm((prev) => ({
+                    ...prev,
+                    end_date: contract.end_date ?? '',
+                  }))
+                })
+                .catch((err: Error) => setError(err.message))
+            }}
+          />
+        </div>
+      )}
     </div>
   )
 }

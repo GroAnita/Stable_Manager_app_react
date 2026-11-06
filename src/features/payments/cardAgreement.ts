@@ -79,11 +79,11 @@ export async function listCardAgreementOverview(): Promise<OverviewLine[]> {
     supabase
       .from('contracts')
       .select('id, horse:horses(name), owner:owners(full_name)')
-      .eq('status', 'active'),
+      .in('status', ['active', 'ending_soon']),
     supabase
       .from('card_agreements')
       .select(
-        'contract_id, accepted_at, activated_at, paused_at, withdrawn_at, charge_day, card_brand, card_last4',
+        'contract_id, accepted_at, activated_at, paused_at, withdrawn_at, charge_day, card_brand, card_last4, card_removed_at, card_removal_error',
       ),
   ])
   if (contracts.error) throw contracts.error

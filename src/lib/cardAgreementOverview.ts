@@ -7,6 +7,8 @@ export type AgreementRow = {
   charge_day: number
   card_brand: string | null
   card_last4: string | null
+  card_removed_at?: string | null
+  card_removal_error?: string | null
 }
 
 export type OverviewContract = {

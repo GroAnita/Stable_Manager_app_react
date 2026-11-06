@@ -23,6 +23,8 @@ export type Database = {
           agreement_text: string
           card_brand: string | null
           card_last4: string | null
+          card_removal_error: string | null
+          card_removed_at: string | null
           charge_day: number
           contract_id: string
           copy_sent_at: string | null
@@ -425,6 +427,10 @@ export type Database = {
           mucking_price_list_item_id: string | null
           mucking_schedule: string
           notes: string | null
+          notice_given_at: string | null
+          notice_given_by: string | null
+          notice_given_by_role: string | null
+          notice_months: number | null
           owner_id: string
           stable_id: string
           stall_id: string | null
@@ -455,6 +461,10 @@ export type Database = {
           mucking_price_list_item_id?: string | null
           mucking_schedule?: string
           notes?: string | null
+          notice_given_at?: string | null
+          notice_given_by?: string | null
+          notice_given_by_role?: string | null
+          notice_months?: number | null
           owner_id: string
           stable_id: string
           stall_id?: string | null
@@ -485,6 +495,10 @@ export type Database = {
           mucking_price_list_item_id?: string | null
           mucking_schedule?: string
           notes?: string | null
+          notice_given_at?: string | null
+          notice_given_by?: string | null
+          notice_given_by_role?: string | null
+          notice_months?: number | null
           owner_id?: string
           stable_id?: string
           stall_id?: string | null
@@ -1962,6 +1976,7 @@ export type Database = {
           credited_amount: number
           due_date: string
           id: string
+          is_final_invoice: boolean
           invoice_email_delivered_at: string | null
           invoice_email_delivery_status: string | null
           invoice_email_error: string | null
@@ -1988,6 +2003,7 @@ export type Database = {
           credited_amount?: number
           due_date: string
           id?: string
+          is_final_invoice?: boolean
           invoice_email_delivered_at?: string | null
           invoice_email_delivery_status?: string | null
           invoice_email_error?: string | null
@@ -2035,6 +2051,7 @@ export type Database = {
           credited_amount?: number
           due_date?: string
           id?: string
+          is_final_invoice?: boolean
           invoice_email_delivered_at?: string | null
           invoice_email_delivery_status?: string | null
           invoice_email_error?: string | null
@@ -3094,6 +3111,14 @@ export type Database = {
       }
       create_credit_note: {
         Args: { p_lines: Json; p_payment_id: string; p_reason: string }
+        Returns: string
+      }
+      cancel_contract_notice: {
+        Args: { p_contract_id: string }
+        Returns: undefined
+      }
+      give_contract_notice: {
+        Args: { p_contract_id: string; p_end_date?: string | null }
         Returns: string
       }
       publish_feeding_rota: {

@@ -1,3 +1,4 @@
+import { ContractNoticePanel } from '../components/ContractNoticePanel'
 import { invoiceAmountDue } from '../lib/billing'
 import { useCallback, useEffect, useState } from 'react'
 import { Browser } from '@capacitor/browser'
@@ -145,6 +146,21 @@ export default function MyContract() {
         <div key={contract.id} className="panel p-6">
           <ContractFields contract={contract} />
           <CardAgreementPanel contractId={contract.id} />
+          <ContractNoticePanel
+            contract={contract}
+            role="boarder"
+            onChanged={() => {
+              getContractDetail(contract.id)
+                .then((updated) =>
+                  setContracts((prev) =>
+                    prev.map((other) =>
+                      other.id === updated.id ? updated : other,
+                    ),
+                  ),
+                )
+                .catch((err: Error) => setError(err.message))
+            }}
+          />
         </div>
       ))}
 

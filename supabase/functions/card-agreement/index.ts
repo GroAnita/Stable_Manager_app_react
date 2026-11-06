@@ -11,6 +11,7 @@
 // INVOICE_EMAIL_TEST_TO unless INVOICE_EMAIL_ALLOW_REAL is 'true'.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'npm:stripe@23.1.0'
+import { endCardAgreement } from '../_shared/endAgreement.ts'
 import { sendEmail } from '../_shared/sendEmail.ts'
 import { agreementAsText, buildAgreement } from './agreementText.ts'
 
@@ -94,7 +95,21 @@ Deno.serve(async (req) => {
     if (contractError) throw contractError
     // deno-lint-ignore no-explicit-any
     const row = contract as any
-    if (!row || row.owner?.user_id !== caller.id) {
+    if (!row) return jsonResponse({ error: 'Contract not found' }, 404)
+    const isBoarder = row.owner?.user_id === caller.id
+    // The stable owner can only stop automatic payment, nothing else here.
+    let isStableOwner = false
+    if (!isBoarder && action === 'withdraw') {
+      const { data: profile } = await admin
+        .from('profiles')
+        .select('role, stable_id')
+        .eq('id', caller.id)
+        .maybeSingle()
+      isStableOwner =
+        profile?.role === 'stable_owner' &&
+        profile.stable_id === row.stable_id
+    }
+    if (!isBoarder && !isStableOwner) {
       return jsonResponse({ error: 'Contract not found' }, 404)
     }
 
@@ -138,50 +153,21 @@ Deno.serve(async (req) => {
       if (!agreementRow?.activated_at) {
         return jsonResponse({ error: 'No active agreement' }, 409)
       }
-      // Recorded before Stripe is called: withdrawing has to stick even if
-      // Stripe can't be reached.
-      const withdrawnAt = new Date().toISOString()
-      const { error: withdrawError } = await admin
-        .from('card_agreements')
-        .update({ withdrawn_at: withdrawnAt, withdrawn_by: caller.id })
-        .eq('id', agreementRow.id)
-      if (withdrawError) throw withdrawError
-      const { error: contractUpdateError } = await admin
-        .from('contracts')
-        .update({ card_agreement_accepted_at: null })
-        .eq('id', contractId)
-      if (contractUpdateError) throw contractUpdateError
-
-      // An open page to change the card must not save one after this.
-      if (agreementRow.pending_card_session_id && stripeAccount) {
-        try {
-          await stripe.checkout.sessions.expire(
-            agreementRow.pending_card_session_id,
-            {},
-            { stripeAccount },
-          )
-        } catch (error) {
-          console.error('card-agreement expire failed:', error)
-        }
-      }
-
-      if (agreementRow.stripe_payment_method_id && stripeAccount) {
-        try {
-          await stripe.paymentMethods.detach(
-            agreementRow.stripe_payment_method_id,
-            {},
-            { stripeAccount },
-          )
-        } catch (error) {
-          console.error('card-agreement detach failed:', error)
-        }
-      }
+      // Stops all charges even if Stripe can't be reached. A card that couldn't be
+      // removed is tried again by card-cleanup.
+      await endCardAgreement(
+        stripe,
+        admin,
+        agreementRow,
+        stripeAccount,
+        caller.id,
+      )
       await sendEmail({
         to: ownerEmail,
         stableName,
         replyTo: stableEmail,
         subject: `Automatisk betaling til ${stableName} er avsluttet`,
-        text: `Tillatelsen til automatiske korttrekk for ${row.horse?.name ?? 'hesten din'} er avsluttet, og kortet ditt blir ikke trukket automatisk fremover.\n\nEt trekk som allerede er gjennomført, blir ikke automatisk tilbakeført. Ubetalte og fremtidige fakturaer må betales på annen avtalt måte.`,
+        text: `${isStableOwner ? 'Stallen har stoppet automatisk betaling. ' : ''}Tillatelsen til automatiske korttrekk for ${row.horse?.name ?? 'hesten din'} er avsluttet, og kortet ditt blir ikke trukket automatisk fremover.\n\nEt trekk som allerede er gjennomført, blir ikke automatisk tilbakeført. Ubetalte og fremtidige fakturaer må betales på annen avtalt måte.`,
       })
       return jsonResponse({ available, active: false, withdrawn: true })
     }

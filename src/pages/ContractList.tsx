@@ -220,6 +220,11 @@ export default function ContractList() {
                   <td>{formatDate(contract.end_date)}</td>
                   <td>
                     <Badge status={contract.status} />
+                    {contract.notice_given_at && (
+                      <p className="mt-1 text-xs font-medium text-amber-700">
+                        {t('contractNotice.listLabel')}
+                      </p>
+                    )}
                   </td>
                   <td>
                     <div className="flex gap-2">
