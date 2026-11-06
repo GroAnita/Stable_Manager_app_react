@@ -12,6 +12,7 @@ import { EmergencyCallButton } from '../components/EmergencyCallButton'
 import { Icon, type IconName } from '../components/Icon'
 import { NotificationBell } from '../components/NotificationBell'
 import { OnboardingChecklist } from '../components/OnboardingChecklist'
+import { TestFlightInvite } from '../components/TestFlightInvite'
 import { WhatsNewBell } from '../components/WhatsNewBell'
 import { signOut } from '../lib/authService'
 import { useAuth } from '../lib/AuthContext'
@@ -384,6 +385,7 @@ export default function AppLayout() {
       {profile?.role === 'stable_owner' && profile.stable_id && (
         <OnboardingChecklist stableId={profile.stable_id} />
       )}
+      {profile?.role === 'stable_owner' && <TestFlightInvite />}
     </div>
   )
 }

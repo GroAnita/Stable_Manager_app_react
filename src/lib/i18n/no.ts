@@ -1186,6 +1186,13 @@ export const no: typeof en = {
     loading: 'Laster prisliste…',
     noStableFound: 'Fant ingen stall for denne brukeren. Vennligst logg inn.',
   },
+  testFlightInvite: {
+    title: 'Stalldrift for iPhone og iPad',
+    body: 'Appen for iPhone og iPad er nå klar til testing. Har du lyst til å prøve den, du og brukerne dine?',
+    howTo: 'Send e-postadressene til alle som ønsker å være med til oss, så sender vi dem en invitasjon. Spør gjerne brukerne dine først.',
+    subject: 'Vil prøve Stalldrift på iPhone/iPad',
+    close: 'Lukk',
+  },
   whatsNew: {
     title: 'Nyheter',
     titleWithCount: 'Nyheter, {count} uleste',
