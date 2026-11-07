@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { AnalyticsConsentToggle } from '../components/AnalyticsConsentToggle'
+import { DeleteAccountSection } from '../components/DeleteAccountSection'
 import {
   getMyOwnerRecord,
   updateOwner,
@@ -99,9 +100,7 @@ export default function MyProfile() {
         <h1 className="text-3xl font-semibold text-slate-900">
           {t('myProfile.title')}
         </h1>
-        <p className="mt-2 text-sm text-slate-500">
-          {t('myProfile.subtitle')}
-        </p>
+        <p className="mt-2 text-sm text-slate-500">{t('myProfile.subtitle')}</p>
       </div>
 
       {error && (
@@ -177,15 +176,11 @@ export default function MyProfile() {
             <input
               className="field"
               value={form.emergency_contact}
-              onChange={(e) =>
-                updateField('emergency_contact', e.target.value)
-              }
+              onChange={(e) => updateField('emergency_contact', e.target.value)}
             />
           </label>
           <label>
-            <span className="field-label">
-              {t('ownerForm.emergencyPhone')}
-            </span>
+            <span className="field-label">{t('ownerForm.emergencyPhone')}</span>
             <input
               type="tel"
               className="field"
@@ -221,6 +216,8 @@ export default function MyProfile() {
           <AnalyticsConsentToggle />
         </div>
       </div>
+
+      <DeleteAccountSection ownsStable={false} />
     </div>
   )
 }

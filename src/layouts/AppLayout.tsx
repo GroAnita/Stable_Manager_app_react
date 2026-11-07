@@ -10,6 +10,7 @@ import logoDark from '../assets/stalldrift-logo-dark.svg'
 import logoLight from '../assets/stalldrift-logo-light.svg'
 import { BillingBanner } from '../components/BillingBanner'
 import { EmergencyCallButton } from '../components/EmergencyCallButton'
+import { StableClosed } from '../components/StableClosed'
 import { Icon, type IconName } from '../components/Icon'
 import { NotificationBell } from '../components/NotificationBell'
 import { OnboardingChecklist } from '../components/OnboardingChecklist'
@@ -109,7 +110,7 @@ const OWNER_ALLOWED_PATHS = [
 // stays off-limits, mirroring how the owner role is restricted above.
 const instructorNavItems: NavItem[] = [lessonsItem]
 
-const INSTRUCTOR_ALLOWED_PATHS = ['/lessons']
+const INSTRUCTOR_ALLOWED_PATHS = ['/lessons', '/my-profile']
 
 function SidebarLink({
   item,
@@ -187,6 +188,10 @@ export default function AppLayout() {
   async function handleSignOut() {
     await signOut()
     navigate('/auth', { replace: true })
+  }
+
+  if (profile?.stable?.closed_at) {
+    return <StableClosed onSignOut={handleSignOut} />
   }
 
   if (isOwner && !ownerAllowedPaths.includes(location.pathname)) {
@@ -288,12 +293,10 @@ export default function AppLayout() {
           )}
         </nav>
         <div className="border-t border-white/70 pt-4">
-          {!isInstructor && (
-            <SidebarLink
-              item={isOwner ? ownerProfileItem : settingsItem}
-              onClick={() => setSidebarOpen(false)}
-            />
-          )}
+          <SidebarLink
+            item={isOwner || isInstructor ? ownerProfileItem : settingsItem}
+            onClick={() => setSidebarOpen(false)}
+          />
           <p className="mt-3 mb-2 truncate px-1 text-xs text-ink/60">
             {session?.user.email}
           </p>

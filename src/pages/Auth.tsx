@@ -40,7 +40,14 @@ export default function Auth() {
   const [submitting, setSubmitting] = useState(false)
   const [googleSubmitting, setGoogleSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [info, setInfo] = useState<string | null>(null)
+  const deleted = searchParams.get('deleted')
+  const [info, setInfo] = useState<string | null>(
+    deleted === 'stable'
+      ? t('deleteAccount.doneStable')
+      : deleted === 'account'
+        ? t('deleteAccount.doneAccount')
+        : null,
+  )
 
   useEffect(() => {
     if (!session) return

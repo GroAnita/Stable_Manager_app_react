@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { Capacitor } from '@capacitor/core'
 import { AnalyticsConsentToggle } from '../components/AnalyticsConsentToggle'
+import { DeleteAccountSection } from '../components/DeleteAccountSection'
 import { Icon, type IconName } from '../components/Icon'
 import {
   getMyProfile,
@@ -630,6 +631,9 @@ export default function Settings() {
                 </a>
               </div>
             </div>
+          )}
+          {section === 'account' && (
+            <DeleteAccountSection ownsStable={canEdit} />
           )}
 
           {section === 'languageAppearance' && (

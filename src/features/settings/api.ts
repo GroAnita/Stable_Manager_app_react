@@ -9,7 +9,7 @@ export type StableType = Database['public']['Enums']['stable_type']
 export type Profile = Database['public']['Tables']['profiles']['Row'] & {
   stable: Pick<
     Stable,
-    'name' | 'logo_url' | 'enabled_features' | 'vat_registered'
+    'name' | 'logo_url' | 'enabled_features' | 'vat_registered' | 'closed_at'
   > | null
 }
 
@@ -20,7 +20,9 @@ export async function getMyProfile(): Promise<Profile> {
   if (!user) throw new Error('Not signed in.')
   const { data, error } = await supabase
     .from('profiles')
-    .select('*, stable:stables(name, logo_url, enabled_features, vat_registered)')
+    .select(
+      '*, stable:stables(name, logo_url, enabled_features, vat_registered, closed_at)',
+    )
     .eq('id', user.id)
     .single()
   if (error) throw error
@@ -142,4 +144,14 @@ export async function openSubscriptionPortal(): Promise<string> {
 
 export async function changeSubscriptionPlan(plan: string): Promise<void> {
   await invokeBilling({ action: 'change_plan', plan })
+}
+
+// Deletes the signed-in user's account. A stable owner's stable is closed and
+// deleted after 3 months instead; see the delete-account function.
+export async function deleteMyAccount(): Promise<'deleted' | 'stable_closed'> {
+  const { data, error } = await supabase.functions.invoke('delete-account', {
+    body: { confirm: 'SLETT' },
+  })
+  if (error) throw await supabaseFunctionError(error)
+  return data.result
 }

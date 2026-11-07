@@ -29,6 +29,7 @@ export default function OwnerDetail() {
   const [horses, setHorses] = useState<OwnerHorse[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
   const [invite, setInvite] = useState<string | null>(null)
   const [inviteSaving, setInviteSaving] = useState(false)
   const [inviteError, setInviteError] = useState<string | null>(null)
@@ -61,11 +62,21 @@ export default function OwnerDetail() {
     if (
       !id ||
       !owner ||
-      !(await confirm(t('ownerDetail.confirmDelete', { name: owner.full_name })))
+      !(await confirm(
+        t('ownerDetail.confirmDelete', { name: owner.full_name }),
+      ))
     )
       return
-    await deleteOwner(id)
-    navigate('/owners')
+    try {
+      await deleteOwner(id)
+      navigate('/owners')
+    } catch (err) {
+      setDeleteError(
+        (err as Error).message.includes('owner_has_invoices')
+          ? t('ownerDetail.deleteBlockedInvoices')
+          : (err as Error).message,
+      )
+    }
   }
 
   async function handleGenerateInvite() {
@@ -161,6 +172,11 @@ export default function OwnerDetail() {
           </button>
         </div>
       </div>
+      {deleteError && (
+        <p role="alert" className="text-sm text-red-600">
+          {deleteError}
+        </p>
+      )}
 
       <div className="grid gap-6 xl:grid-cols-[1.1fr_1.4fr]">
         <div className="space-y-6">
