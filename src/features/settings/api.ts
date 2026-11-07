@@ -16,7 +16,10 @@ export type Profile = Database['public']['Tables']['profiles']['Row'] & {
 export async function getMyProfile(): Promise<Profile> {
   const {
     data: { user },
+    error: userError,
   } = await supabase.auth.getUser()
+  // Passed on as is, so a deleted or blocked user can be told apart from no network.
+  if (userError) throw userError
   if (!user) throw new Error('Not signed in.')
   const { data, error } = await supabase
     .from('profiles')

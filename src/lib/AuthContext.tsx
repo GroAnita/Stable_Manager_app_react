@@ -1,4 +1,4 @@
-import type { Session } from '@supabase/supabase-js'
+import { isAuthApiError, type Session } from '@supabase/supabase-js'
 import {
   createContext,
   useContext,
@@ -18,15 +18,19 @@ type AuthContextValue = {
   refreshProfile: () => Promise<void>
 }
 
+// The server no longer accepts this login: the user was deleted or blocked, for
+// example after deleting the account. Being offline doesn't count.
+function loginIsGone(error: unknown): boolean {
+  return isAuthApiError(error) && [401, 403, 404].includes(error.status)
+}
+
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState<Profile | null>(null)
-  const [profileForUserId, setProfileForUserId] = useState<string | null>(
-    null,
-  )
+  const [profileForUserId, setProfileForUserId] = useState<string | null>(null)
   const profileLoading =
     session !== null && profileForUserId !== session.user.id
 
@@ -62,8 +66,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then((data) => {
         if (!cancelled) setProfile(data)
       })
-      .catch(() => {
-        if (!cancelled) setProfile(null)
+      .catch((error: unknown) => {
+        if (cancelled) return
+        setProfile(null)
+        // Otherwise the app would send them to create a new stable.
+        if (loginIsGone(error)) void supabase.auth.signOut({ scope: 'local' })
       })
       .finally(() => {
         if (!cancelled) setProfileForUserId(session.user.id)
