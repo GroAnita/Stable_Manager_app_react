@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import 'flag-icons/css/flag-icons.min.css'
 import logoDark from '../assets/stalldrift-logo-dark.svg'
 import { Icon, type IconName } from '../components/Icon'
@@ -27,7 +27,10 @@ export default function Auth() {
   const navigate = useNavigate()
   const { session } = useAuth()
   const { t, language, setLanguage, setCurrency } = usePreferences()
-  const [mode, setMode] = useState<Mode>('login')
+  const [searchParams] = useSearchParams()
+  const [mode, setMode] = useState<Mode>(
+    searchParams.get('mode') === 'signup' ? 'signup' : 'login',
+  )
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')

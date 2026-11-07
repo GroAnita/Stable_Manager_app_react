@@ -1,3 +1,4 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "buildCommand": "npm run build:web",
+  "rewrites": [{ "source": "/(.*)", "destination": "/app.html" }]
 }

@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>ND-Stalldrift – stallsystem for oppstalling og stalldrift</title>
+    <meta name="description" content="Samle hester, hesteeiere, kontrakter, fakturaer, fôringsturnus og oppgaver på ett sted. Stallsystem for deg som driver stall. Prøv gratis i 30 dager." />
+    <link rel="canonical" href="https://www.ndstalldrift.no/" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ND-Stalldrift" />
+    <meta property="og:locale" content="nb_NO" />
+    <meta property="og:url" content="https://www.ndstalldrift.no/" />
+    <meta property="og:title" content="ND-Stalldrift – stallsystem for oppstalling og stalldrift" />
+    <meta property="og:description" content="Samle hester, hesteeiere, kontrakter, fakturaer, fôringsturnus og oppgaver på ett sted. Prøv gratis i 30 dager." />
+    <meta property="og:image" content="https://www.ndstalldrift.no/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="ND-Stalldrift: Alt stallen din trenger, på ett sted" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      // Logged-in users and login returns belong in the app, not on this page.
+      ;(function () {
+        var l = window.location
+        if (/access_token|error_description/.test(l.hash) || /[?&]code=/.test(l.search)) {
+          l.replace('/auth' + l.search + l.hash)
+          return
+        }
+        try {
+          for (var i = 0; i < localStorage.length; i++) {
+            if (/^sb-.*-auth-token$/.test(localStorage.key(i))) {
+              l.replace('/dashboard')
+              return
+            }
+          }
+        } catch (e) {}
+      })()
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "ND-Stalldrift",
+        "url": "https://www.ndstalldrift.no/",
+        "description": "Stallsystem som samler hester, hesteeiere, kontrakter, fakturaer, fôringsturnus og oppgaver på ett sted.",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web",
+        "inLanguage": "nb",
+        "offers": {
+          "@type": "AggregateOffer",
+          "priceCurrency": "NOK",
+          "lowPrice": "374",
+          "highPrice": "1499",
+          "offerCount": "4"
+        },
+        "publisher": { "@type": "Organization", "name": "Nestun Digital" }
+      }
+    </script>
+    <style>
+      :root { --forest: #3a6b52; --forest-dark: #2c5240; --gold: #d8b25a; --cream: #f7f6f2; --card: #ffffff; --ink: #24302a; --muted: #5d6a63; --line: #e4e4dc; }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+      body { margin: 0; background: var(--cream); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+      a { color: inherit; }
+      .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+      header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 0; }
+      .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; color: var(--forest); text-decoration: none; }
+      .brand img { width: 36px; height: 36px; }
+      .btn { display: inline-block; border-radius: 999px; padding: 12px 24px; font-weight: 600; font-size: 16px; text-decoration: none; text-align: center; }
+      .btn-primary { background: var(--forest); color: #fff; }
+      .btn-primary:hover { background: var(--forest-dark); }
+      .btn-ghost { color: var(--forest); border: 1.5px solid var(--forest); padding: 8px 18px; font-size: 15px; white-space: nowrap; }
+      .btn-ghost:hover { background: rgba(58, 107, 82, 0.08); }
+      .hero { padding: 48px 0 56px; }
+      h1 { font-size: clamp(34px, 6vw, 54px); line-height: 1.12; margin: 0; max-width: 780px; letter-spacing: -0.01em; }
+      .lead { font-size: clamp(18px, 2.4vw, 21px); color: var(--muted); max-width: 660px; margin: 20px 0 28px; }
+      .fine { font-size: 14px; color: var(--muted); margin-top: 12px; }
+      section { padding: 44px 0; }
+      h2 { font-size: clamp(26px, 4vw, 34px); line-height: 1.2; margin: 0 0 18px; }
+      h2 + .intro { margin-top: -8px; }
+      .intro { color: var(--muted); max-width: 640px; margin: 0 0 26px; }
+      .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+      .plans { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+      .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
+      .card h3 { margin: 0 0 6px; font-size: 18px; color: var(--forest); }
+      .card p { margin: 0; color: var(--muted); font-size: 15.5px; }
+      .card.wide { grid-column: 1 / -1; }
+      .band { background: var(--card); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+      ol.steps { margin: 0; padding-left: 22px; max-width: 680px; }
+      ol.steps li { margin-bottom: 10px; }
+      .card .price { font-size: 28px; font-weight: 700; color: var(--ink); margin-top: 6px; }
+      .card .price span { font-size: 15px; font-weight: 400; color: var(--muted); }
+      details { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 18px; margin-bottom: 10px; max-width: 760px; }
+      summary { font-weight: 600; cursor: pointer; }
+      details p { margin: 10px 0 0; color: var(--muted); }
+      .shot { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 10px; overflow-x: auto; }
+      .shot img { display: block; width: 100%; min-width: 760px; height: auto; }
+      .shot-caption { font-size: 14px; color: var(--muted); margin: 10px 2px 0; }
+      .pay { background: #e9f0eb; }
+      .pay .shot { margin-top: 18px; }
+      .badge { display: inline-block; background: var(--gold); color: #3b2f0e; font-size: 13px; font-weight: 700; border-radius: 999px; padding: 3px 12px; margin-bottom: 12px; }
+      .pay .fine a { color: var(--forest); font-weight: 600; }
+      .cta { background: var(--forest); color: #fff; text-align: center; }
+      .cta h2 { color: #fff; }
+      .cta p { color: rgba(255, 255, 255, 0.85); margin: 0 auto 24px; max-width: 560px; }
+      .cta .btn { background: #fff; color: var(--forest); }
+      footer { padding: 28px 0; font-size: 14px; color: var(--muted); }
+      footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <a class="brand" href="/"><img src="/favicon.svg" alt="" width="36" height="36" />ND-Stalldrift</a>
+        <a class="btn btn-ghost" href="/auth">Logg inn</a>
+      </header>
+      <main>
+        <div class="hero">
+          <h1>Stallsystemet som samler hele stalldriften på ett sted</h1>
+          <p class="lead">Hold orden på hester, hesteeiere, bokser, kontrakter, fakturaer og fôringsturnus, på mobilen, nettbrettet og PC-en. Laget for norske staller.</p>
+          <a class="btn btn-primary" href="/auth?mode=signup">Prøv gratis i 30 dager</a>
+          <p class="fine">Du trenger ikke betalingskort for å prøve.</p>
+        </div>
+      </main>
+    </div>
+
+    <section class="band" id="funksjoner">
+      <div class="wrap">
+        <h2>Alt du trenger for å drive stall</h2>
+        <p class="intro">Slipp lapper, regneark og lange meldingstråder. Alle ser det de trenger, og ingenting faller mellom to stoler.</p>
+        <div class="grid">
+          <div class="card"><h3>Hester og eiere</h3><p>Hesteprofiler med fôringsplaner og vaksinasjonsoversikt, og eiere samlet i ett register.</p></div>
+          <div class="card"><h3>Fôringsturnus</h3><p>Lag turnus automatisk og rettferdig fordelt etter antall hester. Eierne kan melde fra om dager de ikke kan.</p></div>
+          <div class="card"><h3>Kontrakter og fakturaer</h3><p>Oppstallingskontrakter, månedlige fakturaer og oversikt over hva som er betalt, med prisliste for grovfôr, strø og tjenester.</p></div>
+          <div class="card"><h3>Bokser og paddocker</h3><p>Se hvilke bokser som er ledige, hvem som står hvor, og hvordan paddockene brukes.</p></div>
+          <div class="card"><h3>Oppgaver og kalender</h3><p>Fordel arbeidet i stallen, med oppgaver som gjentar seg, og samle hendelsene i én kalender.</p></div>
+          <div class="card"><h3>Oppslagstavle</h3><p>Del beskjeder med hele stallen på ett sted, så ingen går glipp av noe.</p></div>
+          <div class="card"><h3>Lager og rapporter</h3><p>Følg med på beholdningen og få oversikt over hvordan driften går.</p></div>
+          <div class="card"><h3>Roller for alle</h3><p>Egne visninger for stalleier, ansatte og hesteeiere. Alle ser bare det de trenger.</p></div>
+          <div class="card"><h3>Stallrutiner</h3><p>Sett stallens faste fôringstider én gang. Hver hest velger fra samme liste, og tidene brukes i fôringsturnusen.</p></div>
+          <div class="card wide"><h3>Brannsikkerhet</h3><p>Kravene til hestestaller fra forskrift om velferd for hest er oppsummert på ett sted, og sjekklisten viser når ting sist ble sjekket og når neste sjekk bør skje. Programmet viser også om stallen er stor nok til at det kreves brannvarslingsanlegg, så du har oversikt uten å lete i regelverket.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="turnus">
+      <div class="wrap">
+        <h2>Fôringsturnus uten krangel</h2>
+        <p class="intro">Velg periode og hvilke fôringer som skal dekkes. Programmet fordeler vaktene etter hvor mange hester hver eier har, tar hensyn til dagene de ikke kan, og du publiserer når du er fornøyd.</p>
+        <figure class="shot">
+          <img src="/screenshots/foringsturnus.png" width="1517" height="486" loading="lazy" alt="Fôringsturnus i ND-Stalldrift: to uker med frokost, lunsj, middag og kveldsmat fordelt på fire hesteeiere" />
+        </figure>
+        <p class="shot-caption">Eksempel fra programmet. Navnene er oppdiktet.</p>
+      </div>
+    </section>
+
+    <section class="band" id="hesteprofil">
+      <div class="wrap">
+        <h2>Alt om hver hest, samlet på ett sted</h2>
+        <p class="intro">Pass, mikrochip, eier, boks og paddock, vaksinasjonsstatus, forsikring, allergier og medisinske notater. Du slipper å lete når du trenger det.</p>
+        <figure class="shot">
+          <img src="/screenshots/hesteprofil.png" width="1025" height="560" loading="lazy" alt="Hesteprofil i ND-Stalldrift med pass, mikrochip, eier, boks, paddock, vaksinasjonsstatus og forsikring" />
+        </figure>
+        <p class="shot-caption">Eksempel fra programmet. Opplysningene er oppdiktet.</p>
+      </div>
+    </section>
+
+    <section class="pay" id="kortbetaling">
+      <div class="wrap">
+        <span class="badge">Kommer snart</span>
+        <h2>Kortbetaling av stalleie, rett i programmet</h2>
+        <p class="intro">Slipp å følge opp hvem som har betalt. Hesteeieren godkjenner en kortavtale, og du trekker stalleien med ett klikk. Fakturaen, betalingen og regnskapsgrunnlaget henger sammen på ett sted.</p>
+        <div class="grid">
+          <div class="card"><h3>Digital kortavtale</h3><p>Hesteeieren signerer avtalen og lagrer kortet sitt selv. Du ser hvem som har signert.</p></div>
+          <div class="card"><h3>Faktura før trekket</h3><p>Hesteeieren får en spesifisert faktura på e-post minst 7 dager før kortet trekkes.</p></div>
+          <div class="card"><h3>Trekk med ett klikk</h3><p>Trekk fakturaen når den forfaller, eller la hesteeieren betale selv med «Betal nå».</p></div>
+          <div class="card"><h3>Pengene går til stallen</h3><p>Betalingen går gjennom Stripe til stallens egen konto, ikke via oss.</p></div>
+          <div class="card"><h3>Oversikt når et trekk feiler</h3><p>Hesteeieren får beskjed, og du ser hva som ikke er betalt.</p></div>
+          <div class="card"><h3>Klart for regnskapet</h3><p>Kreditnotaer, oversikt over utbetalinger og mva-grunnlag du kan laste ned til regnskapsføreren.</p></div>
+        </div>
+        <figure class="shot">
+          <img src="/screenshots/fakturaer.png" width="1496" height="261" loading="lazy" alt="Fakturaoversikt i ND-Stalldrift med forfallsdato, beløp, status og knappen Betal nå" />
+        </figure>
+        <p class="shot-caption">Slik ser hesteeieren fakturaene sine. Eksempel fra programmet, med oppdiktede tall.</p>
+        <p class="fine">Kortbetaling blir et tillegg på abonnementet: 250 kr per måned inkludert mva for stallen, uansett hvor mange betalinger dere har. Stripes gebyr per betaling kommer i tillegg og betales av stallen. Vil du være blant de første? <a href="mailto:support@nestundigital.no?subject=Kortbetaling%20i%20ND-Stalldrift">Si fra til oss</a>.</p>
+      </div>
+    </section>
+
+    <section id="hvem">
+      <div class="wrap">
+        <h2>For staller i alle størrelser</h2>
+        <div class="grid">
+          <div class="card"><h3>Oppstallingsstaller</h3><p>Kontrakter, fakturering og fôringsturnus for stallen med mange hesteeiere.</p></div>
+          <div class="card"><h3>Rideskoler</h3><p>Ridetimer og kurs sammen med resten av driften.</p></div>
+          <div class="card"><h3>Private staller</h3><p>Enkel oversikt over hester, oppgaver og hvem som gjør hva.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band" id="priser">
+      <div class="wrap">
+        <h2>Priser</h2>
+        <p class="intro">Prisen følger antall hester. Alle priser er per måned og inkludert mva. De første 30 dagene er gratis.</p>
+        <div class="grid plans">
+          <div class="card"><h3>Liten</h3><p>Opptil 10 hester</p><p class="price">374 kr <span>/mnd</span></p></div>
+          <div class="card"><h3>Mellomstor</h3><p>11–20 hester</p><p class="price">749 kr <span>/mnd</span></p></div>
+          <div class="card"><h3>Stor</h3><p>21–30 hester</p><p class="price">1 124 kr <span>/mnd</span></p></div>
+          <div class="card"><h3>Ekstra stor</h3><p>Over 30 hester</p><p class="price">1 499 kr <span>/mnd</span></p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="kom-i-gang">
+      <div class="wrap">
+        <h2>Slik kommer du i gang</h2>
+        <ol class="steps">
+          <li>Opprett en konto og legg inn stallen din.</li>
+          <li>Legg inn bokser, hester, eiere og prisliste. En sjekkliste viser deg veien.</li>
+          <li>Inviter hesteeiere og ansatte, så er alle på samme sted.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="band" id="spørsmål">
+      <div class="wrap">
+        <h2>Vanlige spørsmål</h2>
+        <details><summary>Hva koster det å prøve?</summary><p>Ingenting. De første 30 dagene er gratis, og du trenger ikke legge inn betalingskort. Etterpå velger du abonnement etter antall hester.</p></details>
+        <details><summary>Fungerer det på mobilen?</summary><p>Ja. ND-Stalldrift åpnes i nettleseren på mobil, nettbrett og PC.</p></details>
+        <details><summary>Må hesteeierne betale for å bruke det?</summary><p>Nei. Stallen har abonnementet, og hesteeiere og ansatte inviteres inn i stallens konto.</p></details>
+        <details><summary>Hva skjer hvis jeg ikke velger abonnement?</summary><p>Når prøveperioden er over, har du 14 dager på å velge abonnement. Deretter blir stallen skrivebeskyttet, så du kan fortsatt lese det du har lagt inn.</p></details>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="wrap">
+        <h2>Klar for en enklere stallhverdag?</h2>
+        <p>Opprett en konto og test med din egen stall i 30 dager.</p>
+        <a class="btn" href="/auth?mode=signup">Prøv gratis</a>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        <span>© Nestun Digital</span>
+        <a href="mailto:support@nestundigital.no">support@nestundigital.no</a>
+      </div>
+    </footer>
+    <script defer src="/_vercel/insights/script.js"></script>
+  </body>
+</html>
