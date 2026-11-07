@@ -86,6 +86,10 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
+    document.documentElement.lang = language
+  }, [language])
+
+  useEffect(() => {
     function applyTheme() {
       const isDark = theme === 'dark' || (theme === 'system' && systemPrefersDark())
       document.documentElement.classList.toggle('dark', isDark)

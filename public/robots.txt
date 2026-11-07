@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /invite/
+Disallow: /reset-password
+
+Sitemap: https://www.ndstalldrift.no/sitemap.xml
