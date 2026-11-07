@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { webOrigin } from '../lib/platform'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import 'flag-icons/css/flag-icons.min.css'
 import logoDark from '../assets/stalldrift-logo-dark.svg'
@@ -384,6 +385,16 @@ export default function Auth() {
               </button>
             </p>
           )}
+          <p className="mt-4 text-center text-xs text-slate-400">
+            <a
+              href={`${webOrigin()}/personvern`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              {t('auth.privacyPolicyLink')}
+            </a>
+          </p>
         </div>
       </div>
     </main>

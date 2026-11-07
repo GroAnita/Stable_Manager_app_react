@@ -111,6 +111,7 @@ export const no: typeof en = {
     invalidResetLink:
       'Denne lenken er ugyldig eller har utløpt. Be om en ny nedenfor.',
     marketingHeadline: 'Alt stallen din trenger, på ett sted',
+    privacyPolicyLink: 'Personvernerklæring',
     marketingSubtitle:
       'Hester, kontrakter, fakturering og hele teamet i ett enkelt dashbord — på norsk eller engelsk.',
     marketingFeatureHorses:
@@ -1450,6 +1451,7 @@ export const no: typeof en = {
     accountEmail: 'E-post:',
     accountRole: 'Rolle:',
     privacyTitle: 'Personvern',
+    privacyPolicyLink: 'Les personvernerklæringen',
     privacyAnalyticsLabel: 'Tillat analyse (Microsoft Clarity)',
     privacyAnalyticsHint:
       'Hjelper oss å se hvilke deler av appen som er forvirrende eller mest brukt, slik at vi vet hva vi bør forbedre. Å slå dette av laster siden på nytt for å stoppe sporingen umiddelbart.',

@@ -108,6 +108,7 @@ export const en = {
     invalidResetLink:
       'This reset link is invalid or has expired. Request a new one below.',
     marketingHeadline: 'Everything your stable needs, in one place',
+    privacyPolicyLink: 'Privacy policy',
     marketingSubtitle:
       'Horses, contracts, invoicing and the whole team on one simple dashboard — in English or Norwegian.',
     marketingFeatureHorses:
@@ -1450,6 +1451,7 @@ export const en = {
     accountEmail: 'Email:',
     accountRole: 'Role:',
     privacyTitle: 'Privacy',
+    privacyPolicyLink: 'Privacy policy',
     privacyAnalyticsLabel: 'Allow analytics (Microsoft Clarity)',
     privacyAnalyticsHint:
       'Helps us see which parts of the app are confusing or get used the most, so we know what to improve. Turning this off will reload the page to stop tracking right away.',

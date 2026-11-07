@@ -18,6 +18,7 @@ import {
   type Language,
   type Theme,
 } from '../lib/PreferencesContext'
+import { webOrigin } from '../lib/platform'
 import { SUPPORT_EMAIL, supportMailto } from '../lib/support'
 import { isPaymentsAddonEnabled } from '../features/payments/connect'
 import { BillingPanel } from './settings/BillingPanel'
@@ -619,6 +620,14 @@ export default function Settings() {
                 <div className="mt-3">
                   <AnalyticsConsentToggle />
                 </div>
+                <a
+                  href={`${webOrigin()}/personvern`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-block text-sm font-medium text-forest hover:underline"
+                >
+                  {t('settings.privacyPolicyLink')}
+                </a>
               </div>
             </div>
           )}
