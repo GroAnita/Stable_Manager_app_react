@@ -3,6 +3,22 @@
 import type Stripe from 'npm:stripe@23.1.0'
 import { priceLookupKey } from './subscriptionState.ts'
 
+// The product names in Stripe, as the stable owner sees them on receipts and
+// invoices. Plans with card payments are StallOrgPro.
+const SIZE_NAMES: Record<string, string> = {
+  small: 'Liten',
+  medium: 'Medium',
+  large: 'Stor',
+  xlarge: 'XL',
+}
+
+export function stripeProductName(plan: string, fallback: string): string {
+  const withPayments = plan.endsWith('_payments')
+  const size = SIZE_NAMES[plan.replace(/_payments$/, '')]
+  if (!size) return `StallOrg ${fallback}`
+  return `${withPayments ? 'StallOrgPro' : 'StallOrg'} ${size}`
+}
+
 // Finds the plan's price in Stripe, making it from public.subscription_plans the first
 // time or when the price there has changed, so the two can't drift apart.
 export async function ensurePrice(
@@ -40,7 +56,7 @@ export async function ensurePrice(
       transfer_lookup_key: true,
       // The price stays the same for customers when VAT registration comes.
       tax_behavior: 'inclusive',
-      product_data: { name: `StallOrg ${row.name}` },
+      product_data: { name: stripeProductName(plan, row.name) },
     },
     { idempotencyKey: `stalldrift-price-${lookupKey}-${unitAmount}` },
   )
