@@ -1,3 +1,4 @@
+import AuthenticationServices
 import Capacitor
 import UIKit
 import WebKit
@@ -13,6 +14,75 @@ class MainViewController: CAPBridgeViewController {
         let wrapped = PrintingWebViewUIDelegate(forwardingTo: webView.uiDelegate)
         printingUIDelegate = wrapped
         webView.uiDelegate = wrapped
+        bridge?.registerPluginInstance(AppleSignInPlugin())
+    }
+}
+
+// Shows Apple's own sign-in sheet and hands the identity token to the web app,
+// which signs in to Supabase with it (authService.ts, signInWithApple).
+@objc(AppleSignInPlugin)
+class AppleSignInPlugin: CAPPlugin, CAPBridgedPlugin,
+    ASAuthorizationControllerDelegate,
+    ASAuthorizationControllerPresentationContextProviding
+{
+    let identifier = "AppleSignInPlugin"
+    let jsName = "AppleSignIn"
+    let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "signIn", returnType: CAPPluginReturnPromise)
+    ]
+    private var pendingCall: CAPPluginCall?
+
+    @objc func signIn(_ call: CAPPluginCall) {
+        guard let nonce = call.getString("nonce"), !nonce.isEmpty else {
+            call.reject("Missing nonce")
+            return
+        }
+        pendingCall = call
+        let request = ASAuthorizationAppleIDProvider().createRequest()
+        request.requestedScopes = [.fullName, .email]
+        request.nonce = nonce
+        DispatchQueue.main.async {
+            let controller = ASAuthorizationController(authorizationRequests: [request])
+            controller.delegate = self
+            controller.presentationContextProvider = self
+            controller.performRequests()
+        }
+    }
+
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        bridge?.webView?.window ?? ASPresentationAnchor()
+    }
+
+    func authorizationController(
+        controller: ASAuthorizationController,
+        didCompleteWithAuthorization authorization: ASAuthorization
+    ) {
+        defer { pendingCall = nil }
+        guard
+            let credential = authorization.credential as? ASAuthorizationAppleIDCredential,
+            let tokenData = credential.identityToken,
+            let token = String(data: tokenData, encoding: .utf8)
+        else {
+            pendingCall?.reject("Apple gave no identity token")
+            return
+        }
+        pendingCall?.resolve([
+            "identityToken": token,
+            "givenName": credential.fullName?.givenName ?? "",
+            "familyName": credential.fullName?.familyName ?? "",
+        ])
+    }
+
+    func authorizationController(
+        controller: ASAuthorizationController,
+        didCompleteWithError error: Error
+    ) {
+        defer { pendingCall = nil }
+        if (error as? ASAuthorizationError)?.code == .canceled {
+            pendingCall?.reject("Cancelled", "CANCELLED")
+        } else {
+            pendingCall?.reject(error.localizedDescription)
+        }
     }
 }
 

@@ -83,6 +83,7 @@ export const no: typeof en = {
     hidePassword: 'Skjul passord',
     pleaseWait: 'Vennligst vent…',
     orContinueWith: 'Eller fortsett med',
+    continueWithApple: 'Fortsett med Apple',
     continueWithGoogle: 'Fortsett med Google',
     signIn: 'Logg inn',
     signUp: 'Registrer deg',

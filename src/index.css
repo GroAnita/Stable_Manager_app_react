@@ -113,6 +113,10 @@
 .logo-for-dark {
   display: none;
 }
+.dark .btn-apple {
+  background-color: #fff;
+  color: #000;
+}
 .dark .logo-for-light {
   display: none;
 }
@@ -189,6 +193,9 @@
   }
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 rounded-xl bg-secondary px-4 py-2.5 text-sm font-medium text-white hover:bg-secondary/90;
+  }
+  .btn-apple {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-black px-4 py-2.5 text-sm font-medium text-white hover:bg-black/85 disabled:opacity-60;
   }
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-card px-4 py-2.5 text-sm font-medium text-slate-700 hover:border-forest/20 hover:text-forest;

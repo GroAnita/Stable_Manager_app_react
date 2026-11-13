@@ -81,6 +81,7 @@ export const en = {
     hidePassword: 'Hide password',
     pleaseWait: 'Please wait…',
     orContinueWith: 'Or continue with',
+    continueWithApple: 'Continue with Apple',
     continueWithGoogle: 'Continue with Google',
     signIn: 'Sign in',
     signUp: 'Sign up',
