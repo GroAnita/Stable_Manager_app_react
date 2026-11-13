@@ -1427,12 +1427,6 @@ export const en = {
     failedToLoad: 'Failed to load inventory: {error}',
     noStableFound: 'No stable found for the current user. Please sign in.',
   },
-  consent: {
-    message:
-      'We use Microsoft Clarity to understand how the app is used, so we can improve it. No data is sold. You can change your mind anytime in Settings.',
-    accept: 'Accept',
-    decline: 'Decline',
-  },
   deleteAccount: {
     title: 'Delete account',
     memberBody: 'Your login and profile are deleted, and you can’t sign in again. What the stable has registered about you, such as your owner card, contracts and invoices, stays with the stable, because it is responsible for them and must keep its accounts. An active card agreement ends and your card is removed. The stable is told.',
@@ -1474,9 +1468,6 @@ export const en = {
     accountRole: 'Role:',
     privacyTitle: 'Privacy',
     privacyPolicyLink: 'Privacy policy',
-    privacyAnalyticsLabel: 'Allow analytics (Microsoft Clarity)',
-    privacyAnalyticsHint:
-      'Helps us see which parts of the app are confusing or get used the most, so we know what to improve. Turning this off will reload the page to stop tracking right away.',
     staffInvite: 'Staff access',
     staffInviteHint:
       'Generate a link to send a staff member so they can create a login with access to your stable.',

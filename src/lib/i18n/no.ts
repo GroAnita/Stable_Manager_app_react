@@ -1427,12 +1427,6 @@ export const no: typeof en = {
     failedToLoad: 'Kunne ikke laste lager: {error}',
     noStableFound: 'Fant ingen stall for denne brukeren. Vennligst logg inn.',
   },
-  consent: {
-    message:
-      'Vi bruker Microsoft Clarity for å forstå hvordan appen brukes, slik at vi kan forbedre den. Ingen data selges. Du kan endre dette når du vil under Innstillinger.',
-    accept: 'Godta',
-    decline: 'Avslå',
-  },
   deleteAccount: {
     title: 'Slett konto',
     memberBody: 'Innloggingen og profilen din slettes, og du kan ikke logge inn igjen. Det stallen har registrert om deg, som eierkort, kontrakter og fakturaer, blir hos stallen, fordi stallen er ansvarlig for dem og må ta vare på regnskapet. En aktiv kortavtale avsluttes, og kortet ditt fjernes. Stallen får beskjed.',
@@ -1474,9 +1468,6 @@ export const no: typeof en = {
     accountRole: 'Rolle:',
     privacyTitle: 'Personvern',
     privacyPolicyLink: 'Les personvernerklæringen',
-    privacyAnalyticsLabel: 'Tillat analyse (Microsoft Clarity)',
-    privacyAnalyticsHint:
-      'Hjelper oss å se hvilke deler av appen som er forvirrende eller mest brukt, slik at vi vet hva vi bør forbedre. Å slå dette av laster siden på nytt for å stoppe sporingen umiddelbart.',
     staffInvite: 'Ansattes tilgang',
     staffInviteHint:
       'Lag en lenke du kan sende til en ansatt, slik at de kan lage en pålogging med tilgang til stallen din.',

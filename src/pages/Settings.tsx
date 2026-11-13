@@ -1,7 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { Capacitor } from '@capacitor/core'
-import { AnalyticsConsentToggle } from '../components/AnalyticsConsentToggle'
 import { DeleteAccountSection } from '../components/DeleteAccountSection'
 import { Icon, type IconName } from '../components/Icon'
 import {
@@ -618,9 +617,6 @@ export default function Settings() {
                 <h3 className="text-sm font-semibold text-slate-800">
                   {t('settings.privacyTitle')}
                 </h3>
-                <div className="mt-3">
-                  <AnalyticsConsentToggle />
-                </div>
                 <a
                   href={`${webOrigin()}/personvern`}
                   target="_blank"

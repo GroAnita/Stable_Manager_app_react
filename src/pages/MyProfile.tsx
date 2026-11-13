@@ -1,11 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { AnalyticsConsentToggle } from '../components/AnalyticsConsentToggle'
 import { DeleteAccountSection } from '../components/DeleteAccountSection'
 import {
   getMyOwnerRecord,
   updateOwner,
   type Owner,
 } from '../features/owners/api'
+import { webOrigin } from '../lib/platform'
 import { usePreferences } from '../lib/PreferencesContext'
 
 type FormState = {
@@ -212,9 +212,14 @@ export default function MyProfile() {
 
       <div className="panel p-5">
         <h2 className="section-title">{t('settings.privacyTitle')}</h2>
-        <div className="mt-3">
-          <AnalyticsConsentToggle />
-        </div>
+        <a
+          href={`${webOrigin()}/personvern`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 inline-block text-sm font-medium text-forest hover:underline"
+        >
+          {t('settings.privacyPolicyLink')}
+        </a>
       </div>
 
       <DeleteAccountSection ownsStable={false} />

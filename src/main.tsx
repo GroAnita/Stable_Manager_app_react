@@ -7,16 +7,23 @@ import { Capacitor } from '@capacitor/core'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import './index.css'
-import { ConsentBanner } from './components/ConsentBanner'
 import { AuthProvider } from './lib/AuthContext'
 import { ConfirmProvider } from './lib/ConfirmContext'
-import { initClarity } from './lib/clarity'
 import { disableNumberInputStepping } from './lib/numberInputs'
 import { PreferencesProvider } from './lib/PreferencesContext'
 import { router } from './router'
 import { supabase } from './lib/supabaseClient'
 
-initClarity()
+// Microsoft Clarity is gone. Clear the consent choice and the cookies it set for
+// those who accepted, so nothing from it stays on the device.
+try {
+  localStorage.removeItem('stalldrift.analyticsConsent')
+} catch {
+  // ignore storage errors (e.g. private browsing)
+}
+for (const name of ['_clck', '_clsk', 'CLID', 'ANONCHK', 'MR', 'MUID', 'SM']) {
+  document.cookie = `${name}=; Max-Age=0; path=/`
+}
 disableNumberInputStepping()
 
 // A deploy can ship new, differently-hashed JS chunks while a tab is still
@@ -49,7 +56,6 @@ createRoot(document.getElementById('root')!).render(
           <RouterProvider router={router} />
         </ConfirmProvider>
       </AuthProvider>
-      <ConsentBanner />
       <SpeedInsights />
       <Analytics />
     </PreferencesProvider>
