@@ -23,7 +23,7 @@ export async function sendEmail(input: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: name ? `"${name} via Stalldrift" <${from}>` : from,
+        from: name ? `"${name} via StallOrg" <${from}>` : from,
         to: [to],
         ...(input.replyTo ? { reply_to: input.replyTo } : {}),
         subject: input.subject,

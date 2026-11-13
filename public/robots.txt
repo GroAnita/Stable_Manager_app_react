@@ -3,4 +3,4 @@ Allow: /
 Disallow: /invite/
 Disallow: /reset-password
 
-Sitemap: https://www.ndstalldrift.no/sitemap.xml
+Sitemap: https://www.stallorg.no/sitemap.xml

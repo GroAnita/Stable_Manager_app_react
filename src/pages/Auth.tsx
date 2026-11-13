@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { webOrigin } from '../lib/platform'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import 'flag-icons/css/flag-icons.min.css'
-import logoDark from '../assets/stalldrift-logo-dark.svg'
+import logoDark from '../assets/stallorg-logo-dark.svg'
 import { Icon, type IconName } from '../components/Icon'
 import {
   requestPasswordReset,

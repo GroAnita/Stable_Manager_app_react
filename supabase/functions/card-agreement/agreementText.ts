@@ -2,7 +2,7 @@
 // specific is filled in from the stable, boarder and contract. Change VERSION
 // whenever the wording changes, because each acceptance is stored with it.
 
-export const AGREEMENT_VERSION = '1.1, 6. november 2026'
+export const AGREEMENT_VERSION = '1.2, 13. november 2026'
 
 export type AgreementFields = {
   stableName: string
@@ -71,7 +71,7 @@ export function buildAgreement(fields: AgreementFields): Agreement {
       {
         heading: '1 Samtykke til automatisk betaling',
         paragraphs: [
-          `Jeg gir ${stable} tillatelse til å belaste mitt registrerte betalingskort automatisk hver måned for betaling etter oppstallingsavtalen. Betalingen administreres gjennom Stalldrift og behandles av Stripe.`,
+          `Jeg gir ${stable} tillatelse til å belaste mitt registrerte betalingskort automatisk hver måned for betaling etter oppstallingsavtalen. Betalingen administreres gjennom StallOrg og behandles av Stripe.`,
           'Tillatelsen gjelder denne stallen og betalingene beskrevet nedenfor.',
         ],
       },
@@ -109,8 +109,8 @@ export function buildAgreement(fields: AgreementFields): Agreement {
       {
         heading: '6 Avslutte automatisk betaling',
         paragraphs: [
-          `Jeg kan trekke tilbake tillatelsen til fremtidige automatiske korttrekk ved å velge «Avslutt automatisk betaling» under Min kontrakt i Stalldrift, eller ved å sende melding til ${withdrawContact}.`,
-          'Tilbaketrekkingen gjelder fra den er registrert i Stalldrift eller meldingen er kommet frem til stallen. Den krever ikke godkjenning fra stallen. Stallen skal da stanse fremtidige automatiske trekk og nye trekkforsøk under denne tillatelsen, og sende meg en bekreftelse.',
+          `Jeg kan trekke tilbake tillatelsen til fremtidige automatiske korttrekk ved å velge «Avslutt automatisk betaling» under Min kontrakt i StallOrg, eller ved å sende melding til ${withdrawContact}.`,
+          'Tilbaketrekkingen gjelder fra den er registrert i StallOrg eller meldingen er kommet frem til stallen. Den krever ikke godkjenning fra stallen. Stallen skal da stanse fremtidige automatiske trekk og nye trekkforsøk under denne tillatelsen, og sende meg en bekreftelse.',
           'Et trekk som allerede er gjennomført, blir ikke automatisk tilbakeført. Dersom en betaling allerede er sendt til behandling, skal stallen opplyse om den kan stoppes. Mine rettigheter til å bestride betalingen påvirkes ikke.',
           'Å avslutte automatisk betaling avslutter ikke oppstallingsavtalen og fjerner ikke betalingsplikten for gyldige krav. Ubetalte og fremtidige fakturaer må da betales på annen avtalt måte.',
         ],
@@ -125,7 +125,7 @@ export function buildAgreement(fields: AgreementFields): Agreement {
         heading: '8 Personopplysninger',
         paragraphs: [
           `${stable}${fields.stableOrgNumber ? `, org.nr. ${fields.stableOrgNumber},` : ''} er behandlingsansvarlig for personopplysninger som brukes til å administrere oppstallingsforholdet og stallens fakturering. Kontakt: ${contact}.`,
-          'Stallen bruker Stalldrift til avtale- og betalingsadministrasjon og Stripe til kortbetaling. Nødvendige kunde-, avtale-, faktura- og betalingsopplysninger behandles for å administrere avtalen, gjennomføre betaling og oppfylle lovpålagte plikter.',
+          'Stallen bruker StallOrg til avtale- og betalingsadministrasjon og Stripe til kortbetaling. Nødvendige kunde-, avtale-, faktura- og betalingsopplysninger behandles for å administrere avtalen, gjennomføre betaling og oppfylle lovpålagte plikter.',
           `Mer informasjon om behandlingsgrunnlag, mottakere, eventuell overføring utenfor EØS, lagringstid og dine personvernrettigheter finnes i ${
             fields.stablePrivacyPolicyUrl
               ? `stallens personvernerklæring: ${fields.stablePrivacyPolicyUrl}`

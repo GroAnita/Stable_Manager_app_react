@@ -3,22 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>ND-Stalldrift – stallsystem for oppstalling og stalldrift</title>
+    <title>StallOrg – stallsystem for oppstalling og stalldrift</title>
     <meta name="description" content="Samle hester, hesteeiere, kontrakter, fakturaer, fôringsturnus og oppgaver på ett sted. Stallsystem for deg som driver stall. Prøv gratis i 30 dager." />
-    <link rel="canonical" href="https://www.ndstalldrift.no/" />
+    <link rel="canonical" href="https://www.stallorg.no/" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="ND-Stalldrift" />
+    <meta property="og:site_name" content="StallOrg" />
     <meta property="og:locale" content="nb_NO" />
-    <meta property="og:url" content="https://www.ndstalldrift.no/" />
-    <meta property="og:title" content="ND-Stalldrift – stallsystem for oppstalling og stalldrift" />
+    <meta property="og:url" content="https://www.stallorg.no/" />
+    <meta property="og:title" content="StallOrg – stallsystem for oppstalling og stalldrift" />
     <meta property="og:description" content="Samle hester, hesteeiere, kontrakter, fakturaer, fôringsturnus og oppgaver på ett sted. Prøv gratis i 30 dager." />
-    <meta property="og:image" content="https://www.ndstalldrift.no/og-image.png" />
+    <meta property="og:image" content="https://www.stallorg.no/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="ND-Stalldrift: Alt stallen din trenger, på ett sted" />
+    <meta property="og:image:alt" content="StallOrg: Alt stallen din trenger, på ett sted" />
     <meta name="twitter:card" content="summary_large_image" />
     <script>
       // Logged-in users and login returns belong in the app, not on this page.
@@ -42,8 +42,8 @@
       {
         "@context": "https://schema.org",
         "@type": "WebApplication",
-        "name": "ND-Stalldrift",
-        "url": "https://www.ndstalldrift.no/",
+        "name": "StallOrg",
+        "url": "https://www.stallorg.no/",
         "description": "Stallsystem som samler hester, hesteeiere, kontrakter, fakturaer, fôringsturnus og oppgaver på ett sted.",
         "applicationCategory": "BusinessApplication",
         "operatingSystem": "Web",
@@ -67,7 +67,7 @@
       .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
       header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 0; }
       .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; color: var(--forest); text-decoration: none; }
-      .brand img { width: 36px; height: 36px; }
+      .brand img { width: 150px; height: auto; display: block; }
       .btn { display: inline-block; border-radius: 999px; padding: 12px 24px; font-weight: 600; font-size: 16px; text-decoration: none; text-align: center; }
       .btn-primary { background: var(--forest); color: #fff; }
       .btn-primary:hover { background: var(--forest-dark); }
@@ -113,7 +113,7 @@
   <body>
     <div class="wrap">
       <header class="top">
-        <a class="brand" href="/"><img src="/favicon.svg" alt="" width="36" height="36" />ND-Stalldrift</a>
+        <a class="brand" href="/"><img src="/stallorg-logo.svg" alt="StallOrg" width="150" height="40" /></a>
         <a class="btn btn-ghost" href="/auth">Logg inn</a>
       </header>
       <main>
@@ -150,7 +150,7 @@
         <h2>Fôringsturnus uten krangel</h2>
         <p class="intro">Velg periode og hvilke fôringer som skal dekkes. Programmet fordeler vaktene etter hvor mange hester hver eier har, tar hensyn til dagene de ikke kan, og du publiserer når du er fornøyd.</p>
         <figure class="shot">
-          <img src="/screenshots/foringsturnus.png" width="1517" height="486" loading="lazy" alt="Fôringsturnus i ND-Stalldrift: to uker med frokost, lunsj, middag og kveldsmat fordelt på fire hesteeiere" />
+          <img src="/screenshots/foringsturnus.png" width="1517" height="486" loading="lazy" alt="Fôringsturnus i StallOrg: to uker med frokost, lunsj, middag og kveldsmat fordelt på fire hesteeiere" />
         </figure>
         <p class="shot-caption">Eksempel fra programmet. Navnene er oppdiktet.</p>
       </div>
@@ -161,7 +161,7 @@
         <h2>Alt om hver hest, samlet på ett sted</h2>
         <p class="intro">Pass, mikrochip, eier, boks og paddock, vaksinasjonsstatus, forsikring, allergier og medisinske notater. Du slipper å lete når du trenger det.</p>
         <figure class="shot">
-          <img src="/screenshots/hesteprofil.png" width="1025" height="560" loading="lazy" alt="Hesteprofil i ND-Stalldrift med pass, mikrochip, eier, boks, paddock, vaksinasjonsstatus og forsikring" />
+          <img src="/screenshots/hesteprofil.png" width="1025" height="560" loading="lazy" alt="Hesteprofil i StallOrg med pass, mikrochip, eier, boks, paddock, vaksinasjonsstatus og forsikring" />
         </figure>
         <p class="shot-caption">Eksempel fra programmet. Opplysningene er oppdiktet.</p>
       </div>
@@ -181,10 +181,10 @@
           <div class="card"><h3>Klart for regnskapet</h3><p>Kreditnotaer, oversikt over utbetalinger og mva-grunnlag du kan laste ned til regnskapsføreren.</p></div>
         </div>
         <figure class="shot">
-          <img src="/screenshots/fakturaer.png" width="1496" height="261" loading="lazy" alt="Fakturaoversikt i ND-Stalldrift med forfallsdato, beløp, status og knappen Betal nå" />
+          <img src="/screenshots/fakturaer.png" width="1496" height="261" loading="lazy" alt="Fakturaoversikt i StallOrg med forfallsdato, beløp, status og knappen Betal nå" />
         </figure>
         <p class="shot-caption">Slik ser hesteeieren fakturaene sine. Eksempel fra programmet, med oppdiktede tall.</p>
-        <p class="fine">Kortbetaling blir et tillegg på abonnementet: 250 kr per måned inkludert mva for stallen, uansett hvor mange betalinger dere har. Stripes gebyr per betaling kommer i tillegg og betales av stallen. Vil du være blant de første? <a href="mailto:support@nestundigital.no?subject=Kortbetaling%20i%20ND-Stalldrift">Si fra til oss</a>.</p>
+        <p class="fine">Kortbetaling blir et tillegg på abonnementet: 250 kr per måned inkludert mva for stallen, uansett hvor mange betalinger dere har. Stripes gebyr per betaling kommer i tillegg og betales av stallen. Vil du være blant de første? <a href="mailto:support@nestundigital.no?subject=Kortbetaling%20i%20StallOrg">Si fra til oss</a>.</p>
       </div>
     </section>
 
@@ -227,7 +227,7 @@
       <div class="wrap">
         <h2>Vanlige spørsmål</h2>
         <details><summary>Hva koster det å prøve?</summary><p>Ingenting. De første 30 dagene er gratis, og du trenger ikke legge inn betalingskort. Etterpå velger du abonnement etter antall hester.</p></details>
-        <details><summary>Fungerer det på mobilen?</summary><p>Ja. ND-Stalldrift åpnes i nettleseren på mobil, nettbrett og PC.</p></details>
+        <details><summary>Fungerer det på mobilen?</summary><p>Ja. StallOrg åpnes i nettleseren på mobil, nettbrett og PC.</p></details>
         <details><summary>Må hesteeierne betale for å bruke det?</summary><p>Nei. Stallen har abonnementet, og hesteeiere og ansatte inviteres inn i stallens konto.</p></details>
         <details><summary>Hva skjer hvis jeg ikke velger abonnement?</summary><p>Når prøveperioden er over, har du 14 dager på å velge abonnement. Deretter blir stallen skrivebeskyttet, så du kan fortsatt lese det du har lagt inn.</p></details>
       </div>

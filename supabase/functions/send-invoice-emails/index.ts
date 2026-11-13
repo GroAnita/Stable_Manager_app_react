@@ -23,7 +23,7 @@ function jsonResponse(body: unknown, status = 200) {
 // Resend rejects display names containing these characters unless quoted.
 function fromHeader(stableName: string, address: string): string {
   const name = stableName.replace(/["\\<>\r\n]/g, '').trim()
-  return name ? `"${name} via Stalldrift" <${address}>` : address
+  return name ? `"${name} via StallOrg" <${address}>` : address
 }
 
 Deno.serve(async (req) => {

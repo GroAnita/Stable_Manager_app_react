@@ -1,4 +1,4 @@
-// Works out the figures a stable's accountant needs. Stalldrift only shows the
+// Works out the figures a stable's accountant needs. StallOrg only shows the
 // numbers: how they're booked and reported is up to the accountant.
 
 export type ReportInvoiceLine = {

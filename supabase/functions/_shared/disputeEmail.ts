@@ -28,7 +28,7 @@ export function buildDisputeEmail(input: {
       input.evidenceDueBy
         ? `Du må svare i Stripe innen ${formatDate(input.evidenceDueBy)}. Svarer du ikke, taper du normalt saken.`
         : 'Logg inn i Stripe for å se hva som må gjøres.',
-      'Svaret gis i Stripe-kontoen din, ikke i Stalldrift.',
+      'Svaret gis i Stripe-kontoen din, ikke i StallOrg.',
     ].join('\n\n'),
   }
 }

@@ -63,7 +63,7 @@ export function buildChargeFailureEmail(input: {
     subject: `Trekket for ${invoice} mislyktes`,
     text: [
       `Vi klarte ikke å trekke ${amount} for ${invoice} fra kortet ditt. Kortet ble ikke belastet, og fakturaen er fortsatt ubetalt.`,
-      'Du kan betale den selv: logg inn i Stalldrift, gå til Min kontrakt og velg Betal nå.',
+      'Du kan betale den selv: logg inn i StallOrg, gå til Min kontrakt og velg Betal nå.',
       input.retryOn
         ? `Hvis fakturaen fortsatt er ubetalt, kan stallen prøve å trekke ${amount} fra kortet ditt på nytt fra og med ${formatDate(input.retryOn)}.`
         : 'Kortet ditt blir ikke forsøkt trukket flere ganger for denne fakturaen, så den må betales på annen måte.',

@@ -6,8 +6,8 @@ import {
   useLocation,
   useNavigate,
 } from 'react-router-dom'
-import logoDark from '../assets/stalldrift-logo-dark.svg'
-import logoLight from '../assets/stalldrift-logo-light.svg'
+import logoDark from '../assets/stallorg-logo-dark.svg'
+import logoLight from '../assets/stallorg-logo-light.svg'
 import { BillingBanner } from '../components/BillingBanner'
 import { EmergencyCallButton } from '../components/EmergencyCallButton'
 import { StableClosed } from '../components/StableClosed'

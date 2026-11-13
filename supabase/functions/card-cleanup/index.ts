@@ -165,7 +165,7 @@ Deno.serve(async (req) => {
             stableName: account.stable?.name ?? '',
             replyTo: account.stable?.email ?? null,
             subject: `Automatisk betaling til ${account.stable?.name ?? 'stallen'} er avsluttet`,
-            text: `Stallen bruker ikke lenger kortbetaling gjennom Stalldrift, så automatisk betaling for ${agreement.contract?.horse?.name ?? 'hesten din'} er avsluttet, og kortet ditt blir ikke trukket mer. Stallplassen fortsetter som før. Du får en siste faktura for overgangen, og fakturaene betales nå på den måten som står på dem.`,
+            text: `Stallen bruker ikke lenger kortbetaling gjennom StallOrg, så automatisk betaling for ${agreement.contract?.horse?.name ?? 'hesten din'} er avsluttet, og kortet ditt blir ikke trukket mer. Stallplassen fortsetter som før. Du får en siste faktura for overgangen, og fakturaene betales nå på den måten som står på dem.`,
           })
         }
       }

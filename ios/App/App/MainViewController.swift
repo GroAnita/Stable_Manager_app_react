@@ -47,7 +47,7 @@ private class PrintingWebViewUIDelegate: NSObject, WKUIDelegate {
             let printController = UIPrintInteractionController.shared
             let printInfo = UIPrintInfo(dictionary: nil)
             printInfo.outputType = .general
-            printInfo.jobName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? "ND-Stalldrift"
+            printInfo.jobName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? "StallOrg"
             printController.printInfo = printInfo
             printController.printingItem = data
             printController.present(animated: true)

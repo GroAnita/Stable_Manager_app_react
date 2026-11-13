@@ -5,7 +5,7 @@ import { Capacitor } from '@capacitor/core'
 // password-reset link tapped in Mail, or an invite link shared elsewhere).
 // Fall back to the deployed web app for any link meant to be opened outside
 // the app itself.
-const PRODUCTION_WEB_ORIGIN = 'https://www.ndstalldrift.no'
+const PRODUCTION_WEB_ORIGIN = 'https://www.stallorg.no'
 
 export function webOrigin(): string {
   return Capacitor.isNativePlatform()

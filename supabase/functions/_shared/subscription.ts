@@ -1,4 +1,4 @@
-// Shared by the functions that deal with a stable's Stalldrift subscription.
+// Shared by the functions that deal with a stable's StallOrg subscription.
 // deno-lint-ignore-file no-explicit-any
 import type Stripe from 'npm:stripe@23.1.0'
 import { priceLookupKey } from './subscriptionState.ts'
@@ -40,7 +40,7 @@ export async function ensurePrice(
       transfer_lookup_key: true,
       // The price stays the same for customers when VAT registration comes.
       tax_behavior: 'inclusive',
-      product_data: { name: `Stalldrift ${row.name}` },
+      product_data: { name: `StallOrg ${row.name}` },
     },
     { idempotencyKey: `stalldrift-price-${lookupKey}-${unitAmount}` },
   )

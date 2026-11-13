@@ -11,6 +11,12 @@ export type WhatsNewEntry = {
 
 export const WHATS_NEW_ENTRIES: WhatsNewEntry[] = [
   {
+    id: 'new-name-stallorg',
+    date: '2026-11-13',
+    titleKey: 'whatsNew.newName.title',
+    bodyKey: 'whatsNew.newName.body',
+  },
+  {
     id: 'new-feeding-rota',
     date: '2026-11-06',
     titleKey: 'whatsNew.newFeedingRota.title',

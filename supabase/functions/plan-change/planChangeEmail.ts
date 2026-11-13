@@ -16,14 +16,14 @@ export function buildPlanChangeEmail(input: {
   if (input.cancelled || !input.switchDate) {
     return {
       subject: `Automatisk betaling til ${input.stableName} fortsetter`,
-      text: `${input.stableName} har likevel valgt å fortsette med kortbetaling gjennom Stalldrift. Automatisk betaling for ${horse} fortsetter som før, og du trenger ikke å gjøre noe.`,
+      text: `${input.stableName} har likevel valgt å fortsette med kortbetaling gjennom StallOrg. Automatisk betaling for ${horse} fortsetter som før, og du trenger ikke å gjøre noe.`,
     }
   }
   const date = formatDate(input.switchDate)
   return {
     subject: `Automatisk betaling til ${input.stableName} avsluttes ${date}`,
     text: [
-      `${input.stableName} slutter å bruke kortbetaling gjennom Stalldrift ${date}. Automatisk betaling for ${horse} avsluttes da, og kortet ditt fjernes.`,
+      `${input.stableName} slutter å bruke kortbetaling gjennom StallOrg ${date}. Automatisk betaling for ${horse} avsluttes da, og kortet ditt fjernes.`,
       'Stallplassen fortsetter som før. Dette endrer ikke oppstallingsavtalen.',
       'Fakturaer med trekkdato før overgangen trekkes som vanlig. Du får en siste faktura for overgangen, og den og senere fakturaer betales på den måten som står på dem. Du blir ikke belastet to ganger for samme periode.',
       `Har du spørsmål, kontakt ${input.stableName}.`,

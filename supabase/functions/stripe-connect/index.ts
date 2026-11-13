@@ -20,9 +20,12 @@ const corsHeaders = {
     'authorization, x-client-info, apikey, content-type',
 }
 
-const PRODUCTION_ORIGIN = 'https://www.ndstalldrift.no'
+const PRODUCTION_ORIGIN = 'https://www.stallorg.no'
 const ALLOWED_RETURN_ORIGINS = [
   PRODUCTION_ORIGIN,
+  'https://stallorg.no',
+  // The old domain, still accepted while it redirects here.
+  'https://www.ndstalldrift.no',
   'https://ndstalldrift.no',
   'http://localhost:5180',
 ]

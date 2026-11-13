@@ -125,7 +125,7 @@ async function deleteMember(admin: Admin, userId: string, name: string) {
     admin,
     { column: 'owner_id', values: ownerIds },
     userId,
-    'Du har slettet kontoen din i Stalldrift.',
+    'Du har slettet kontoen din i StallOrg.',
   )
   if (ownerIds.length > 0) {
     const { error } = await admin
@@ -149,7 +149,7 @@ async function deleteMember(admin: Admin, userId: string, name: string) {
       to: stable.email,
       stableName: stable.name,
       replyTo: null,
-      subject: `${name || 'En bruker'} har slettet kontoen sin i Stalldrift`,
+      subject: `${name || 'En bruker'} har slettet kontoen sin i StallOrg`,
       text: `${name || 'En bruker'} har slettet kontoen sin og kan ikke lenger logge inn. Det stallen har registrert, som eierkort, kontrakter og fakturaer, er beholdt, fordi stallen er ansvarlig for dem og må ta vare på regnskapet. Eventuelle kortavtaler er avsluttet. Du kan selv slette eierkortet når det ikke er fakturaer knyttet til det.`,
     })
   }
@@ -193,7 +193,7 @@ async function closeStables(
       admin,
       { column: 'stable_id', values: [stable.id] },
       userId,
-      `${stable.name} har sluttet å bruke Stalldrift.`,
+      `${stable.name} har sluttet å bruke StallOrg.`,
     )
 
     const { error: closeError } = await admin
@@ -216,7 +216,7 @@ async function closeStables(
     to: email,
     stableName: names,
     replyTo: null,
-    subject: 'Kontoen din i Stalldrift er slettet',
+    subject: 'Kontoen din i StallOrg er slettet',
     text: `Kontoen din er slettet, og ${names} er stengt. Abonnementet er sagt opp, alle kortavtaler er avsluttet, og ingen kan lenger logge inn i stallen.\n\nAlle opplysninger om stallen slettes for godt ${osloDate(deleteAfter)}. Ombestemmer du deg før det, kan du skrive til support@nestundigital.no, så åpner vi stallen igjen.`,
   })
   return deleteAfter
