@@ -1,7 +1,8 @@
 import { supabase } from '../../lib/supabaseClient'
 import type { Database } from '../../types/supabase'
 
-export type LessonSession = Database['public']['Tables']['lesson_sessions']['Row']
+export type LessonSession =
+  Database['public']['Tables']['lesson_sessions']['Row']
 export type LessonSessionInsert =
   Database['public']['Tables']['lesson_sessions']['Insert']
 
@@ -20,35 +21,51 @@ export type LessonBooking =
       Database['public']['Tables']['owners']['Row'],
       'id' | 'full_name'
     > | null
-    rider: Pick<Database['public']['Tables']['riders']['Row'], 'id' | 'full_name'> | null
-    horse: Pick<Database['public']['Tables']['horses']['Row'], 'id' | 'name'> | null
+    rider: Pick<
+      Database['public']['Tables']['riders']['Row'],
+      'id' | 'full_name'
+    > | null
+    horse: Pick<
+      Database['public']['Tables']['horses']['Row'],
+      'id' | 'name'
+    > | null
   }
 
 export type LessonSessionWithBookings = LessonSession & {
   course: Pick<
     Course,
-    'id' | 'title' | 'booking_mode' | 'spare_release_days_before'
+    'id' | 'title' | 'color' | 'booking_mode' | 'spare_release_days_before'
   > | null
   bookings: LessonBooking[]
 }
 
 export type MyBooking = LessonBooking & {
-  session: (Pick<LessonSession, 'id' | 'title' | 'starts_at' | 'ends_at' | 'status'> & {
-    course: Pick<Course, 'id' | 'title'> | null
-  }) | null
+  session:
+    | (Pick<
+        LessonSession,
+        'id' | 'title' | 'starts_at' | 'ends_at' | 'status'
+      > & {
+        course: Pick<Course, 'id' | 'title'> | null
+      })
+    | null
 }
 
-export type CourseEnrolment = Database['public']['Tables']['enrolments']['Row'] & {
-  rider: Pick<Database['public']['Tables']['riders']['Row'], 'id' | 'full_name'> | null
-}
+export type CourseEnrolment =
+  Database['public']['Tables']['enrolments']['Row'] & {
+    rider: Pick<
+      Database['public']['Tables']['riders']['Row'],
+      'id' | 'full_name'
+    > | null
+  }
 
 export type BlockedDate = Database['public']['Tables']['blocked_dates']['Row']
-export type BlockedDateInsert = Database['public']['Tables']['blocked_dates']['Insert']
+export type BlockedDateInsert =
+  Database['public']['Tables']['blocked_dates']['Insert']
 
 const BOOKING_SELECT =
   'id, session_id, owner_id, rider_id, horse_id, enrolment_id, status, cancelled_at, created_at, owner:owners(id, full_name), rider:riders(id, full_name), horse:horses(id, name)'
 
-const SESSION_SELECT = `*, course:courses(id, title, booking_mode, spare_release_days_before), bookings:lesson_bookings(${BOOKING_SELECT})`
+const SESSION_SELECT = `*, course:courses(id, title, color, booking_mode, spare_release_days_before), bookings:lesson_bookings(${BOOKING_SELECT})`
 
 function startOfTodayIso(): string {
   const date = new Date()
@@ -67,7 +84,9 @@ export function toLocalIsoDate(date: Date): string {
 // ---------------------------------------------------------------------------
 // Sessions (both course-generated and standalone/ad-hoc)
 
-export async function listUpcomingSessions(): Promise<LessonSessionWithBookings[]> {
+export async function listUpcomingSessions(): Promise<
+  LessonSessionWithBookings[]
+> {
   const { data, error } = await supabase
     .from('lesson_sessions')
     .select(SESSION_SELECT)
@@ -121,6 +140,17 @@ export async function createStandaloneSession(
   return data
 }
 
+export async function updateSessionColor(
+  id: string,
+  color: string | null,
+): Promise<void> {
+  const { error } = await supabase
+    .from('lesson_sessions')
+    .update({ color })
+    .eq('id', id)
+  if (error) throw error
+}
+
 export async function cancelSession(id: string): Promise<void> {
   const { error } = await supabase
     .from('lesson_sessions')
@@ -151,7 +181,10 @@ export async function createCourse(input: CourseInsert): Promise<Course> {
   return data
 }
 
-export async function updateCourse(id: string, input: CourseUpdate): Promise<Course> {
+export async function updateCourse(
+  id: string,
+  input: CourseUpdate,
+): Promise<Course> {
   const { data, error } = await supabase
     .from('courses')
     .update(input)
@@ -170,7 +203,10 @@ export async function updateCourse(id: string, input: CourseUpdate): Promise<Cou
  * entirely rather than generated and then cancelled — a course that
  * spans more holidays just ends up with fewer sessions than another. */
 export function computeCourseSessionDates(
-  course: Pick<Course, 'term_start_date' | 'term_end_date' | 'weekday' | 'start_time' | 'end_time'>,
+  course: Pick<
+    Course,
+    'term_start_date' | 'term_end_date' | 'weekday' | 'start_time' | 'end_time'
+  >,
   excludeDates?: Set<string>,
 ): { starts_at: string; ends_at: string }[] {
   const sessions: { starts_at: string; ends_at: string }[] = []
@@ -188,7 +224,10 @@ export function computeCourseSessionDates(
       startsAt.setHours(startHour, startMinute, 0, 0)
       const endsAt = new Date(current)
       endsAt.setHours(endHour, endMinute, 0, 0)
-      sessions.push({ starts_at: startsAt.toISOString(), ends_at: endsAt.toISOString() })
+      sessions.push({
+        starts_at: startsAt.toISOString(),
+        ends_at: endsAt.toISOString(),
+      })
     }
     current.setDate(current.getDate() + 7)
   }
@@ -221,7 +260,9 @@ export async function listBlockedDates(): Promise<BlockedDate[]> {
   return data
 }
 
-export async function addBlockedDate(input: BlockedDateInsert): Promise<BlockedDate> {
+export async function addBlockedDate(
+  input: BlockedDateInsert,
+): Promise<BlockedDate> {
   const { data, error } = await supabase
     .from('blocked_dates')
     .insert(input)
@@ -249,7 +290,11 @@ export async function addBlockedDates(
   if (error) throw error
 }
 
-const NORWEGIAN_FIXED_HOLIDAYS: { month: number; day: number; label: string }[] = [
+const NORWEGIAN_FIXED_HOLIDAYS: {
+  month: number
+  day: number
+  label: string
+}[] = [
   { month: 1, day: 1, label: 'Nyttårsdag' },
   { month: 5, day: 1, label: 'Arbeidernes dag' },
   { month: 5, day: 17, label: 'Grunnlovsdag' },

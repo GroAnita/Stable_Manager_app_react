@@ -586,6 +586,7 @@ export type Database = {
         Row: {
           booking_mode: Database["public"]["Enums"]["course_booking_mode"]
           capacity: number
+          color: string | null
           created_at: string
           created_by: string | null
           end_time: string
@@ -607,6 +608,7 @@ export type Database = {
         Insert: {
           booking_mode?: Database["public"]["Enums"]["course_booking_mode"]
           capacity?: number
+          color?: string | null
           created_at?: string
           created_by?: string | null
           end_time: string
@@ -628,6 +630,7 @@ export type Database = {
         Update: {
           booking_mode?: Database["public"]["Enums"]["course_booking_mode"]
           capacity?: number
+          color?: string | null
           created_at?: string
           created_by?: string | null
           end_time?: string
@@ -1684,6 +1687,7 @@ export type Database = {
       lesson_sessions: {
         Row: {
           capacity: number
+          color: string | null
           course_id: string | null
           created_at: string
           created_by: string | null
@@ -1699,6 +1703,7 @@ export type Database = {
         }
         Insert: {
           capacity?: number
+          color?: string | null
           course_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -1714,6 +1719,7 @@ export type Database = {
         }
         Update: {
           capacity?: number
+          color?: string | null
           course_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -3428,6 +3434,7 @@ export type Database = {
         Args: { p_course_id: string; p_sessions: Json }
         Returns: {
           capacity: number
+          color: string | null
           course_id: string | null
           created_at: string
           created_by: string | null

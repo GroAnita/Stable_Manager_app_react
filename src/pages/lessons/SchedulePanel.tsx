@@ -7,9 +7,15 @@ import {
   cancelBooking,
   cancelSession,
   createStandaloneSession,
+  updateSessionColor,
   listUpcomingStandaloneSessions,
   type LessonSessionWithBookings,
 } from '../../features/lessons/api'
+import {
+  DEFAULT_LESSON_COLOR,
+  sessionColor,
+} from '../../features/lessons/colors'
+import { ColorPicker } from '../../components/lessons/ColorPicker'
 import { getCurrentStableId } from '../../lib/stableContext'
 import { usePreferences } from '../../lib/PreferencesContext'
 
@@ -20,6 +26,7 @@ type LessonFormState = {
   ends_at: string
   capacity: string
   notes: string
+  color: string | null
 }
 
 function emptyForm(): LessonFormState {
@@ -30,6 +37,7 @@ function emptyForm(): LessonFormState {
     ends_at: '',
     capacity: '4',
     notes: '',
+    color: null,
   }
 }
 
@@ -83,6 +91,7 @@ export function SchedulePanel() {
         ends_at: new Date(addForm.ends_at).toISOString(),
         capacity: Number(addForm.capacity) || 1,
         notes: addForm.notes || null,
+        color: addForm.color,
       })
       setAddOpen(false)
       load()
@@ -125,7 +134,9 @@ export function SchedulePanel() {
         </button>
       </div>
 
-      {loading && <p className="text-sm text-slate-500">{t('lessons.loading')}</p>}
+      {loading && (
+        <p className="text-sm text-slate-500">{t('lessons.loading')}</p>
+      )}
       {error && (
         <p role="alert" className="text-sm text-red-600">
           {error}
@@ -149,7 +160,8 @@ export function SchedulePanel() {
                 key={session.id}
                 type="button"
                 onClick={() => setSelectedId(session.id)}
-                className="panel flex flex-col gap-2 p-5 text-left transition hover:-translate-y-0.5"
+                className="panel flex flex-col gap-2 border-l-[6px] p-5 text-left transition hover:-translate-y-0.5"
+                style={{ borderLeftColor: sessionColor(session) }}
               >
                 <p className="font-medium text-slate-900">{session.title}</p>
                 <p className="text-sm text-slate-500">
@@ -239,6 +251,11 @@ export function SchedulePanel() {
               onChange={(e) => updateAddField('notes', e.target.value)}
             />
           </label>
+          <ColorPicker
+            value={addForm.color}
+            onChange={(color) => updateAddField('color', color)}
+            standardColor={DEFAULT_LESSON_COLOR}
+          />
           <button type="submit" disabled={addSaving} className="btn-primary">
             {addSaving ? t('common.saving') : t('lessons.save')}
           </button>
@@ -261,10 +278,25 @@ function SessionDetailView({
 }) {
   const { t, formatDate, formatTime } = usePreferences()
   const [cancelOpen, setCancelOpen] = useState(false)
+  const [colorError, setColorError] = useState<string | null>(null)
+
+  async function changeColor(color: string | null) {
+    const previous = session.color
+    setColorError(null)
+    onUpdate({ ...session, color })
+    try {
+      await updateSessionColor(session.id, color)
+    } catch (err) {
+      onUpdate({ ...session, color: previous })
+      setColorError((err as Error).message)
+    }
+  }
 
   // Standalone lessons never have enrolment-generated bookings (only a
   // course's sessions do), so this roster is never split term/drop-in.
-  const confirmedBookings = session.bookings.filter((b) => b.status === 'confirmed')
+  const confirmedBookings = session.bookings.filter(
+    (b) => b.status === 'confirmed',
+  )
 
   async function removeBooking(bookingId: string) {
     await cancelBooking(bookingId)
@@ -296,7 +328,14 @@ function SessionDetailView({
       <div className="panel p-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <h2 className="section-title">{session.title}</h2>
+            <div className="flex items-center gap-2">
+              <span
+                aria-hidden="true"
+                className="h-3.5 w-3.5 shrink-0 rounded-full"
+                style={{ background: sessionColor(session) }}
+              />
+              <h2 className="section-title">{session.title}</h2>
+            </div>
             <p className="mt-1 text-sm text-slate-500">
               {[
                 formatDate(session.starts_at),
@@ -309,6 +348,18 @@ function SessionDetailView({
             {session.notes && (
               <p className="mt-1 text-sm text-slate-500">{session.notes}</p>
             )}
+            <div className="mt-4">
+              <ColorPicker
+                value={session.color}
+                onChange={changeColor}
+                standardColor={DEFAULT_LESSON_COLOR}
+              />
+              {colorError && (
+                <p role="alert" className="mt-1 text-sm text-red-600">
+                  {colorError}
+                </p>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <span className="rounded-full bg-forest/10 px-3 py-1 text-xs font-medium text-forest">
@@ -317,18 +368,28 @@ function SessionDetailView({
                 capacity: session.capacity,
               })}
             </span>
-            <button type="button" className="btn-ghost" onClick={() => setCancelOpen(true)}>
+            <button
+              type="button"
+              className="btn-ghost"
+              onClick={() => setCancelOpen(true)}
+            >
               {t('lessons.deleteLessonTitle')}
             </button>
           </div>
         </div>
 
         {confirmedBookings.length === 0 ? (
-          <p className="mt-6 text-sm text-slate-500">{t('lessons.noBookingsYet')}</p>
+          <p className="mt-6 text-sm text-slate-500">
+            {t('lessons.noBookingsYet')}
+          </p>
         ) : (
           <div className="mt-6 flex flex-col gap-2 border-t border-slate-100 pt-4">
             {confirmedBookings.map((booking) => (
-              <BookingRow key={booking.id} booking={booking} onRemove={removeBooking} />
+              <BookingRow
+                key={booking.id}
+                booking={booking}
+                onRemove={removeBooking}
+              />
             ))}
           </div>
         )}

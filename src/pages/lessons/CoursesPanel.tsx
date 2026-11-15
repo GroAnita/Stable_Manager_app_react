@@ -17,6 +17,8 @@ import {
   type CourseEnrolment,
   type LessonSessionWithBookings,
 } from '../../features/lessons/api'
+import { DEFAULT_COURSE_COLOR } from '../../features/lessons/colors'
+import { ColorPicker } from '../../components/lessons/ColorPicker'
 import { getCurrentStableId } from '../../lib/stableContext'
 import { usePreferences } from '../../lib/PreferencesContext'
 
@@ -37,6 +39,7 @@ type CourseFormState = {
   term_end_date: string
   booking_mode: CourseBookingMode
   spare_release_days_before: string
+  color: string | null
 }
 
 function emptyForm(): CourseFormState {
@@ -54,6 +57,7 @@ function emptyForm(): CourseFormState {
     term_end_date: '',
     booking_mode: 'mixed',
     spare_release_days_before: '7',
+    color: null,
   }
 }
 
@@ -72,6 +76,7 @@ function toCourseForm(course: Course): CourseFormState {
     term_end_date: course.term_end_date,
     booking_mode: course.booking_mode,
     spare_release_days_before: String(course.spare_release_days_before),
+    color: course.color,
   }
 }
 
@@ -90,6 +95,7 @@ function formToCourseInput(form: CourseFormState) {
     term_end_date: form.term_end_date,
     booking_mode: form.booking_mode,
     spare_release_days_before: Number(form.spare_release_days_before) || 0,
+    color: form.color,
   }
 }
 
@@ -98,7 +104,10 @@ function CourseFormFields({
   onChange,
 }: {
   form: CourseFormState
-  onChange: <K extends keyof CourseFormState>(key: K, value: CourseFormState[K]) => void
+  onChange: <K extends keyof CourseFormState>(
+    key: K,
+    value: CourseFormState[K],
+  ) => void
 }) {
   const { t } = usePreferences()
   return (
@@ -206,7 +215,9 @@ function CourseFormFields({
         <select
           className="field"
           value={form.booking_mode}
-          onChange={(e) => onChange('booking_mode', e.target.value as CourseBookingMode)}
+          onChange={(e) =>
+            onChange('booking_mode', e.target.value as CourseBookingMode)
+          }
         >
           {BOOKING_MODES.map((mode) => (
             <option key={mode} value={mode}>
@@ -214,7 +225,9 @@ function CourseFormFields({
             </option>
           ))}
         </select>
-        <p className="mt-1 text-xs text-slate-400">{t('lessons.bookingModeHint')}</p>
+        <p className="mt-1 text-xs text-slate-400">
+          {t('lessons.bookingModeHint')}
+        </p>
       </label>
       {form.booking_mode === 'mixed' && (
         <label>
@@ -224,7 +237,9 @@ function CourseFormFields({
             min={0}
             className="field"
             value={form.spare_release_days_before}
-            onChange={(e) => onChange('spare_release_days_before', e.target.value)}
+            onChange={(e) =>
+              onChange('spare_release_days_before', e.target.value)
+            }
           />
           <p className="mt-1 text-xs text-slate-400">
             {t('lessons.spareReleaseDaysHint')}
@@ -251,6 +266,13 @@ function CourseFormFields({
             onChange={(e) => onChange('price', e.target.value)}
           />
         </label>
+      </div>
+      <div className="col-span-full">
+        <ColorPicker
+          value={form.color}
+          onChange={(color) => onChange('color', color)}
+          standardColor={DEFAULT_COURSE_COLOR}
+        />
       </div>
     </>
   )
@@ -330,7 +352,9 @@ export function CoursesPanel() {
         </button>
       </div>
 
-      {loading && <p className="text-sm text-slate-500">{t('lessons.loading')}</p>}
+      {loading && (
+        <p className="text-sm text-slate-500">{t('lessons.loading')}</p>
+      )}
       {error && (
         <p role="alert" className="text-sm text-red-600">
           {error}
@@ -350,7 +374,8 @@ export function CoursesPanel() {
               key={course.id}
               type="button"
               onClick={() => setSelectedId(course.id)}
-              className="panel flex flex-col gap-2 p-5 text-left transition hover:-translate-y-0.5"
+              className="panel flex flex-col gap-2 border-l-[6px] p-5 text-left transition hover:-translate-y-0.5"
+              style={{ borderLeftColor: course.color ?? DEFAULT_COURSE_COLOR }}
             >
               <div className="flex items-center gap-2">
                 <p className="font-medium text-slate-900">{course.title}</p>
@@ -359,10 +384,13 @@ export function CoursesPanel() {
                 </span>
               </div>
               <p className="text-sm text-slate-500">
-                {[course.level, course.instructor_name].filter(Boolean).join(' · ')}
+                {[course.level, course.instructor_name]
+                  .filter(Boolean)
+                  .join(' · ')}
               </p>
               <p className="text-sm text-slate-500">
-                {formatDate(course.term_start_date)} – {formatDate(course.term_end_date)}
+                {formatDate(course.term_start_date)} –{' '}
+                {formatDate(course.term_end_date)}
               </p>
             </button>
           ))}
@@ -382,7 +410,9 @@ export function CoursesPanel() {
           )}
           <CourseFormFields
             form={addForm}
-            onChange={(key, value) => setAddForm((prev) => ({ ...prev, [key]: value }))}
+            onChange={(key, value) =>
+              setAddForm((prev) => ({ ...prev, [key]: value }))
+            }
           />
           <button type="submit" disabled={addSaving} className="btn-primary">
             {addSaving ? t('common.saving') : t('lessons.save')}
@@ -411,10 +441,14 @@ function CourseDetailView({
   const [generating, setGenerating] = useState(false)
   const [generateMessage, setGenerateMessage] = useState<string | null>(null)
   const [withdrawingId, setWithdrawingId] = useState<string | null>(null)
-  const [assigningBookingId, setAssigningBookingId] = useState<string | null>(null)
+  const [assigningBookingId, setAssigningBookingId] = useState<string | null>(
+    null,
+  )
 
   const [editOpen, setEditOpen] = useState(false)
-  const [editForm, setEditForm] = useState<CourseFormState>(() => toCourseForm(course))
+  const [editForm, setEditForm] = useState<CourseFormState>(() =>
+    toCourseForm(course),
+  )
   const [editSaving, setEditSaving] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
 
@@ -443,7 +477,9 @@ function CourseDetailView({
       setSessions((prev) =>
         prev.map((session) => ({
           ...session,
-          bookings: session.bookings.map((b) => (b.id === bookingId ? updated : b)),
+          bookings: session.bookings.map((b) =>
+            b.id === bookingId ? updated : b,
+          ),
         })),
       )
     } catch (err) {
@@ -458,7 +494,12 @@ function CourseDetailView({
     setGenerateMessage(null)
     try {
       const generated = await generateSessionsForCourse(course)
-      setGenerateMessage(t('lessons.sessionsGenerated', { count: generated.length, title: course.title }))
+      setGenerateMessage(
+        t('lessons.sessionsGenerated', {
+          count: generated.length,
+          title: course.title,
+        }),
+      )
       load()
     } catch (err) {
       setError((err as Error).message)
@@ -472,7 +513,9 @@ function CourseDetailView({
     try {
       await withdrawFromCourse(enrolmentId)
       setEnrolments((prev) =>
-        prev.map((e) => (e.id === enrolmentId ? { ...e, status: 'withdrawn' } : e)),
+        prev.map((e) =>
+          e.id === enrolmentId ? { ...e, status: 'withdrawn' } : e,
+        ),
       )
     } catch (err) {
       setError((err as Error).message)
@@ -519,6 +562,11 @@ function CourseDetailView({
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <div className="flex items-center gap-2">
+              <span
+                aria-hidden="true"
+                className="h-3.5 w-3.5 shrink-0 rounded-full"
+                style={{ background: course.color ?? DEFAULT_COURSE_COLOR }}
+              />
               <h2 className="section-title">{course.title}</h2>
               <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
                 {t(`lessons.bookingMode.${course.booking_mode}`)}
@@ -535,7 +583,8 @@ function CourseDetailView({
                 .join(' · ')}
             </p>
             <p className="mt-1 text-sm text-slate-500">
-              {formatDate(course.term_start_date)} – {formatDate(course.term_end_date)}
+              {formatDate(course.term_start_date)} –{' '}
+              {formatDate(course.term_end_date)}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -567,15 +616,24 @@ function CourseDetailView({
 
       <div className="panel p-6">
         <h3 className="section-title">{t('lessons.enrolledRidersTitle')}</h3>
-        {loading && <p className="mt-2 text-sm text-slate-500">{t('lessons.loading')}</p>}
+        {loading && (
+          <p className="mt-2 text-sm text-slate-500">{t('lessons.loading')}</p>
+        )}
         {!loading && activeEnrolments.length === 0 && (
-          <p className="mt-2 text-sm text-slate-500">{t('lessons.noEnrolmentsMessage')}</p>
+          <p className="mt-2 text-sm text-slate-500">
+            {t('lessons.noEnrolmentsMessage')}
+          </p>
         )}
         {activeEnrolments.length > 0 && (
           <div className="mt-3 flex flex-col gap-2">
             {activeEnrolments.map((enrolment) => (
-              <div key={enrolment.id} className="flex items-center justify-between text-sm">
-                <span className="text-slate-700">{enrolment.rider?.full_name ?? '—'}</span>
+              <div
+                key={enrolment.id}
+                className="flex items-center justify-between text-sm"
+              >
+                <span className="text-slate-700">
+                  {enrolment.rider?.full_name ?? '—'}
+                </span>
                 <button
                   type="button"
                   className="text-xs font-medium text-red-600 hover:underline"
@@ -593,7 +651,9 @@ function CourseDetailView({
       <div className="panel p-6">
         <h3 className="section-title">{t('lessons.sessionsTitle')}</h3>
         {!loading && sessions.length === 0 && (
-          <p className="mt-2 text-sm text-slate-500">{t('lessons.noSessionsGeneratedMessage')}</p>
+          <p className="mt-2 text-sm text-slate-500">
+            {t('lessons.noSessionsGeneratedMessage')}
+          </p>
         )}
         {sessions.length > 0 && (
           <div className="mt-3 flex flex-col gap-3">
@@ -602,10 +662,17 @@ function CourseDetailView({
                 (b) => b.status === 'confirmed',
               )
               return (
-                <div key={session.id} className="rounded-2xl border border-slate-100 p-3">
+                <div
+                  key={session.id}
+                  className="rounded-2xl border border-l-4 border-slate-100 p-3"
+                  style={{
+                    borderLeftColor: course.color ?? DEFAULT_COURSE_COLOR,
+                  }}
+                >
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium text-slate-700">
-                      {formatDate(session.starts_at)} · {formatTime(session.starts_at)}–
+                      {formatDate(session.starts_at)} ·{' '}
+                      {formatTime(session.starts_at)}–
                       {formatTime(session.ends_at)}
                     </span>
                     <span className="text-slate-500">
@@ -623,15 +690,21 @@ function CourseDetailView({
                           className="flex items-center justify-between gap-2 text-sm"
                         >
                           <span className="text-slate-700">
-                            {booking.rider?.full_name ?? booking.owner?.full_name ?? '—'}
+                            {booking.rider?.full_name ??
+                              booking.owner?.full_name ??
+                              '—'}
                           </span>
                           <select
                             className="field"
                             value={booking.horse_id ?? ''}
                             disabled={assigningBookingId === booking.id}
-                            onChange={(e) => handleAssignHorse(booking.id, e.target.value)}
+                            onChange={(e) =>
+                              handleAssignHorse(booking.id, e.target.value)
+                            }
                           >
-                            <option value="">{t('lessons.noHorseAssigned')}</option>
+                            <option value="">
+                              {t('lessons.noHorseAssigned')}
+                            </option>
                             {horses.map((horse) => (
                               <option key={horse.id} value={horse.id}>
                                 {horse.name}
@@ -660,10 +733,14 @@ function CourseDetailView({
               {editError}
             </p>
           )}
-          <p className="text-xs text-slate-400">{t('lessons.editCourseHint')}</p>
+          <p className="text-xs text-slate-400">
+            {t('lessons.editCourseHint')}
+          </p>
           <CourseFormFields
             form={editForm}
-            onChange={(key, value) => setEditForm((prev) => ({ ...prev, [key]: value }))}
+            onChange={(key, value) =>
+              setEditForm((prev) => ({ ...prev, [key]: value }))
+            }
           />
           <button type="submit" disabled={editSaving} className="btn-primary">
             {editSaving ? t('common.saving') : t('common.save')}

@@ -10,6 +10,7 @@ import {
   listUpcomingSessions,
   type LessonSessionWithBookings,
 } from '../../features/lessons/api'
+import { sessionColor } from '../../features/lessons/colors'
 import { getMyOwnerRecord } from '../../features/owners/api'
 import { listRiders, type Rider } from '../../features/riders/api'
 import { usePreferences } from '../../lib/PreferencesContext'
@@ -24,11 +25,15 @@ function eligibility(
   session: LessonSessionWithBookings,
   formatDate: (d: string | null) => string,
 ): Eligibility {
-  const confirmedCount = session.bookings.filter((b) => b.status === 'confirmed').length
+  const confirmedCount = session.bookings.filter(
+    (b) => b.status === 'confirmed',
+  ).length
   const full = confirmedCount >= session.capacity
 
   if (!session.course) {
-    return full ? { bookable: false, reasonKey: 'bookLesson.full' } : { bookable: true }
+    return full
+      ? { bookable: false, reasonKey: 'bookLesson.full' }
+      : { bookable: true }
   }
   if (session.course.booking_mode === 'term_only') {
     return { bookable: false, reasonKey: 'bookLesson.termOnly' }
@@ -59,8 +64,12 @@ export function BookLessonPanel() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
-  const [riderBySession, setRiderBySession] = useState<Record<string, string>>({})
-  const [horseBySession, setHorseBySession] = useState<Record<string, string>>({})
+  const [riderBySession, setRiderBySession] = useState<Record<string, string>>(
+    {},
+  )
+  const [horseBySession, setHorseBySession] = useState<Record<string, string>>(
+    {},
+  )
   const [bookingSessionId, setBookingSessionId] = useState<string | null>(null)
 
   function load() {
@@ -110,7 +119,9 @@ export function BookLessonPanel() {
     <div className="space-y-4">
       <p className="text-sm text-slate-500">{t('bookLesson.subtitle')}</p>
 
-      {loading && <p className="text-sm text-slate-500">{t('lessons.loading')}</p>}
+      {loading && (
+        <p className="text-sm text-slate-500">{t('lessons.loading')}</p>
+      )}
       {error && (
         <p role="alert" className="text-sm text-red-600">
           {error}
@@ -133,11 +144,17 @@ export function BookLessonPanel() {
           {sessions.map((session) => {
             const result = eligibility(session, formatDate)
             return (
-              <div key={session.id} className="panel p-5">
+              <div
+                key={session.id}
+                className="panel border-l-[6px] p-5"
+                style={{ borderLeftColor: sessionColor(session) }}
+              >
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="font-medium text-slate-900">{session.title}</p>
+                      <p className="font-medium text-slate-900">
+                        {session.title}
+                      </p>
                       {session.course && (
                         <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
                           {session.course.title}
@@ -146,7 +163,8 @@ export function BookLessonPanel() {
                     </div>
                     <p className="mt-1 text-sm text-slate-500">
                       {formatDate(session.starts_at)} ·{' '}
-                      {formatTime(session.starts_at)}–{formatTime(session.ends_at)}
+                      {formatTime(session.starts_at)}–
+                      {formatTime(session.ends_at)}
                     </p>
                   </div>
 
@@ -181,7 +199,9 @@ export function BookLessonPanel() {
                           }))
                         }
                       >
-                        <option value="">{t('bookLesson.noHorsePreference')}</option>
+                        <option value="">
+                          {t('bookLesson.noHorsePreference')}
+                        </option>
                         {horses.map((horse) => (
                           <option key={horse.id} value={horse.id}>
                             {horse.name}
