@@ -1276,6 +1276,53 @@ export type Database = {
           },
         ]
       }
+      forage_analyses: {
+        Row: {
+          analysed_on: string | null
+          created_at: string
+          dry_matter_percent: number
+          feh_per_kg_dm: number
+          id: string
+          in_use: boolean
+          name: string
+          notes: string | null
+          stable_id: string
+          updated_at: string
+        }
+        Insert: {
+          analysed_on?: string | null
+          created_at?: string
+          dry_matter_percent: number
+          feh_per_kg_dm: number
+          id?: string
+          in_use?: boolean
+          name: string
+          notes?: string | null
+          stable_id: string
+          updated_at?: string
+        }
+        Update: {
+          analysed_on?: string | null
+          created_at?: string
+          dry_matter_percent?: number
+          feh_per_kg_dm?: number
+          id?: string
+          in_use?: boolean
+          name?: string
+          notes?: string | null
+          stable_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forage_analyses_stable_id_fkey"
+            columns: ["stable_id"]
+            isOneToOne: false
+            referencedRelation: "stables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       horse_additional_owners: {
         Row: {
           created_at: string
@@ -1320,12 +1367,16 @@ export type Database = {
           birthday: string | null
           breed: string | null
           color: string | null
+          concentrate_feh_per_kg: number | null
+          concentrate_kg_per_day: number | null
           created_at: string
           extras: string | null
           feeding_notes: string | null
+          forage_analysis_id: string | null
           front_hoof_size: string | null
           gender: string | null
           id: string
+          ideal_weight_kg: number | null
           insurance_company: string | null
           insurance_number: string | null
           is_school_horse: boolean
@@ -1343,6 +1394,7 @@ export type Database = {
           turnout_shelter_id: string | null
           updated_at: string
           vaccination_status: string | null
+          workload: string | null
         }
         Insert: {
           active?: boolean
@@ -1354,12 +1406,16 @@ export type Database = {
           birthday?: string | null
           breed?: string | null
           color?: string | null
+          concentrate_feh_per_kg?: number | null
+          concentrate_kg_per_day?: number | null
           created_at?: string
           extras?: string | null
           feeding_notes?: string | null
+          forage_analysis_id?: string | null
           front_hoof_size?: string | null
           gender?: string | null
           id?: string
+          ideal_weight_kg?: number | null
           insurance_company?: string | null
           insurance_number?: string | null
           is_school_horse?: boolean
@@ -1377,6 +1433,7 @@ export type Database = {
           turnout_shelter_id?: string | null
           updated_at?: string
           vaccination_status?: string | null
+          workload?: string | null
         }
         Update: {
           active?: boolean
@@ -1388,12 +1445,16 @@ export type Database = {
           birthday?: string | null
           breed?: string | null
           color?: string | null
+          concentrate_feh_per_kg?: number | null
+          concentrate_kg_per_day?: number | null
           created_at?: string
           extras?: string | null
           feeding_notes?: string | null
+          forage_analysis_id?: string | null
           front_hoof_size?: string | null
           gender?: string | null
           id?: string
+          ideal_weight_kg?: number | null
           insurance_company?: string | null
           insurance_number?: string | null
           is_school_horse?: boolean
@@ -1411,8 +1472,16 @@ export type Database = {
           turnout_shelter_id?: string | null
           updated_at?: string
           vaccination_status?: string | null
+          workload?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "horses_forage_analysis_id_fkey"
+            columns: ["forage_analysis_id"]
+            isOneToOne: false
+            referencedRelation: "forage_analyses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "horses_owner_id_fkey"
             columns: ["owner_id"]

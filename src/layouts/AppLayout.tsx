@@ -41,6 +41,7 @@ const navGroups: { labelKey: string; items: NavItem[] }[] = [
       { key: 'calendar', to: '/calendar', icon: 'calendar' },
       { key: 'tasks', to: '/tasks', icon: 'checkSquare' },
       { key: 'feedingRota', to: '/feeding-rota', icon: 'feedBag' },
+      { key: 'feedCalculator', to: '/feed-calculator', icon: 'scale' },
       { key: 'noticeBoard', to: '/notice-board', icon: 'bell' },
     ],
   },
@@ -86,6 +87,7 @@ const ownerNavItems: NavItem[] = [
   { key: 'myContract', to: '/my-contract', icon: 'fileText' },
   { key: 'calendar', to: '/calendar', icon: 'calendar' },
   { key: 'myFeedingRota', to: '/my-feeding-rota', icon: 'feedBag' },
+  { key: 'feedCalculator', to: '/feed-calculator', icon: 'scale' },
   { key: 'noticeBoard', to: '/notice-board', icon: 'bell' },
 ]
 
@@ -102,6 +104,7 @@ const OWNER_ALLOWED_PATHS = [
   '/my-profile',
   '/calendar',
   '/my-feeding-rota',
+  '/feed-calculator',
   '/notice-board',
 ]
 

@@ -15,6 +15,7 @@ import {
 import { useConfirm } from '../../lib/ConfirmContext'
 import { usePreferences } from '../../lib/PreferencesContext'
 import { FeedingExtras } from './FeedingExtras'
+import { ForageCard } from './ForageCard'
 
 type FeedingTimeFormState = {
   feeding_shift_type_id: string
@@ -30,7 +31,10 @@ function emptyTimeForm(): FeedingTimeFormState {
 // An entry edited before the stable routine existed has no
 // feeding_shift_type_id — best-effort match it to a shift type by label so
 // editing it doesn't start from a blank selection, but don't force it.
-function toTimeForm(entry: FeedingTime, shiftTypes: ShiftType[]): FeedingTimeFormState {
+function toTimeForm(
+  entry: FeedingTime,
+  shiftTypes: ShiftType[],
+): FeedingTimeFormState {
   const matched =
     entry.feeding_shift_type_id ??
     shiftTypes.find((st) => st.label === entry.label)?.id ??
@@ -238,7 +242,11 @@ export function FeedingTab({
     if (!shiftType) return
     const remaining = remainingHayKg(null)
     const hayValue = addForm.hay ? Number(addForm.hay) : null
-    if (remaining !== null && hayValue !== null && hayValue > remaining + 0.001) {
+    if (
+      remaining !== null &&
+      hayValue !== null &&
+      hayValue > remaining + 0.001
+    ) {
       setAddError(
         t('horseDetail.hayExceedsContract', {
           remaining: Math.max(0, remaining),
@@ -290,7 +298,11 @@ export function FeedingTab({
     if (!shiftType) return
     const remaining = remainingHayKg(editing.id)
     const hayValue = editForm.hay ? Number(editForm.hay) : null
-    if (remaining !== null && hayValue !== null && hayValue > remaining + 0.001) {
+    if (
+      remaining !== null &&
+      hayValue !== null &&
+      hayValue > remaining + 0.001
+    ) {
       setEditError(
         t('horseDetail.hayExceedsContract', {
           remaining: Math.max(0, remaining),
@@ -359,6 +371,12 @@ export function FeedingTab({
 
   return (
     <div>
+      <ForageCard
+        horseId={horseId}
+        feedingTimes={feedingTimes}
+        includedHayKg={hayCapKg}
+      />
+
       <div className="mb-4 flex flex-wrap justify-end gap-2">
         <button type="button" className="btn-ghost" onClick={openInstructions}>
           <Icon name="edit" className="h-4 w-4" />
