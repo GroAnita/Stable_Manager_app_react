@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Badge } from '../components/Badge'
-import { HorseAvatar } from '../components/HorseAvatar'
+import { HorsePhotoPicker } from '../components/HorsePhotoPicker'
 import { Icon } from '../components/Icon'
 import {
   deleteHorse,
@@ -71,16 +71,26 @@ export default function HorseDetail() {
       getHorseSchedule(id),
       listHorseLessonBookings(id),
     ])
-      .then(([horseData, medical, vaccinationRecords, feeding, times, events, lessonBookings]) => {
-        if (cancelled) return
-        setHorse(horseData)
-        setMedicalRecords(medical)
-        setVaccinations(vaccinationRecords)
-        setFeedingPlan(feeding)
-        setFeedingTimes(times)
-        setSchedule(events)
-        setLessonBookingDates(lessonBookings.map((b) => b.starts_at))
-      })
+      .then(
+        ([
+          horseData,
+          medical,
+          vaccinationRecords,
+          feeding,
+          times,
+          events,
+          lessonBookings,
+        ]) => {
+          if (cancelled) return
+          setHorse(horseData)
+          setMedicalRecords(medical)
+          setVaccinations(vaccinationRecords)
+          setFeedingPlan(feeding)
+          setFeedingTimes(times)
+          setSchedule(events)
+          setLessonBookingDates(lessonBookings.map((b) => b.starts_at))
+        },
+      )
       .catch((err: Error) => {
         if (!cancelled) setError(err.message)
       })
@@ -120,10 +130,9 @@ export default function HorseDetail() {
       </Link>
       <div className="page-header">
         <div className="flex items-center gap-4">
-          <HorseAvatar
-            name={horse.name}
-            photoUrl={horse.photo_url}
-            className="h-20 w-20 text-3xl"
+          <HorsePhotoPicker
+            horse={horse}
+            onChange={(photoUrl) => setHorse({ ...horse, photo_url: photoUrl })}
           />
           <div>
             <p className="text-sm tracking-[0.25em] text-slate-400 uppercase">
@@ -182,7 +191,9 @@ export default function HorseDetail() {
             <OverviewTab
               horse={horse}
               vaccinations={vaccinations}
-              lessonBookingDates={lessonBookingEnabled ? lessonBookingDates : null}
+              lessonBookingDates={
+                lessonBookingEnabled ? lessonBookingDates : null
+              }
             />
             <AdditionalOwnersCard
               horseId={horse.id}

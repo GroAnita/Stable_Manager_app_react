@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Badge } from '../components/Badge'
 import { EmptyState } from '../components/EmptyState'
+import { HorsePhotoPicker } from '../components/HorsePhotoPicker'
 import { Icon } from '../components/Icon'
 import { Modal } from '../components/Modal'
 import { Toggle } from '../components/Toggle'
@@ -292,9 +293,27 @@ export default function MyHorse() {
         }) => (
           <div key={horse.id} className="panel space-y-6 p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-2xl font-semibold text-slate-900">
-                {horse.name}
-              </h2>
+              <div className="flex items-center gap-4">
+                <HorsePhotoPicker
+                  horse={horse}
+                  className="h-16 w-16 text-2xl"
+                  onChange={(photoUrl) =>
+                    setBundles((prev) =>
+                      prev.map((bundle) =>
+                        bundle.horse.id === horse.id
+                          ? {
+                              ...bundle,
+                              horse: { ...bundle.horse, photo_url: photoUrl },
+                            }
+                          : bundle,
+                      ),
+                    )
+                  }
+                />
+                <h2 className="text-2xl font-semibold text-slate-900">
+                  {horse.name}
+                </h2>
+              </div>
               <div className="flex flex-wrap items-center gap-2">
                 <Badge status={horse.status} />
                 {horse.away && <Badge status="away" />}

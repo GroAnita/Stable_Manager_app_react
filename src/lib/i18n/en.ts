@@ -474,6 +474,14 @@ export const en = {
   horseDetail: {
     backToHorses: 'Back to horses',
     profile: 'Horse profile',
+    changePhoto: 'Change photo',
+    addPhoto: 'Add photo',
+    removePhoto: 'Remove photo',
+    confirmRemovePhoto: 'Remove the photo of this horse?',
+    uploadingPhoto: 'Uploading…',
+    photoFailed: 'Could not save the photo: {error}',
+    photoUnsupported:
+      'This browser cannot read the photo (iPhone HEIC photos only work in Safari). Save it as JPG or PNG, or upload it from your phone.',
     edit: 'Edit',
     deleteHorse: 'Delete horse',
     breed: 'Breed',

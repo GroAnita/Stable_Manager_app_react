@@ -278,6 +278,108 @@ export async function updateHorse(
   return data
 }
 
+const HORSE_PHOTO_BUCKET = 'horse-photos'
+// The bucket is private, so the horse keeps a long-lived signed link (ten years).
+const HORSE_PHOTO_LINK_SECONDS = 10 * 365 * 24 * 60 * 60
+const HORSE_PHOTO_MAX_SIZE = 1200
+
+export class UnsupportedPhotoError extends Error {}
+
+// createImageBitmap first; an <img> as fallback (Safari reads HEIC that way).
+async function decodePhoto(
+  file: File,
+): Promise<{ source: CanvasImageSource; width: number; height: number }> {
+  try {
+    const bitmap = await createImageBitmap(file)
+    return { source: bitmap, width: bitmap.width, height: bitmap.height }
+  } catch {
+    const url = URL.createObjectURL(file)
+    try {
+      const image = new Image()
+      image.src = url
+      await image.decode()
+      return {
+        source: image,
+        width: image.naturalWidth,
+        height: image.naturalHeight,
+      }
+    } finally {
+      URL.revokeObjectURL(url)
+    }
+  }
+}
+
+// Phone photos are often several MB, and HEIC only shows in Safari: always
+// store a JPEG of at most 1200 px. A photo the browser cannot read is refused
+// rather than stored in a format other browsers cannot show.
+async function shrinkPhoto(file: File): Promise<Blob> {
+  let decoded
+  try {
+    decoded = await decodePhoto(file)
+  } catch {
+    throw new UnsupportedPhotoError(file.name)
+  }
+  const scale = Math.min(
+    1,
+    HORSE_PHOTO_MAX_SIZE / Math.max(decoded.width, decoded.height),
+  )
+  const canvas = document.createElement('canvas')
+  canvas.width = Math.round(decoded.width * scale)
+  canvas.height = Math.round(decoded.height * scale)
+  canvas
+    .getContext('2d')
+    ?.drawImage(decoded.source, 0, 0, canvas.width, canvas.height)
+  if ('close' in decoded.source) decoded.source.close()
+  const blob = await new Promise<Blob | null>((resolve) =>
+    canvas.toBlob(resolve, 'image/jpeg', 0.85),
+  )
+  if (!blob) throw new UnsupportedPhotoError(file.name)
+  return blob
+}
+
+async function removeOldHorsePhotos(folder: string, keep?: string) {
+  const { data } = await supabase.storage.from(HORSE_PHOTO_BUCKET).list(folder)
+  const old = (data ?? [])
+    .map((item) => `${folder}/${item.name}`)
+    .filter((path) => path !== keep)
+  if (old.length) await supabase.storage.from(HORSE_PHOTO_BUCKET).remove(old)
+}
+
+export async function uploadHorsePhoto({
+  stableId,
+  horseId,
+  file,
+}: {
+  stableId: string
+  horseId: string
+  file: File
+}): Promise<string> {
+  const folder = `${stableId}/${horseId}`
+  const path = `${folder}/photo-${Date.now()}.jpg`
+  const { error: uploadError } = await supabase.storage
+    .from(HORSE_PHOTO_BUCKET)
+    .upload(path, await shrinkPhoto(file), { contentType: 'image/jpeg' })
+  if (uploadError) throw uploadError
+  const { data, error: signError } = await supabase.storage
+    .from(HORSE_PHOTO_BUCKET)
+    .createSignedUrl(path, HORSE_PHOTO_LINK_SECONDS)
+  if (signError) throw signError
+  await updateHorse(horseId, { photo_url: data.signedUrl })
+  await removeOldHorsePhotos(folder, path)
+  return data.signedUrl
+}
+
+export async function removeHorsePhoto({
+  stableId,
+  horseId,
+}: {
+  stableId: string
+  horseId: string
+}): Promise<void> {
+  await updateHorse(horseId, { photo_url: null })
+  await removeOldHorsePhotos(`${stableId}/${horseId}`)
+}
+
 export async function deleteHorse(id: string): Promise<void> {
   const { error } = await supabase.from('horses').delete().eq('id', id)
   if (error) throw error
@@ -596,7 +698,8 @@ export async function logFeedingExtra(params: {
         itemId: contract.turnout_price_list_item_id,
       },
     ]) {
-      if (alreadyPaid || service.schedule === 'none' || !service.itemId) continue
+      if (alreadyPaid || service.schedule === 'none' || !service.itemId)
+        continue
       const { data: serviceItem } = await supabase
         .from('price_list_items')
         .select('price, unit, vat_exempt')

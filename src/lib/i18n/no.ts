@@ -475,6 +475,14 @@ export const no: typeof en = {
   horseDetail: {
     backToHorses: 'Tilbake til hester',
     profile: 'Hesteprofil',
+    changePhoto: 'Bytt bilde',
+    addPhoto: 'Legg til bilde',
+    removePhoto: 'Fjern bilde',
+    confirmRemovePhoto: 'Fjerne bildet av hesten?',
+    uploadingPhoto: 'Laster opp…',
+    photoFailed: 'Kunne ikke lagre bildet: {error}',
+    photoUnsupported:
+      'Nettleseren kan ikke lese dette bildet (HEIC-bilder fra iPhone fungerer bare i Safari). Lagre det som JPG eller PNG, eller last det opp fra telefonen.',
     edit: 'Rediger',
     deleteHorse: 'Slett hest',
     breed: 'Rase',
