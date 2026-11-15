@@ -18,6 +18,7 @@ import { TestFlightInvite } from '../components/TestFlightInvite'
 import { WhatsNewBell } from '../components/WhatsNewBell'
 import { signOut } from '../lib/authService'
 import { useAuth } from '../lib/AuthContext'
+import { usePaymentsAttention } from '../lib/attention'
 import { useFeature } from '../lib/features'
 import { usePreferences } from '../lib/PreferencesContext'
 import 'flag-icons/css/flag-icons.min.css'
@@ -118,9 +119,11 @@ const INSTRUCTOR_ALLOWED_PATHS = ['/lessons', '/my-profile']
 function SidebarLink({
   item,
   onClick,
+  badge = 0,
 }: {
   item: NavItem
   onClick: () => void
+  badge?: number
 }) {
   const { t } = usePreferences()
   return (
@@ -137,6 +140,14 @@ function SidebarLink({
         <Icon name={item.icon} className="h-5 w-5" />
       </span>
       <span>{t(`nav.${item.key}`)}</span>
+      {badge > 0 && (
+        <span
+          className="ml-auto min-w-6 rounded-full bg-accent px-2 py-0.5 text-center text-xs font-semibold text-white"
+          aria-label={t('nav.needsAttention', { count: badge })}
+        >
+          {badge}
+        </span>
+      )}
     </NavLink>
   )
 }
@@ -151,6 +162,12 @@ export default function AppLayout() {
   const isInstructor = profile?.role === 'riding_instructor'
   const lessonBookingEnabled = useFeature('lesson_booking')
   const coRiderEnabled = useFeature('co_rider')
+  const canSeePayments =
+    profile?.role === 'stable_owner' || profile?.role === 'stable_employee'
+  const paymentsAttention = usePaymentsAttention(
+    canSeePayments,
+    location.pathname,
+  )
 
   const baseNavGroups = lessonBookingEnabled
     ? [
@@ -288,6 +305,7 @@ export default function AppLayout() {
                       key={item.to}
                       item={item}
                       onClick={() => setSidebarOpen(false)}
+                      badge={item.to === '/payments' ? paymentsAttention : 0}
                     />
                   ))}
                 </div>
@@ -339,10 +357,16 @@ export default function AppLayout() {
               <button
                 type="button"
                 aria-label={t('nav.openMenu')}
-                className="rounded-2xl border border-slate-200 bg-card p-2.5 text-ink/70 lg:hidden"
+                className="relative rounded-2xl border border-slate-200 bg-card p-2.5 text-ink/70 lg:hidden"
                 onClick={() => setSidebarOpen(true)}
               >
                 <Icon name="menu" className="h-5 w-5" />
+                {paymentsAttention > 0 && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute -top-1 -right-1 h-3 w-3 rounded-full border-2 border-card bg-accent"
+                  />
+                )}
               </button>
               <p className="text-xs font-medium tracking-[0.25em] text-ink/40 uppercase">
                 {profile?.role ? t(`role.${profile.role}`) : t('nav.overview')}
