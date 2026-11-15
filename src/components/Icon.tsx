@@ -31,6 +31,9 @@ export type IconName =
   | 'sun'
   | 'creditCard'
   | 'feedBag'
+  | 'moon'
+  | 'sunrise'
+  | 'swap'
   | 'scale'
   | 'share'
   | 'flame'
@@ -209,6 +212,27 @@ const strokeIcons: Record<IconName, ReactNode> = {
     <>
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
       <circle cx="12" cy="7" r="4" />
+    </>
+  ),
+  moon: <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />,
+  sunrise: (
+    <>
+      <path d="M17 18a5 5 0 0 0-10 0" />
+      <line x1="12" y1="2" x2="12" y2="9" />
+      <line x1="4.22" y1="10.22" x2="5.64" y2="11.64" />
+      <line x1="1" y1="18" x2="3" y2="18" />
+      <line x1="21" y1="18" x2="23" y2="18" />
+      <line x1="18.36" y1="11.64" x2="19.78" y2="10.22" />
+      <line x1="23" y1="22" x2="1" y2="22" />
+      <polyline points="8 6 12 2 16 6" />
+    </>
+  ),
+  swap: (
+    <>
+      <polyline points="17 1 21 5 17 9" />
+      <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+      <polyline points="7 23 3 19 7 15" />
+      <path d="M21 13v2a4 4 0 0 1-4 4H3" />
     </>
   ),
   sun: (

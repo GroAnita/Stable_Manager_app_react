@@ -1,4 +1,5 @@
 import { invoiceAmountDue } from '../lib/billing'
+import { AttentionPanel } from './paymentList/AttentionPanel'
 import { CreditNotePanel } from './paymentList/CreditNotePanel'
 import { useEffect, useMemo, useState } from 'react'
 import { Badge } from '../components/Badge'
@@ -47,9 +48,7 @@ export default function PaymentList() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [selected, setSelected] = useState<PaymentListItem | null>(null)
-  const [invoicePaymentId, setInvoicePaymentId] = useState<string | null>(
-    null,
-  )
+  const [invoicePaymentId, setInvoicePaymentId] = useState<string | null>(null)
   const [markingPaid, setMarkingPaid] = useState<string | null>(null)
 
   useEffect(() => {
@@ -241,6 +240,8 @@ export default function PaymentList() {
         </div>
       </div>
 
+      <AttentionPanel />
+
       <div className="grid gap-4 md:grid-cols-3">
         <Card
           label={t('paymentList.paidThisMonth')}
@@ -371,7 +372,8 @@ export default function PaymentList() {
                       <span className="text-sm text-slate-400">
                         {t('common.settled')}
                       </span>
-                    ) : payment.charge_status === 'processing' ? null : invoiceAmountDue(payment) <= 0 ? (
+                    ) : payment.charge_status ===
+                      'processing' ? null : invoiceAmountDue(payment) <= 0 ? (
                       <span className="text-sm text-slate-400">
                         {t('paymentList.fullyCredited')}
                       </span>
@@ -498,7 +500,9 @@ export default function PaymentList() {
             )}
             {disputeState(selected.dispute_status) && (
               <p className="text-red-600">
-                {t(`paymentList.dispute_${disputeState(selected.dispute_status)}`)}
+                {t(
+                  `paymentList.dispute_${disputeState(selected.dispute_status)}`,
+                )}
                 {selected.dispute_amount !== null
                   ? `: ${formatCurrency(selected.dispute_amount)}`
                   : ''}
