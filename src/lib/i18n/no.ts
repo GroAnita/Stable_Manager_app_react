@@ -1601,6 +1601,7 @@ export const no: typeof en = {
     accountRole: 'Rolle:',
     privacyTitle: 'Personvern',
     privacyPolicyLink: 'Les personvernerklæringen',
+    dpaLink: 'Les databehandleravtalen',
     staffInvite: 'Ansattes tilgang',
     staffInviteHint:
       'Lag en lenke du kan sende til en ansatt, slik at de kan lage en pålogging med tilgang til stallen din.',

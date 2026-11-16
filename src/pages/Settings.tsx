@@ -625,6 +625,16 @@ export default function Settings() {
                 >
                   {t('settings.privacyPolicyLink')}
                 </a>
+                {profile?.role === 'stable_owner' && (
+                  <a
+                    href={`${webOrigin()}/databehandleravtale`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 ml-6 inline-block text-sm font-medium text-forest hover:underline"
+                  >
+                    {t('settings.dpaLink')}
+                  </a>
+                )}
               </div>
             </div>
           )}

@@ -1600,6 +1600,7 @@ export const en = {
     accountRole: 'Role:',
     privacyTitle: 'Privacy',
     privacyPolicyLink: 'Privacy policy',
+    dpaLink: 'Read the data processing agreement',
     staffInvite: 'Staff access',
     staffInviteHint:
       'Generate a link to send a staff member so they can create a login with access to your stable.',

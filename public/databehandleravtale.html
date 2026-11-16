@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Databehandleravtale – StallOrg</title>
+    <meta name="description" content="Databehandleravtalen mellom stallen og Nestun Digital for personopplysninger stallen behandler i StallOrg." />
+    <link rel="canonical" href="https://www.stallorg.no/databehandleravtale" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <style>
+      :root { --forest: #3a6b52; --cream: #f7f6f2; --card: #ffffff; --ink: #24302a; --muted: #5d6a63; --line: #e4e4dc; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--cream); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.65; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+      .wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 48px; }
+      header { padding: 16px 0 8px; }
+      .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; color: var(--forest); text-decoration: none; }
+      h1 { font-size: clamp(30px, 5vw, 40px); line-height: 1.15; margin: 24px 0 6px; }
+      h2 { font-size: 22px; line-height: 1.3; margin: 34px 0 8px; }
+      h3 { font-size: 17px; margin: 20px 0 4px; }
+      p, ul { margin: 0 0 12px; }
+      ul { padding-left: 22px; }
+      li { margin-bottom: 6px; }
+      a { color: var(--forest); }
+      .updated { color: var(--muted); font-size: 15px; }
+      .table-wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: 14px; margin: 12px 0 16px; }
+      table { border-collapse: collapse; width: 100%; font-size: 15px; }
+      th, td { text-align: left; vertical-align: top; overflow-wrap: anywhere; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+      th { background: #f1f1ea; }
+      tr:last-child td { border-bottom: 0; }
+      th, td { overflow-wrap: break-word; hyphens: auto; -webkit-hyphens: auto; }
+      td:first-child, th:first-child { width: 36%; }
+      @media (max-width: 520px) { th, td { padding: 9px 10px; font-size: 14px; } td:first-child, th:first-child { width: 40%; } }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header><a class="brand" href="/"><img src="/stallorg-logo.svg" alt="StallOrg" width="130" height="35" style="display:block" /></a></header>
+      <main>
+        <h1>Databehandleravtale</h1>
+        <p class="updated">Sist oppdatert: 16. november 2026</p>
+        <p>Denne avtalen gjelder personopplysninger som stallen legger inn og bruker i StallOrg. Den er en del av <a href="/vilkar">salgsvilkårene</a>, og stallen inngår den når den godtar vilkårene, ved å starte prøveperioden eller et abonnement. Avtalen oppfyller kravene i personvernforordningen (GDPR) artikkel 28.</p>
+
+        <h2>1. Partene</h2>
+        <ul>
+          <li><strong>Behandlingsansvarlig</strong> er stallen som bruker StallOrg, representert ved stalleieren.</li>
+          <li><strong>Databehandler</strong> er Nestun Digital, som er enkeltpersonforetaket Nestun Digital Bråthen, org.nr. 938 795 657, Vålaugsvegen 57A, 2032 Maura. E-post: <a href="mailto:support@nestundigital.no">support@nestundigital.no</a>.</li>
+        </ul>
+        <p>Avtalen gjelder ikke opplysninger som Nestun Digital selv er behandlingsansvarlig for, som brukerkontoer, stallens abonnement, kundeservice, sikkerhet og nettsiden. Dem beskriver <a href="/personvern">personvernerklæringen</a>.</p>
+
+        <h2>2. Hva behandlingen gjelder</h2>
+        <p><strong>Formål:</strong> å levere StallOrg til stallen, slik programmet er beskrevet i salgsvilkårene, og å gi stallen brukerstøtte.</p>
+        <p><strong>Art:</strong> lagring, visning, sortering, beregning, utskrift og sending av e-post og varsler, alt det stallen selv bruker programmet til, i tillegg til sikkerhetskopi, feilsøking og sletting.</p>
+        <p><strong>Varighet:</strong> så lenge stallen bruker StallOrg, og fram til opplysningene er slettet etter punkt 11.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>De registrerte</th><th>Typer opplysninger</th></tr></thead>
+            <tbody>
+              <tr><td>Hesteeiere, medeiere og kontaktpersoner</td><td>Navn, adresse, e-post, telefon, nødkontakt, notater, hester, kontrakter, fakturaer, betalingsstatus og fôringsvakter.</td></tr>
+              <tr><td>Ryttere, forryttere og foresatte</td><td>Navn, kontaktinformasjon, fødselsdato for ryttere, kontaktperson, notater, ridetimer og kurs. Ryttere kan være barn.</td></tr>
+              <tr><td>Ansatte og instruktører</td><td>Navn, e-post, telefon, rolle, vakter og oppgaver.</td></tr>
+              <tr><td>Hesteeiere med kortavtale</td><td>Signert kortavtale med navn og tidspunkt, korttype, de fire siste sifrene og betalingshistorikk. Hele kortnummeret lagres hos Stripe, aldri i StallOrg.</td></tr>
+              <tr><td>Alle som stallen registrerer</td><td>Det stallen selv skriver i fritekstfelt, dokumenter og bilder.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>StallOrg er ikke laget for særlige kategorier av personopplysninger, som helseopplysninger om mennesker, eller for fødselsnummer. Stallen skal ikke legge inn slike opplysninger. Opplysninger om hestens helse er ikke personopplysninger i seg selv.</p>
+
+        <h2>3. Stallens plikter</h2>
+        <ul>
+          <li>Stallen har ansvar for at den har lov til å behandle opplysningene den legger inn, og for å informere de registrerte, for eksempel i sin egen personvernerklæring.</li>
+          <li>Stallen bestemmer hvilke opplysninger som legges inn, hvem i stallen som får tilgang, og hvor lenge opplysningene beholdes, innenfor reglene som gjelder for stallen.</li>
+          <li>Stallen skal gi Nestun Digital beskjed hvis instruksen i punkt 4 ikke er nok for behandlingen den ønsker.</li>
+        </ul>
+
+        <h2>4. Instruks</h2>
+        <p>Nestun Digital behandler opplysningene bare etter dokumentert instruks fra stallen. Instruksen er denne avtalen, salgsvilkårene og det stallen selv gjør og velger i StallOrg, for eksempel å sende en faktura eller invitere en hesteeier. Andre instrukser gis skriftlig til <a href="mailto:support@nestundigital.no">support@nestundigital.no</a>.</p>
+        <p>Nestun Digital bruker ikke opplysningene til egne formål, selger dem ikke, og bruker dem ikke til markedsføring. Mener Nestun Digital at en instruks er i strid med personvernreglene, sier vi fra til stallen med en gang. Krever loven at vi utleverer opplysninger, varsler vi stallen først hvis loven tillater det.</p>
+
+        <h2>5. Taushetsplikt og tilgang</h2>
+        <p>Bare den som trenger det for å drifte StallOrg eller hjelpe stallen, får tilgang til stallens opplysninger, og alle med tilgang har taushetsplikt. Brukerstøtte ser på stallens opplysninger bare når det trengs for å løse en henvendelse eller en feil.</p>
+
+        <h2>6. Sikkerhet</h2>
+        <p>Nestun Digital har tekniske og organisatoriske tiltak som passer til risikoen, etter artikkel 32. De viktigste er:</p>
+        <ul>
+          <li>Kryptert trafikk (HTTPS) mellom brukerne og StallOrg, og kryptert lagring hos databaseleverandøren.</li>
+          <li>Hver stall er skilt fra de andre i databasen, og tilgang styres etter rolle (stalleier, ansatt, instruktør, hesteeier og forrytter), håndhevet i databasen og ikke bare i appen.</li>
+          <li>Passord lagres kryptert og kan ikke leses av oss. Hele kortnummer lagres aldri i StallOrg.</li>
+          <li>Daglig sikkerhetskopi av databasen.</li>
+          <li>Hemmelige nøkler oppbevares bare i serverfunksjonene, aldri i appen.</li>
+          <li>Tilgang til drift og database er begrenset til de som trenger det, og beskyttet med sterk innlogging.</li>
+          <li>Endringer testes før de tas i bruk, og sikkerhetsoppdateringer installeres løpende.</li>
+        </ul>
+
+        <h2>7. Underleverandører</h2>
+        <p>Stallen gir en generell forhåndsgodkjenning til at Nestun Digital bruker underleverandører (underdatabehandlere). Nestun Digital inngår avtaler med dem som gir minst samme beskyttelse som denne avtalen, og er ansvarlig overfor stallen for at de oppfyller pliktene sine. Disse brukes i dag:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Leverandør</th><th>Brukes til</th><th>Sted og grunnlag for overføring</th></tr></thead>
+            <tbody>
+              <tr><td>Supabase</td><td>Database, innlogging, filer og serverfunksjoner</td><td>Irland (EU)</td></tr>
+              <tr><td>Resend</td><td>Sender e-post, for eksempel fakturaer og invitasjoner</td><td>Sendes fra Irland (EU). Selskapet behandler også data i USA. SCC og DPF.</td></tr>
+              <tr><td>Vercel</td><td>Leverer nettsiden og appen til nettleseren</td><td>Hovedsakelig USA, også andre land. SCC og DPF.</td></tr>
+              <tr><td>Apple</td><td>Varsler til iPhone</td><td>Irland og USA. SCC.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>SCC er EU-kommisjonens standard personvernbestemmelser. DPF er EU–US Data Privacy Framework.</p>
+        <p>Nye eller bytte underleverandører varsler vi på e-post til stalleieren og i denne avtalen minst 30 dager før de tas i bruk. Stallen kan protestere med saklig grunn innen fristen. Finner vi ingen løsning, kan stallen si opp abonnementet med virkning fra endringen, og får tilbake det som er betalt for tiden etter.</p>
+        <p><strong>Stripe:</strong> Ved kortbetaling av stalleie har stallen sin egen avtale med Stripe, og stallens Stripe-konto tar imot betalingen. Stripe behandler da kort- og betalingsopplysninger etter sin avtale med stallen, og er ikke underleverandør etter denne avtalen. StallOrg sender opplysningene som trengs for betalingen, som navn, e-post og beløp, til stallens Stripe-konto når stallen bruker kortbetaling.</p>
+
+        <h2>8. Overføring utenfor EØS</h2>
+        <p>Opplysningene lagres i EU. Overføres opplysninger til land utenfor EØS, skjer det bare med et gyldig grunnlag etter personvernforordningen kapittel V, som standard personvernbestemmelser (SCC) eller EU–US Data Privacy Framework, slik tabellen over viser.</p>
+
+        <h2>9. Hjelp til stallen</h2>
+        <ul>
+          <li><strong>De registrertes rettigheter:</strong> Det meste kan stallen gjøre selv i StallOrg, som å rette, hente ut og slette opplysninger. Det stallen ikke kan gjøre selv, hjelper vi med. Får vi en henvendelse direkte fra en registrert, sender vi den videre til stallen og svarer ikke på stallens vegne uten avtale.</li>
+          <li><strong>Sikkerhet og konsekvensvurderinger:</strong> Vi gir stallen informasjonen den trenger for egen risikovurdering, en eventuell vurdering av personvernkonsekvenser og eventuell forhåndsdrøfting med Datatilsynet.</li>
+        </ul>
+
+        <h2>10. Brudd på personopplysningssikkerheten</h2>
+        <p>Oppdager vi et brudd som berører stallens opplysninger, varsler vi stalleieren på e-post uten ugrunnet opphold, og senest innen 48 timer etter at vi ble kjent med det. Da rekker stallen å melde fra til Datatilsynet innen 72 timer når det kreves. Varselet sier så langt vi vet hva som har skjedd, hvilke opplysninger og hvor mange som er berørt, sannsynlige konsekvenser og hva vi gjør. Vi gir mer informasjon etter hvert som vi får den, og retter opp bruddet så raskt som mulig.</p>
+
+        <h2>11. Når avtalen er slutt</h2>
+        <p>Før abonnementet er slutt, kan stallen hente ut det den trenger, for eksempel regnskapsrapporter og fakturaer. Ber stallen om det, gir vi også en kopi av stallens opplysninger i et vanlig maskinlesbart format.</p>
+        <p>Sletter stalleieren kontoen, stenges stallen med en gang, og alle stallens opplysninger slettes for godt etter 3 måneder. Ellers slettes de 3 måneder etter at abonnementet eller prøveperioden er slutt. Slettede opplysninger kan ligge i sikkerhetskopier i inntil 8 dager før de forsvinner der også. Regnskapsmateriale som stallen er pliktig å oppbevare, må stallen ta vare på selv før det. På forespørsel bekrefter vi skriftlig at opplysningene er slettet.</p>
+
+        <h2>12. Innsyn og revisjon</h2>
+        <p>Vi gir stallen den informasjonen som trengs for å vise at denne avtalen følges. Stallen, eller en uavhengig revisor med taushetsplikt som stallen velger, kan gjennomføre revisjon med minst 30 dagers varsel, og høyst én gang i året med mindre det har vært et brudd. Revisjonen skal ikke gi tilgang til andre stallers opplysninger, og stallen dekker egne kostnader.</p>
+
+        <h2>13. Ansvar og varighet</h2>
+        <p>Ansvar mellom partene følger salgsvilkårene. Hver part svarer for sine egne plikter etter personvernforordningen, også overfor de registrerte, etter artikkel 82. Avtalen gjelder så lenge Nestun Digital behandler opplysninger for stallen, og følger salgsvilkårene om endringer, lovvalg og verneting.</p>
+        <p>Endrer vi denne avtalen, varsler vi som beskrevet i salgsvilkårene. Datoen øverst viser siste versjon. Ved motstrid mellom denne avtalen og salgsvilkårene om behandling av personopplysninger, går denne avtalen foran.</p>
+
+        <h2>Kontakt</h2>
+        <p>Spørsmål om avtalen eller om personopplysninger i stallen sender du til <a href="mailto:support@nestundigital.no">support@nestundigital.no</a>.</p>
+      </main>
+    </div>
+  </body>
+</html>

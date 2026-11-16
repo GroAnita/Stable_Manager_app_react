@@ -3,6 +3,7 @@
   "rewrites": [
     { "source": "/personvern", "destination": "/personvern.html" },
     { "source": "/vilkar", "destination": "/vilkar.html" },
+    { "source": "/databehandleravtale", "destination": "/databehandleravtale.html" },
     { "source": "/(.*)", "destination": "/app.html" }
   ]
 }
