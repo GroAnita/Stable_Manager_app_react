@@ -113,6 +113,7 @@ export const en = {
       'This reset link is invalid or has expired. Request a new one below.',
     marketingHeadline: 'Everything your stable needs, in one place',
     privacyPolicyLink: 'Privacy policy',
+    termsLink: 'Terms of sale',
     marketingSubtitle:
       'Horses, contracts, invoicing and the whole team on one simple dashboard — in English or Norwegian.',
     marketingFeatureHorses:
@@ -1652,6 +1653,8 @@ export const en = {
     billingPaysMonthly: 'You pay monthly.',
     billingPaysYearly: 'You pay for a year at a time.',
     billingYearlyNoRefund: 'Yearly billing: a paid year is not refunded if you cancel during it. The subscription then runs to the end of the year and is not renewed.',
+    billingTermsBefore: 'By starting a subscription you accept the ',
+    billingTermsLink: 'terms of sale',
     billingSwitchYearly: 'Switch to yearly billing',
     billingSwitchYearlyHint: 'Pay for a year at a time and get one month free: NOK {price} a year, saving NOK {saved}.',
     billingSwitchYearlyConfirm: 'Switch to yearly billing? You pay NOK {price} for a year now, less what is left of this month. During the trial, the amount is charged when the trial ends. A paid year is not refunded if you cancel during it; the subscription then runs to the end of the year.',

@@ -23,6 +23,7 @@ import {
 } from '../../features/payments/connect'
 import { planChangeDates } from '../../lib/billing'
 import { useConfirm } from '../../lib/ConfirmContext'
+import { webOrigin } from '../../lib/platform'
 import { usePreferences } from '../../lib/PreferencesContext'
 import { supabase } from '../../lib/supabaseClient'
 
@@ -581,6 +582,18 @@ export function SubscriptionPanel({
                 {t('settings.billingYearlyNoRefund')}
               </p>
             )}
+            <p className="text-sm text-slate-500">
+              {t('settings.billingTermsBefore')}
+              <a
+                href={`${webOrigin()}/vilkar`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-forest hover:underline"
+              >
+                {t('settings.billingTermsLink')}
+              </a>
+              .
+            </p>
             <button
               type="button"
               className="btn-primary"

@@ -2,6 +2,7 @@
   "buildCommand": "npm run build:web",
   "rewrites": [
     { "source": "/personvern", "destination": "/personvern.html" },
+    { "source": "/vilkar", "destination": "/vilkar.html" },
     { "source": "/(.*)", "destination": "/app.html" }
   ]
 }

@@ -436,6 +436,15 @@ export default function Auth() {
             >
               {t('auth.privacyPolicyLink')}
             </a>
+            <span aria-hidden="true"> · </span>
+            <a
+              href={`${webOrigin()}/vilkar`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              {t('auth.termsLink')}
+            </a>
           </p>
         </div>
       </div>

@@ -116,6 +116,7 @@ export const no: typeof en = {
       'Denne lenken er ugyldig eller har utløpt. Be om en ny nedenfor.',
     marketingHeadline: 'Alt stallen din trenger, på ett sted',
     privacyPolicyLink: 'Personvernerklæring',
+    termsLink: 'Salgsvilkår',
     marketingSubtitle:
       'Hester, kontrakter, fakturering og hele teamet i ett enkelt dashbord — på norsk eller engelsk.',
     marketingFeatureHorses:
@@ -1653,6 +1654,8 @@ export const no: typeof en = {
     billingPaysMonthly: 'Du betaler månedlig.',
     billingPaysYearly: 'Du betaler for ett år om gangen.',
     billingYearlyNoRefund: 'Årlig betaling: et betalt år refunderes ikke hvis du sier opp underveis. Abonnementet varer da ut året, og fornyes ikke.',
+    billingTermsBefore: 'Ved å starte abonnement godtar du ',
+    billingTermsLink: 'salgsvilkårene',
     billingSwitchYearly: 'Bytt til årlig betaling',
     billingSwitchYearlyHint: 'Betal for ett år om gangen og få én måned gratis: {price} kr i året, og du sparer {saved} kr.',
     billingSwitchYearlyConfirm: 'Bytte til årlig betaling? Du betaler {price} kr for ett år nå, minus det du har igjen av denne måneden. Er du i prøveperioden, trekkes beløpet når den er over. Et betalt år refunderes ikke hvis du sier opp underveis; abonnementet varer da ut året.',
