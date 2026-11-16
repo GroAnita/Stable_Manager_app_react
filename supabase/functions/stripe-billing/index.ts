@@ -8,7 +8,11 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'npm:stripe@23.1.0'
 import { ensurePrice } from '../_shared/subscription.ts'
-import { trialEndForCheckout } from '../_shared/subscriptionState.ts'
+import {
+  isBillingInterval,
+  trialEndForCheckout,
+  type BillingInterval,
+} from '../_shared/subscriptionState.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -68,7 +72,10 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: 'Invalid session' }, 401)
     }
 
-    const { action, plan, returnOrigin } = await req.json()
+    const { action, plan, interval, returnOrigin } = await req.json()
+    if (interval !== undefined && !isBillingInterval(interval)) {
+      return jsonResponse({ error: 'Unknown interval' }, 400)
+    }
     const admin = createClient(
       supabaseUrl,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
@@ -145,12 +152,29 @@ Deno.serve(async (req) => {
         billing.stripe_subscription_id,
       )
       const item = subscription.items.data[0]
+      const currentInterval: BillingInterval =
+        item.price.recurring?.interval === 'year' ? 'year' : 'month'
+      const targetInterval: BillingInterval = interval ?? currentInterval
+      // A paid year can't be turned back into months halfway; that happens by
+      // cancelling and choosing monthly when the year runs out.
+      if (currentInterval === 'year' && targetInterval === 'month') {
+        return jsonResponse({ error: 'yearly_to_monthly' }, 409)
+      }
+      const price = await ensurePrice(
+        stripe,
+        admin,
+        planRow.key,
+        targetInterval,
+      )
+      if (item.price.id === price) return jsonResponse({ changed: false })
       await stripe.subscriptions.update(subscription.id, {
-        items: [
-          { id: item.id, price: await ensurePrice(stripe, admin, planRow.key) },
-        ],
+        items: [{ id: item.id, price }],
         metadata: { ...subscription.metadata, plan: planRow.key },
-        proration_behavior: 'create_prorations',
+        // Going yearly is charged now, with credit for the unused part of the
+        // month (during a trial, the year starts when the trial ends). A plan
+        // change on a yearly subscription is also invoiced now, not in a year.
+        proration_behavior:
+          targetInterval === 'year' ? 'always_invoice' : 'create_prorations',
         // Card payments need a stable that has paid, so moving to them ends a trial.
         ...(planRow.includes_payments && subscription.status === 'trialing'
           ? { trial_end: 'now' as const }
@@ -201,7 +225,15 @@ Deno.serve(async (req) => {
       // though it's on by default for the account.
       managed_payments: { enabled: false },
       line_items: [
-        { quantity: 1, price: await ensurePrice(stripe, admin, planRow.key) },
+        {
+          quantity: 1,
+          price: await ensurePrice(
+            stripe,
+            admin,
+            planRow.key,
+            interval ?? 'month',
+          ),
+        },
       ],
       success_url: returnUrl,
       cancel_url: returnUrl,

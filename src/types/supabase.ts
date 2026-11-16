@@ -2525,6 +2525,7 @@ export type Database = {
       }
       stable_billing: {
         Row: {
+          billing_interval: string
           cancel_at_period_end: boolean
           created_at: string
           current_period_end: string | null
@@ -3258,6 +3259,7 @@ export type Database = {
           past_due_since: string | null
           has_subscription: boolean
           read_only: boolean
+          billing_interval: string
         }[]
       }
       publish_feeding_rota: {

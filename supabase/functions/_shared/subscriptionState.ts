@@ -3,16 +3,39 @@
 
 export const PRICE_LOOKUP_PREFIX = 'stalldrift_'
 
-export function priceLookupKey(plan: string): string {
-  return `${PRICE_LOOKUP_PREFIX}${plan}`
+export type BillingInterval = 'month' | 'year'
+
+// A year costs eleven months: one month free for paying a year ahead.
+export const YEARLY_MONTHS_CHARGED = 11
+const YEARLY_SUFFIX = '_yearly'
+
+export function isBillingInterval(value: unknown): value is BillingInterval {
+  return value === 'month' || value === 'year'
+}
+
+// Monthly prices keep their old keys (stalldrift_small); yearly ones end in _yearly.
+export function priceLookupKey(
+  plan: string,
+  interval: BillingInterval = 'month',
+): string {
+  return `${PRICE_LOOKUP_PREFIX}${plan}${interval === 'year' ? YEARLY_SUFFIX : ''}`
 }
 
 export function planFromLookupKey(
   key: string | null | undefined,
 ): string | null {
-  return key?.startsWith(PRICE_LOOKUP_PREFIX)
-    ? key.slice(PRICE_LOOKUP_PREFIX.length)
-    : null
+  if (!key?.startsWith(PRICE_LOOKUP_PREFIX)) return null
+  const rest = key.slice(PRICE_LOOKUP_PREFIX.length)
+  return rest.endsWith(YEARLY_SUFFIX)
+    ? rest.slice(0, -YEARLY_SUFFIX.length)
+    : rest
+}
+
+export function priceNokFor(
+  monthlyNok: number,
+  interval: BillingInterval,
+): number {
+  return interval === 'year' ? monthlyNok * YEARLY_MONTHS_CHARGED : monthlyNok
 }
 
 export type BillingStatus = 'active' | 'past_due' | 'canceled'

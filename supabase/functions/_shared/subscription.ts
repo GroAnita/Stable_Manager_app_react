@@ -1,7 +1,11 @@
 // Shared by the functions that deal with a stable's StallOrg subscription.
 // deno-lint-ignore-file no-explicit-any
 import type Stripe from 'npm:stripe@23.1.0'
-import { priceLookupKey } from './subscriptionState.ts'
+import {
+  priceLookupKey,
+  priceNokFor,
+  type BillingInterval,
+} from './subscriptionState.ts'
 
 // The product names in Stripe, as the stable owner sees them on receipts and
 // invoices. Plans with card payments are StallOrgPro.
@@ -19,12 +23,13 @@ export function stripeProductName(plan: string, fallback: string): string {
   return `${withPayments ? 'StallOrgPro' : 'StallOrg'} ${size}`
 }
 
-// Finds the plan's price in Stripe, making it from public.subscription_plans the first
+// Finds the plan's monthly or yearly price in Stripe, making it from public.subscription_plans the first
 // time or when the price there has changed, so the two can't drift apart.
 export async function ensurePrice(
   stripe: Stripe,
   admin: any,
   plan: string,
+  interval: BillingInterval = 'month',
 ): Promise<string> {
   const { data: row, error } = await admin
     .from('subscription_plans')
@@ -33,8 +38,8 @@ export async function ensurePrice(
     .single()
   if (error) throw error
 
-  const lookupKey = priceLookupKey(plan)
-  const unitAmount = row.price_nok * 100
+  const lookupKey = priceLookupKey(plan, interval)
+  const unitAmount = priceNokFor(row.price_nok, interval) * 100
   const { data: existing } = await stripe.prices.list({
     lookup_keys: [lookupKey],
     active: true,
@@ -51,12 +56,14 @@ export async function ensurePrice(
     {
       currency: 'nok',
       unit_amount: unitAmount,
-      recurring: { interval: 'month' },
+      recurring: { interval },
       lookup_key: lookupKey,
       transfer_lookup_key: true,
       // The price stays the same for customers when VAT registration comes.
       tax_behavior: 'inclusive',
-      product_data: { name: stripeProductName(plan, row.name) },
+      product_data: {
+        name: `${stripeProductName(plan, row.name)}${interval === 'year' ? ' (årlig)' : ''}`,
+      },
     },
     { idempotencyKey: `stalldrift-price-${lookupKey}-${unitAmount}` },
   )
@@ -88,12 +95,18 @@ export async function syncSubscriptionPlan(
     billing.stripe_subscription_id,
   )
   const item = subscription.items.data[0]
-  const price = await ensurePrice(stripe, admin, stable.plan)
-  if (item && item.price.id !== price) {
+  if (!item) return
+  // A yearly subscription stays yearly; the difference is invoiced now rather
+  // than a year from now.
+  const interval: BillingInterval =
+    item.price.recurring?.interval === 'year' ? 'year' : 'month'
+  const price = await ensurePrice(stripe, admin, stable.plan, interval)
+  if (item.price.id !== price) {
     await stripe.subscriptions.update(subscription.id, {
       items: [{ id: item.id, price }],
       metadata: { ...subscription.metadata, plan: stable.plan },
-      proration_behavior: 'create_prorations',
+      proration_behavior:
+        interval === 'year' ? 'always_invoice' : 'create_prorations',
     })
   }
 }

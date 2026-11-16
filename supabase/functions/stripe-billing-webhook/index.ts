@@ -91,6 +91,8 @@ Deno.serve(async (req) => {
           ? new Date(item.current_period_end * 1000).toISOString()
           : null,
         cancel_at_period_end: subscription.cancel_at_period_end,
+        billing_interval:
+          item?.price.recurring?.interval === 'year' ? 'year' : 'month',
         past_due_since: pastDueSince(
           status,
           billing.past_due_since,

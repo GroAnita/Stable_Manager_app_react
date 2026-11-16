@@ -115,7 +115,14 @@ export type StableBilling = {
   past_due_since: string | null
   has_subscription: boolean
   read_only: boolean
+  billing_interval: string
 }
+
+export type BillingInterval = 'month' | 'year'
+
+// A year costs eleven months; keep in step with YEARLY_MONTHS_CHARGED in
+// supabase/functions/_shared/subscriptionState.ts.
+export const YEARLY_MONTHS_CHARGED = 11
 
 export async function getStableBilling(): Promise<StableBilling | null> {
   const { data, error } = await supabase.rpc('get_stable_billing_state')
@@ -132,10 +139,14 @@ async function invokeBilling<T>(body: Record<string, unknown>): Promise<T> {
   return data
 }
 
-export async function startSubscriptionCheckout(plan: string): Promise<string> {
+export async function startSubscriptionCheckout(
+  plan: string,
+  interval: BillingInterval = 'month',
+): Promise<string> {
   const { url } = await invokeBilling<{ url: string }>({
     action: 'checkout',
     plan,
+    interval,
   })
   return url
 }
@@ -145,8 +156,12 @@ export async function openSubscriptionPortal(): Promise<string> {
   return url
 }
 
-export async function changeSubscriptionPlan(plan: string): Promise<void> {
-  await invokeBilling({ action: 'change_plan', plan })
+// Without an interval the subscription keeps the one it has.
+export async function changeSubscriptionPlan(
+  plan: string,
+  interval?: BillingInterval,
+): Promise<void> {
+  await invokeBilling({ action: 'change_plan', plan, interval })
 }
 
 // Deletes the signed-in user's account. A stable owner's stable is closed and

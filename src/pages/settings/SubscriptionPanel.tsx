@@ -8,6 +8,8 @@ import {
   openSubscriptionPortal,
   startSubscriptionCheckout,
   updateStable,
+  YEARLY_MONTHS_CHARGED,
+  type BillingInterval,
   type Stable,
   type StableBilling,
   type SubscriptionPlan,
@@ -25,6 +27,8 @@ import { usePreferences } from '../../lib/PreferencesContext'
 import { supabase } from '../../lib/supabaseClient'
 
 const TRIAL_DAYS = 30
+
+const formatNok = (amount: number) => amount.toLocaleString('nb-NO')
 
 function getTrialStatus(
   createdAt: string,
@@ -78,6 +82,7 @@ export function SubscriptionPanel({
   )
   const [switchDate, setSwitchDate] = useState(switchDates[0])
   const [message, setMessage] = useState<string | null>(null)
+  const [chosenInterval, setChosenInterval] = useState<BillingInterval>('month')
 
   useEffect(() => {
     listSubscriptionPlans()
@@ -103,6 +108,13 @@ export function SubscriptionPanel({
     billing?.has_subscription === true &&
     (billing.status === 'active' || billing.status === 'past_due')
   const canBuy = !isTester && !isPaying && !Capacitor.isNativePlatform()
+  const payingYearly = isPaying && billing?.billing_interval === 'year'
+  // Paying stables see what they pay; others see what they're choosing.
+  const shownInterval: BillingInterval = isPaying
+    ? payingYearly
+      ? 'year'
+      : 'month'
+    : chosenInterval
   const selectedPlan = plans.find((plan) => plan.key === stable.plan)
   const overHorseLimit =
     selectedPlan?.horse_max != null &&
@@ -195,7 +207,7 @@ export function SubscriptionPanel({
           { confirmLabel: t('settings.billingBuy') },
         )
       ) {
-        await goToStripe(() => startSubscriptionCheckout(plan))
+        await goToStripe(() => startSubscriptionCheckout(plan, chosenInterval))
       }
       return
     }
@@ -210,9 +222,15 @@ export function SubscriptionPanel({
         }
         const name = plans.find((other) => other.key === plan)?.name ?? ''
         if (
-          !(await confirm(t('settings.billingChangeConfirm', { name }), {
-            confirmLabel: t('settings.billingChange'),
-          }))
+          !(await confirm(
+            t(
+              payingYearly
+                ? 'settings.billingChangeConfirmYearly'
+                : 'settings.billingChangeConfirm',
+              { name },
+            ),
+            { confirmLabel: t('settings.billingChange') },
+          ))
         )
           return
         await changeSubscriptionPlan(plan)
@@ -231,11 +249,39 @@ export function SubscriptionPanel({
         setPlanning({ plan, signed: Number(details ?? 0) })
       } else if (message.includes('plan_change_scheduled')) {
         setError(t('settings.planChangeAlreadyPlanned'))
+      } else if (message.includes('yearly_to_monthly')) {
+        setError(t('settings.billingYearlyToMonthly'))
       } else if (message.includes('plan_not_available')) {
         setError(t('settings.planNotAvailable'))
       } else {
         setError(message)
       }
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const yearlyPrice = (monthly: number) => monthly * YEARLY_MONTHS_CHARGED
+
+  async function handleSwitchToYearly() {
+    if (!selectedPlan || saving) return
+    if (
+      !(await confirm(
+        t('settings.billingSwitchYearlyConfirm', {
+          price: formatNok(yearlyPrice(selectedPlan.price_nok)),
+        }),
+        { confirmLabel: t('settings.billingSwitchYearly') },
+      ))
+    )
+      return
+    setSaving(true)
+    setError(null)
+    setMessage(null)
+    try {
+      await changeSubscriptionPlan(stable.plan, 'year')
+      setMessage(t('settings.billingSwitchedYearly'))
+    } catch (err) {
+      setError((err as Error).message)
     } finally {
       setSaving(false)
     }
@@ -351,6 +397,13 @@ export function SubscriptionPanel({
                 : 'settings.billingActive',
             )}
           </p>
+          <p className="text-sm text-slate-600">
+            {t(
+              payingYearly
+                ? 'settings.billingPaysYearly'
+                : 'settings.billingPaysMonthly',
+            )}
+          </p>
           {billing.current_period_end && (
             <p className="text-sm text-slate-600">
               {t(
@@ -375,6 +428,27 @@ export function SubscriptionPanel({
               {t('settings.billingManage')}
             </button>
           )}
+          {!payingYearly &&
+            canEdit &&
+            selectedPlan &&
+            !Capacitor.isNativePlatform() && (
+              <div className="mt-2 rounded-2xl border border-forest/20 bg-card p-4">
+                <p className="text-sm text-slate-700">
+                  {t('settings.billingSwitchYearlyHint', {
+                    price: formatNok(yearlyPrice(selectedPlan.price_nok)),
+                    saved: formatNok(selectedPlan.price_nok),
+                  })}
+                </p>
+                <button
+                  type="button"
+                  className="btn-primary mt-3"
+                  disabled={saving}
+                  onClick={handleSwitchToYearly}
+                >
+                  {t('settings.billingSwitchYearly')}
+                </button>
+              </div>
+            )}
         </div>
       )}
 
@@ -406,7 +480,42 @@ export function SubscriptionPanel({
       )}
 
       <div className="mt-6">
-        <p className="field-label">{t('settings.planLabel')}</p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="field-label mb-0">{t('settings.planLabel')}</p>
+          {!isPaying && !isTester && (
+            <div
+              role="radiogroup"
+              aria-label={t('settings.intervalLabel')}
+              className="inline-flex rounded-xl border border-slate-200 bg-slate-100 p-1 text-sm"
+            >
+              {(['month', 'year'] as const).map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  role="radio"
+                  aria-checked={chosenInterval === value}
+                  onClick={() => setChosenInterval(value)}
+                  className={`flex items-center gap-2 rounded-lg px-3 py-1.5 font-medium ${
+                    chosenInterval === value
+                      ? 'bg-card text-ink shadow-sm ring-1 ring-forest/30'
+                      : 'text-slate-600'
+                  }`}
+                >
+                  {t(
+                    value === 'month'
+                      ? 'settings.intervalMonthly'
+                      : 'settings.intervalYearly',
+                  )}
+                  {value === 'year' && (
+                    <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-white">
+                      {t('settings.intervalYearlyBadge')}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <div className="mt-2 space-y-3">
           {shownPlans.map((plan) => {
             const selected = stable.plan === plan.key
@@ -438,9 +547,26 @@ export function SubscriptionPanel({
                     )}
                   </div>
                 </div>
-                <p className="shrink-0 font-semibold text-slate-900">
-                  {t('settings.planPriceSuffix', { price: plan.price_nok })}
-                </p>
+                {shownInterval === 'year' ? (
+                  <div className="shrink-0 text-right">
+                    <p className="font-semibold text-slate-900">
+                      {t('settings.planPriceYearSuffix', {
+                        price: formatNok(yearlyPrice(plan.price_nok)),
+                      })}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {t('settings.planPriceYearSaved', {
+                        saved: formatNok(plan.price_nok),
+                      })}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="shrink-0 font-semibold text-slate-900">
+                    {t('settings.planPriceSuffix', {
+                      price: formatNok(plan.price_nok),
+                    })}
+                  </p>
+                )}
               </label>
             )
           })}
@@ -455,7 +581,9 @@ export function SubscriptionPanel({
               className="btn-primary"
               disabled={saving}
               onClick={() =>
-                goToStripe(() => startSubscriptionCheckout(stable.plan))
+                goToStripe(() =>
+                  startSubscriptionCheckout(stable.plan, chosenInterval),
+                )
               }
             >
               {t('settings.billingBuy')}
