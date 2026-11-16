@@ -160,10 +160,18 @@ Deno.serve(async (req) => {
         skipped.push(stable.name)
         continue
       }
+      // A profile named after the farm, or a test name, gets a plain "Hei,".
+      const first = owner.full_name?.trim().split(/\s+/)[0] ?? null
+      const firstName =
+        first &&
+        first.toLowerCase() !== 'test' &&
+        !stable.name.toLowerCase().includes(first.toLowerCase())
+          ? first
+          : null
       recipients.push({
         stableId: row.stable_id,
         stableName: stable.name.trim(),
-        firstName: owner.full_name?.trim().split(/\s+/)[0] ?? null,
+        firstName,
         email: owner.email,
         testerUntil: new Date(row.tester_until),
       })
