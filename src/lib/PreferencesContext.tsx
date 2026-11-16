@@ -12,6 +12,7 @@ import {
   formatDate as formatDatePure,
   formatTime as formatTimePure,
 } from './format'
+import { supabase } from './supabaseClient'
 
 export type Language = 'en' | 'no'
 export type Currency = 'EUR' | 'NOK' | 'SEK' | 'GBP'
@@ -89,9 +90,28 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = language
   }, [language])
 
+  // The database writes notifications (and push messages) in this language, so
+  // it's kept on the profile too: on every start, sign-in and change.
+  useEffect(() => {
+    const sync = () => {
+      void supabase
+        .rpc('set_my_language', { p_language: language })
+        .then(undefined, () => undefined)
+    }
+    void supabase.auth.getSession().then(({ data }) => {
+      if (data.session) sync()
+    })
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      // Not awaited inside the callback, which Supabase warns can deadlock.
+      if (event === 'SIGNED_IN') setTimeout(sync, 0)
+    })
+    return () => data.subscription.unsubscribe()
+  }, [language])
+
   useEffect(() => {
     function applyTheme() {
-      const isDark = theme === 'dark' || (theme === 'system' && systemPrefersDark())
+      const isDark =
+        theme === 'dark' || (theme === 'system' && systemPrefersDark())
       document.documentElement.classList.toggle('dark', isDark)
     }
     applyTheme()

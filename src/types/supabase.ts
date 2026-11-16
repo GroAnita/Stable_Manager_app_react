@@ -2330,6 +2330,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          language: string
           avatar_url: string | null
           created_at: string
           email: string | null
@@ -2341,6 +2342,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          language?: string
           avatar_url?: string | null
           created_at?: string
           email?: string | null
@@ -2352,6 +2354,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          language?: string
           avatar_url?: string | null
           created_at?: string
           email?: string | null
@@ -3264,6 +3267,14 @@ export type Database = {
           billing_interval: string
           tester_until: string | null
         }[]
+      }
+      notify_feeding_shift_assigned: {
+        Args: { p_shift_id: string }
+        Returns: undefined
+      }
+      set_my_language: {
+        Args: { p_language: string }
+        Returns: undefined
       }
       publish_feeding_rota: {
         Args: {

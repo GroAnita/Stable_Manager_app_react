@@ -339,15 +339,9 @@ export async function reassignShift(
     .single()
   if (error) throw error
 
+  // The database writes the notice in the owner's own language.
   if (ownerId) {
-    const shift = data
-    await supabase.from('notifications').insert({
-      stable_id: shift.stable_id,
-      owner_id: ownerId,
-      notification_type: 'feeding_shift_assigned',
-      title: 'Feeding shift assigned to you',
-      message: `You've been assigned a feeding shift on ${shift.date}.`,
-    })
+    await supabase.rpc('notify_feeding_shift_assigned', { p_shift_id: shiftId })
   }
   return data
 }
