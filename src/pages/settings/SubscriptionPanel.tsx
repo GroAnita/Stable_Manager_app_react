@@ -482,7 +482,7 @@ export function SubscriptionPanel({
       <div className="mt-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="field-label mb-0">{t('settings.planLabel')}</p>
-          {!isPaying && !isTester && (
+          {!isPaying && (
             <div
               role="radiogroup"
               aria-label={t('settings.intervalLabel')}
@@ -576,6 +576,11 @@ export function SubscriptionPanel({
             <p className="text-sm text-slate-500">
               {t('settings.billingBuyHint')}
             </p>
+            {chosenInterval === 'year' && (
+              <p className="text-sm text-slate-500">
+                {t('settings.billingYearlyNoRefund')}
+              </p>
+            )}
             <button
               type="button"
               className="btn-primary"
