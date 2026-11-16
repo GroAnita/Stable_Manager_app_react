@@ -116,6 +116,8 @@ export type StableBilling = {
   has_subscription: boolean
   read_only: boolean
   billing_interval: string
+  // A test account's end date, after which it gets a month's trial.
+  tester_until: string | null
 }
 
 export type BillingInterval = 'month' | 'year'

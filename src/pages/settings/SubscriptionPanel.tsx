@@ -459,7 +459,11 @@ export function SubscriptionPanel({
             {t('settings.testerTitle')}
           </p>
           <p className="mt-2 text-sm text-slate-600">
-            {t('settings.testerHint')}
+            {billing?.tester_until
+              ? t('settings.testerEndingHint', {
+                  date: formatDate(billing.tester_until),
+                })
+              : t('settings.testerHint')}
           </p>
         </div>
       ) : isPaying ? null : (

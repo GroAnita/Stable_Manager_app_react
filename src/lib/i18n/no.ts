@@ -1107,6 +1107,7 @@ export const no: typeof en = {
     error_final_invoice_exists: 'Sluttoppgjøret er allerede laget. Lag kreditnota på det først.',
   },
   billingBanner: {
+    testerEnding: 'Testperioden slutter {date}. Da får stallen en gratis prøveperiode, og må velge abonnement innen {trialEnd} for å fortsette.',
     trialEnding: 'Prøveperioden slutter {date}. Velg et abonnement for å fortsette.',
     trialEnded: 'Prøveperioden er over. StallOrg blir skrivebeskyttet {date} hvis det ikke velges abonnement.',
     pastDue: 'Betalingen for abonnementet feilet. StallOrg blir skrivebeskyttet {date} hvis det ikke ordnes.',
@@ -1714,6 +1715,7 @@ export const no: typeof en = {
     signingNotReady: 'Stripe-kontoen må være klar til å ta imot betaling først.',
     testerTitle: 'Testkonto',
     testerHint: 'Du tester StallOrg, så det er gratis og uten sluttdato. Vi sier fra i god tid hvis dette endres.',
+    testerEndingHint: 'Du tester StallOrg gratis til {date}. Da får stallen en gratis prøveperiode på én måned, og må velge abonnement for å fortsette. Alt dere har lagt inn, blir liggende.',
     billingBuy: 'Start abonnement',
     billingPaymentPlanConfirm: 'Kortbetaling krever et aktivt abonnement. Starter du {name}, er prøveperioden over, og du betaler fra i dag. Kortbetaling åpnes når betalingen har gått gjennom.',
     billingPaymentPlanNeedsSubscription: 'Kortbetaling krever et aktivt abonnement. Velg det på stallorg.no, eller kontakt StallOrg hvis du er testkunde.',

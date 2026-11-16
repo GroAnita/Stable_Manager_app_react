@@ -18,7 +18,16 @@ export function BillingBanner({ canManage }: { canManage: boolean }) {
       .catch(() => setBilling(null))
   }, [])
 
-  if (!billing || billing.status === 'tester') return null
+  if (!billing) return null
+  if (billing.status === 'tester') {
+    // Only the stable owner is told that the test period is ending.
+    if (
+      !canManage ||
+      !billing.tester_until ||
+      new Date(billing.tester_until).getTime() <= Date.now()
+    )
+      return null
+  }
 
   const addDays = (iso: string, days: number) => {
     const date = new Date(iso)
@@ -27,7 +36,14 @@ export function BillingBanner({ canManage }: { canManage: boolean }) {
   }
 
   let text: string | null = null
-  if (billing.read_only) {
+  if (billing.status === 'tester' && billing.tester_until) {
+    const trialEnd = new Date(billing.tester_until)
+    trialEnd.setMonth(trialEnd.getMonth() + 1)
+    text = t('billingBanner.testerEnding', {
+      date: formatDate(billing.tester_until),
+      trialEnd: formatDate(trialEnd.toISOString()),
+    })
+  } else if (billing.read_only) {
     text = t('billingBanner.readOnly')
   } else if (billing.status === 'past_due' && billing.past_due_since) {
     text = t('billingBanner.pastDue', {

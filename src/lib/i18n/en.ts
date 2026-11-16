@@ -1106,6 +1106,7 @@ export const en = {
     error_final_invoice_exists: 'The final settlement already exists. Credit it first.',
   },
   billingBanner: {
+    testerEnding: 'The test period ends on {date}. The stable then gets a free trial, and must choose a subscription by {trialEnd} to continue.',
     trialEnding: 'The trial ends {date}. Choose a plan to continue.',
     trialEnded: 'The trial is over. StallOrg becomes read-only {date} unless a plan is chosen.',
     pastDue: 'The subscription payment failed. StallOrg becomes read-only {date} unless this is sorted.',
@@ -1713,6 +1714,7 @@ export const en = {
     signingNotReady: 'The Stripe account must be ready to take payments first.',
     testerTitle: 'Test account',
     testerHint: 'You’re testing StallOrg, so it’s free with no end date. We’ll tell you in good time if this changes.',
+    testerEndingHint: 'You’re testing StallOrg for free until {date}. The stable then gets a free one-month trial, and must choose a subscription to continue. Everything you’ve added stays.',
     billingBuy: 'Start subscription',
     billingPaymentPlanConfirm: 'Card payments need an active subscription. If you start {name}, your trial ends and you pay from today. Card payments open when the payment has gone through.',
     billingPaymentPlanNeedsSubscription: 'Card payments need an active subscription. Choose it at stallorg.no, or contact StallOrg if you’re a test customer.',
