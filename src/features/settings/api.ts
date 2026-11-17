@@ -118,6 +118,25 @@ export type StableBilling = {
   billing_interval: string
   // A test account's end date, after which it gets a month's trial.
   tester_until: string | null
+  // Testers keep the old prices for 12 months if they subscribe by this date.
+  founder_offer_until: string | null
+  // Set once a founder subscription starts; the normal price applies after it.
+  founder_price_until: string | null
+}
+
+// Same rule as hasFounderPrice in supabase/functions/_shared/subscriptionState.ts.
+export function hasFounderPrice(
+  billing: StableBilling | null,
+  nowMs = Date.now(),
+): boolean {
+  if (!billing) return false
+  if (billing.founder_price_until) {
+    return Date.parse(billing.founder_price_until) > nowMs
+  }
+  return (
+    !!billing.founder_offer_until &&
+    Date.parse(billing.founder_offer_until) > nowMs
+  )
 }
 
 export type BillingInterval = 'month' | 'year'

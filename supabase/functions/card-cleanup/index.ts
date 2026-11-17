@@ -8,7 +8,11 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'npm:stripe@23.1.0'
 import { endCardAgreement, removeSavedCard } from '../_shared/endAgreement.ts'
 import { sendEmail } from '../_shared/sendEmail.ts'
-import { syncSubscriptionPlan } from '../_shared/subscription.ts'
+import { ensurePrice, syncSubscriptionPlan } from '../_shared/subscription.ts'
+import {
+  FOUNDER_SWITCH_DAYS_BEFORE,
+  isFounderLookupKey,
+} from '../_shared/subscriptionState.ts'
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -190,5 +194,58 @@ Deno.serve(async (req) => {
     }
   }
 
-  return jsonResponse({ ended, removed, failed, switched })
+  // Founder prices that end within a few days move to the normal price now, with
+  // no proration, so the renewal on the day the founder price ends is already at
+  // the normal price.
+  const switchBefore = new Date(
+    Date.now() + FOUNDER_SWITCH_DAYS_BEFORE * 86400000,
+  ).toISOString()
+  const { data: founders, error: foundersError } = await admin
+    .from('stable_billing')
+    .select('stable_id, stripe_subscription_id')
+    .not('stripe_subscription_id', 'is', null)
+    .not('founder_price_until', 'is', null)
+    .lte('founder_price_until', switchBefore)
+    .in('status', ['active', 'past_due'])
+  if (foundersError) return jsonResponse({ error: foundersError.message }, 500)
+
+  let foundersEnded = 0
+  for (const founder of founders ?? []) {
+    try {
+      const subscription = await stripe.subscriptions.retrieve(
+        founder.stripe_subscription_id,
+      )
+      const item = subscription.items.data[0]
+      if (!item || !isFounderLookupKey(item.price.lookup_key)) continue
+      const { data: stable, error: stableError } = await admin
+        .from('stables')
+        .select('plan')
+        .eq('id', founder.stable_id)
+        .single()
+      if (stableError) throw stableError
+      const interval =
+        item.price.recurring?.interval === 'year' ? 'year' : 'month'
+      await stripe.subscriptions.update(subscription.id, {
+        items: [
+          {
+            id: item.id,
+            price: await ensurePrice(
+              stripe,
+              admin,
+              stable.plan,
+              interval,
+              false,
+            ),
+          },
+        ],
+        proration_behavior: 'none',
+      })
+      foundersEnded += 1
+    } catch (error) {
+      // Tried again the next night.
+      console.error('ending founder price failed:', founder.stable_id, error)
+    }
+  }
+
+  return jsonResponse({ ended, removed, failed, switched, foundersEnded })
 })

@@ -9,6 +9,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'npm:stripe@23.1.0'
 import { ensurePrice } from '../_shared/subscription.ts'
 import {
+  hasFounderPrice,
   isBillingInterval,
   trialEndForCheckout,
   type BillingInterval,
@@ -102,6 +103,7 @@ Deno.serve(async (req) => {
     }
 
     const stripe = new Stripe(stripeKey)
+    const founder = hasFounderPrice(billing, Date.now())
     const origin = ALLOWED_RETURN_ORIGINS.includes(returnOrigin)
       ? returnOrigin
       : PRODUCTION_ORIGIN
@@ -165,6 +167,7 @@ Deno.serve(async (req) => {
         admin,
         planRow.key,
         targetInterval,
+        founder,
       )
       if (item.price.id === price) return jsonResponse({ changed: false })
       await stripe.subscriptions.update(subscription.id, {
@@ -232,6 +235,7 @@ Deno.serve(async (req) => {
             admin,
             planRow.key,
             interval ?? 'month',
+            founder,
           ),
         },
       ],

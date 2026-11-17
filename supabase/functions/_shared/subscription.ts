@@ -2,6 +2,8 @@
 // deno-lint-ignore-file no-explicit-any
 import type Stripe from 'npm:stripe@23.1.0'
 import {
+  hasFounderPrice,
+  isFounderLookupKey,
   priceLookupKey,
   priceNokFor,
   type BillingInterval,
@@ -30,16 +32,19 @@ export async function ensurePrice(
   admin: any,
   plan: string,
   interval: BillingInterval = 'month',
+  founder = false,
 ): Promise<string> {
   const { data: row, error } = await admin
     .from('subscription_plans')
-    .select('name, price_nok')
+    .select('name, price_nok, founder_price_nok')
     .eq('key', plan)
     .single()
   if (error) throw error
 
-  const lookupKey = priceLookupKey(plan, interval)
-  const unitAmount = priceNokFor(row.price_nok, interval) * 100
+  const useFounder = founder && row.founder_price_nok != null
+  const lookupKey = priceLookupKey(plan, interval, useFounder)
+  const monthlyNok = useFounder ? row.founder_price_nok : row.price_nok
+  const unitAmount = priceNokFor(monthlyNok, interval) * 100
   const { data: existing } = await stripe.prices.list({
     lookup_keys: [lookupKey],
     active: true,
@@ -62,7 +67,9 @@ export async function ensurePrice(
       // The price stays the same for customers when VAT registration comes.
       tax_behavior: 'inclusive',
       product_data: {
-        name: `${stripeProductName(plan, row.name)}${interval === 'year' ? ' (årlig)' : ''}`,
+        name: `${stripeProductName(plan, row.name)}${
+          interval === 'year' ? ' (årlig)' : ''
+        }${useFounder ? ' – grunnleggerpris' : ''}`,
       },
     },
     { idempotencyKey: `stalldrift-price-${lookupKey}-${unitAmount}` },
@@ -78,7 +85,7 @@ export async function syncSubscriptionPlan(
 ): Promise<void> {
   const { data: billing, error } = await admin
     .from('stable_billing')
-    .select('stripe_subscription_id')
+    .select('stripe_subscription_id, founder_offer_until, founder_price_until')
     .eq('stable_id', stableId)
     .maybeSingle()
   if (error) throw error
@@ -100,7 +107,10 @@ export async function syncSubscriptionPlan(
   // than a year from now.
   const interval: BillingInterval =
     item.price.recurring?.interval === 'year' ? 'year' : 'month'
-  const price = await ensurePrice(stripe, admin, stable.plan, interval)
+  const founder =
+    isFounderLookupKey(item.price.lookup_key) &&
+    hasFounderPrice(billing, Date.now())
+  const price = await ensurePrice(stripe, admin, stable.plan, interval, founder)
   if (item.price.id !== price) {
     await stripe.subscriptions.update(subscription.id, {
       items: [{ id: item.id, price }],

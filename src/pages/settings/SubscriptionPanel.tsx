@@ -4,6 +4,7 @@ import { Capacitor } from '@capacitor/core'
 import {
   changeSubscriptionPlan,
   getStableBilling,
+  hasFounderPrice,
   listSubscriptionPlans,
   openSubscriptionPortal,
   startSubscriptionCheckout,
@@ -110,6 +111,12 @@ export function SubscriptionPanel({
     (billing.status === 'active' || billing.status === 'past_due')
   const canBuy = !isTester && !isPaying && !Capacitor.isNativePlatform()
   const payingYearly = isPaying && billing?.billing_interval === 'year'
+  const founder = hasFounderPrice(billing)
+  // What the stable pays a month on a plan: the founder price while it has one.
+  const monthlyFor = (plan: SubscriptionPlan) =>
+    founder && plan.founder_price_nok != null
+      ? plan.founder_price_nok
+      : plan.price_nok
   // Paying stables see what they pay; others see what they're choosing.
   const shownInterval: BillingInterval = isPaying
     ? payingYearly
@@ -269,7 +276,7 @@ export function SubscriptionPanel({
     if (
       !(await confirm(
         t('settings.billingSwitchYearlyConfirm', {
-          price: formatNok(yearlyPrice(selectedPlan.price_nok)),
+          price: formatNok(yearlyPrice(monthlyFor(selectedPlan))),
         }),
         { confirmLabel: t('settings.billingSwitchYearly') },
       ))
@@ -436,8 +443,8 @@ export function SubscriptionPanel({
               <div className="mt-2 rounded-2xl border border-forest/20 bg-card p-4">
                 <p className="text-sm text-slate-700">
                   {t('settings.billingSwitchYearlyHint', {
-                    price: formatNok(yearlyPrice(selectedPlan.price_nok)),
-                    saved: formatNok(selectedPlan.price_nok),
+                    price: formatNok(yearlyPrice(monthlyFor(selectedPlan))),
+                    saved: formatNok(monthlyFor(selectedPlan)),
                   })}
                 </p>
                 <button
@@ -480,6 +487,21 @@ export function SubscriptionPanel({
             {trialActive
               ? t('settings.trialHint')
               : t('settings.trialEndedHint')}
+          </p>
+        </div>
+      )}
+
+      {founder && billing && (
+        <div className="mt-6 rounded-2xl border border-accent/30 bg-blush p-4 text-sm text-ink">
+          <p className="font-semibold">{t('settings.founderTitle')}</p>
+          <p className="mt-1">
+            {billing.founder_price_until
+              ? t('settings.founderRunning', {
+                  date: formatDate(billing.founder_price_until.slice(0, 10)),
+                })
+              : t('settings.founderOffer', {
+                  date: formatDate(billing.founder_offer_until ?? ''),
+                })}
           </p>
         </div>
       )}
@@ -554,23 +576,39 @@ export function SubscriptionPanel({
                 </div>
                 {shownInterval === 'year' ? (
                   <div className="shrink-0 text-right">
+                    {monthlyFor(plan) !== plan.price_nok && (
+                      <p className="text-xs text-slate-400 line-through">
+                        {t('settings.planPriceYearSuffix', {
+                          price: formatNok(yearlyPrice(plan.price_nok)),
+                        })}
+                      </p>
+                    )}
                     <p className="font-semibold text-slate-900">
                       {t('settings.planPriceYearSuffix', {
-                        price: formatNok(yearlyPrice(plan.price_nok)),
+                        price: formatNok(yearlyPrice(monthlyFor(plan))),
                       })}
                     </p>
                     <p className="text-xs text-slate-500">
                       {t('settings.planPriceYearSaved', {
-                        saved: formatNok(plan.price_nok),
+                        saved: formatNok(monthlyFor(plan)),
                       })}
                     </p>
                   </div>
                 ) : (
-                  <p className="shrink-0 font-semibold text-slate-900">
-                    {t('settings.planPriceSuffix', {
-                      price: formatNok(plan.price_nok),
-                    })}
-                  </p>
+                  <div className="shrink-0 text-right">
+                    {monthlyFor(plan) !== plan.price_nok && (
+                      <p className="text-xs text-slate-400 line-through">
+                        {t('settings.planPriceSuffix', {
+                          price: formatNok(plan.price_nok),
+                        })}
+                      </p>
+                    )}
+                    <p className="font-semibold text-slate-900">
+                      {t('settings.planPriceSuffix', {
+                        price: formatNok(monthlyFor(plan)),
+                      })}
+                    </p>
+                  </div>
                 )}
               </label>
             )

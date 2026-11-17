@@ -2528,6 +2528,8 @@ export type Database = {
       }
       stable_billing: {
         Row: {
+          founder_offer_until: string | null
+          founder_price_until: string | null
           tester_notice_sent_at: string | null
           tester_until: string | null
           billing_interval: string
@@ -2783,6 +2785,7 @@ export type Database = {
       }
       subscription_plans: {
         Row: {
+          founder_price_nok: number | null
           horse_max: number | null
           horse_min: number
           includes_payments: boolean
@@ -3266,6 +3269,8 @@ export type Database = {
           read_only: boolean
           billing_interval: string
           tester_until: string | null
+          founder_offer_until: string | null
+          founder_price_until: string | null
         }[]
       }
       notify_feeding_shift_assigned: {

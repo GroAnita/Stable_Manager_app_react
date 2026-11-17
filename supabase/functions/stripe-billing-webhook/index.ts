@@ -7,6 +7,8 @@ import Stripe from 'npm:stripe@23.1.0'
 import {
   billingStatusFor,
   pastDueSince,
+  founderPriceUntil,
+  isFounderLookupKey,
   planFromLookupKey,
 } from '../_shared/subscriptionState.ts'
 
@@ -61,7 +63,9 @@ Deno.serve(async (req) => {
     )
     const { data: billing, error: billingError } = await admin
       .from('stable_billing')
-      .select('status, past_due_since, stripe_subscription_id')
+      .select(
+        'status, past_due_since, stripe_subscription_id, founder_price_until',
+      )
       .eq('stable_id', stableId)
       .maybeSingle()
     if (billingError) throw billingError
@@ -93,6 +97,15 @@ Deno.serve(async (req) => {
         cancel_at_period_end: subscription.cancel_at_period_end,
         billing_interval:
           item?.price.recurring?.interval === 'year' ? 'year' : 'month',
+        // The founder price's 12 months start at the first billing date, once.
+        ...(isFounderLookupKey(item?.price.lookup_key) &&
+        !billing.founder_price_until
+          ? {
+              founder_price_until: founderPriceUntil(
+                subscription.trial_end ?? subscription.start_date,
+              ),
+            }
+          : {}),
         past_due_since: pastDueSince(
           status,
           billing.past_due_since,

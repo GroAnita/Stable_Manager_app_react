@@ -8,27 +8,66 @@ export type BillingInterval = 'month' | 'year'
 // A year costs eleven months: one month free for paying a year ahead.
 export const YEARLY_MONTHS_CHARGED = 11
 const YEARLY_SUFFIX = '_yearly'
+// The stables that tested StallOrg keep the old prices for 12 months.
+const FOUNDER_SUFFIX = '_founder'
+// How long before the founder price ends the subscription moves to the normal
+// price (without proration, so nothing is charged then). Earlier than Stripe's
+// renewal reminder 7 days ahead, so that email already shows the normal price.
+export const FOUNDER_SWITCH_DAYS_BEFORE = 10
 
 export function isBillingInterval(value: unknown): value is BillingInterval {
   return value === 'month' || value === 'year'
 }
 
-// Monthly prices keep their old keys (stalldrift_small); yearly ones end in _yearly.
+// Monthly prices keep their old keys (stalldrift_small); yearly ones end in
+// _yearly, and founder prices in _founder after that.
 export function priceLookupKey(
   plan: string,
   interval: BillingInterval = 'month',
+  founder = false,
 ): string {
-  return `${PRICE_LOOKUP_PREFIX}${plan}${interval === 'year' ? YEARLY_SUFFIX : ''}`
+  return `${PRICE_LOOKUP_PREFIX}${plan}${interval === 'year' ? YEARLY_SUFFIX : ''}${founder ? FOUNDER_SUFFIX : ''}`
 }
 
 export function planFromLookupKey(
   key: string | null | undefined,
 ): string | null {
   if (!key?.startsWith(PRICE_LOOKUP_PREFIX)) return null
-  const rest = key.slice(PRICE_LOOKUP_PREFIX.length)
-  return rest.endsWith(YEARLY_SUFFIX)
-    ? rest.slice(0, -YEARLY_SUFFIX.length)
-    : rest
+  let rest = key.slice(PRICE_LOOKUP_PREFIX.length)
+  if (rest.endsWith(FOUNDER_SUFFIX))
+    rest = rest.slice(0, -FOUNDER_SUFFIX.length)
+  if (rest.endsWith(YEARLY_SUFFIX)) rest = rest.slice(0, -YEARLY_SUFFIX.length)
+  return rest
+}
+
+export function isFounderLookupKey(key: string | null | undefined): boolean {
+  return !!key?.startsWith(PRICE_LOOKUP_PREFIX) && key.endsWith(FOUNDER_SUFFIX)
+}
+
+// Whether the stable pays the founder price on its next checkout or plan change:
+// while its founder price runs, or before the offer closes if it hasn't started.
+export function hasFounderPrice(
+  billing: {
+    founder_offer_until?: string | null
+    founder_price_until?: string | null
+  },
+  nowMs: number,
+): boolean {
+  if (billing.founder_price_until) {
+    return Date.parse(billing.founder_price_until) > nowMs
+  }
+  return (
+    !!billing.founder_offer_until &&
+    Date.parse(billing.founder_offer_until) > nowMs
+  )
+}
+
+// The founder price lasts 12 months from the first billing date (the end of the
+// trial, or the day the subscription started).
+export function founderPriceUntil(firstBillingSeconds: number): string {
+  const date = new Date(firstBillingSeconds * 1000)
+  date.setUTCMonth(date.getUTCMonth() + 12)
+  return date.toISOString()
 }
 
 export function priceNokFor(
