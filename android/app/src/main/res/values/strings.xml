@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">StallOrg</string>
+    <string name="title_activity_main">StallOrg</string>
+    <string name="package_name">no.nestundigital.stallorg</string>
+    <string name="custom_url_scheme">no.nestundigital.stalldrift</string>
+</resources>

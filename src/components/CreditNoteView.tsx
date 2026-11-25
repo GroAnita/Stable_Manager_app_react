@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { printPage } from '../lib/print'
 import {
   getCreditNote,
   type CreditNoteDetail,
@@ -209,11 +210,7 @@ export function CreditNoteView({
         {current && (
           <>
             <div className="mb-4 flex justify-end">
-              <button
-                type="button"
-                className="btn-ghost"
-                onClick={() => window.print()}
-              >
+              <button type="button" className="btn-ghost" onClick={printPage}>
                 <Icon name="fileText" className="h-4 w-4" />
                 {t('invoice.print')}
               </button>

@@ -1,4 +1,5 @@
 import { useVatRegistered } from '../lib/useVatRegistered'
+import { printPage } from '../lib/print'
 import { useEffect, useState } from 'react'
 import { Badge } from './Badge'
 import { Icon } from './Icon'
@@ -85,7 +86,11 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
           ...period,
           vatExempt: Boolean(service.item?.vat_exempt) || !vatRegistered,
         }),
-    days: scheduleDaysInPeriod(service.schedule, period.startIso, period.endIso),
+    days: scheduleDaysInPeriod(
+      service.schedule,
+      period.startIso,
+      period.endIso,
+    ),
   }))
   const total =
     Math.round(
@@ -328,9 +333,7 @@ export function ContractFields({ contract }: { contract: ContractDetail }) {
 
       {contract.contract_terms && (
         <div>
-          <span className="field-label">
-            {t('contractView.contractTerms')}
-          </span>
+          <span className="field-label">{t('contractView.contractTerms')}</span>
           <p className="whitespace-pre-wrap text-sm text-slate-700">
             {contract.contract_terms}
           </p>
@@ -416,11 +419,7 @@ export function ContractView({
         {contract && contract.id === contractId && (
           <>
             <div className="mb-4 flex justify-end">
-              <button
-                type="button"
-                className="btn-ghost"
-                onClick={() => window.print()}
-              >
+              <button type="button" className="btn-ghost" onClick={printPage}>
                 <Icon name="fileText" className="h-4 w-4" />
                 {t('contractView.print')}
               </button>

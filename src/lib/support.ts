@@ -14,7 +14,7 @@ export function supportMailto({
   stableName?: string | null
   accountEmail?: string | null
   role?: string | null
-  platform: 'web' | 'ios'
+  platform: 'web' | 'ios' | 'android'
 }): string {
   const subject = '[StallOrg] Support request'
   const body = [
@@ -24,7 +24,7 @@ export function supportMailto({
     `Stable: ${stableName ?? '—'}`,
     `Account: ${accountEmail ?? '—'}`,
     `Role: ${role ?? '—'}`,
-    `Platform: ${platform === 'ios' ? 'iOS app' : 'Web'}`,
+    `Platform: ${platform === 'ios' ? 'iOS app' : platform === 'android' ? 'Android app' : 'Web'}`,
   ].join('\n')
   return `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
 }

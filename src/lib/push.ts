@@ -8,7 +8,8 @@ import { supabase } from './supabaseClient'
 // shift swaps). Safe to call repeatedly; re-registering is a no-op on the
 // OS side and upserts the same token row.
 export async function registerForPushNotifications(): Promise<void> {
-  if (!Capacitor.isNativePlatform()) return
+  // Android push needs Firebase, which isn't set up yet.
+  if (Capacitor.getPlatform() !== 'ios') return
 
   const owner = await getMyOwnerRecord()
   if (!owner) return
@@ -22,10 +23,12 @@ export async function registerForPushNotifications(): Promise<void> {
   if (!granted) return
 
   PushNotifications.addListener('registration', async (token) => {
-    const { error } = await supabase.from('push_tokens').upsert(
-      { owner_id: owner.id, platform: 'ios', token: token.value },
-      { onConflict: 'owner_id,token' },
-    )
+    const { error } = await supabase
+      .from('push_tokens')
+      .upsert(
+        { owner_id: owner.id, platform: 'ios', token: token.value },
+        { onConflict: 'owner_id,token' },
+      )
     if (error) console.error('Failed to register push token:', error.message)
   })
 

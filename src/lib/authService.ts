@@ -100,6 +100,19 @@ export function isAppleSignInCancelled(error: unknown): boolean {
 }
 
 export async function signInWithApple() {
+  if (Capacitor.getPlatform() === 'android') {
+    // No Apple sheet on Android: same system-browser flow as Google.
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'apple',
+      options: {
+        redirectTo: NATIVE_OAUTH_REDIRECT,
+        skipBrowserRedirect: true,
+      },
+    })
+    if (error) throw error
+    if (data.url) await Browser.open({ url: data.url })
+    return
+  }
   if (Capacitor.isNativePlatform()) {
     // Apple gets the hashed nonce and Supabase the raw one, so a token can't
     // be replayed in another sign-in.

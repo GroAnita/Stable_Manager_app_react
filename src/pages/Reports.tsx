@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { printPage } from '../lib/print'
 import { Capacitor } from '@capacitor/core'
 import { Share } from '@capacitor/share'
 import { Card } from '../components/Card'
@@ -322,11 +323,7 @@ export default function Reports() {
             <Icon name="share" className="h-4 w-4" />
             {t('reports.share')}
           </button>
-          <button
-            type="button"
-            className="btn-primary"
-            onClick={() => window.print()}
-          >
+          <button type="button" className="btn-primary" onClick={printPage}>
             <Icon name="fileText" className="h-4 w-4" />
             {t('reports.print')}
           </button>

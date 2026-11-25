@@ -707,7 +707,9 @@ export default function Settings() {
                   stableName: stable?.name,
                   accountEmail: session?.user.email,
                   role: profile?.role,
-                  platform: Capacitor.isNativePlatform() ? 'ios' : 'web',
+                  platform: Capacitor.isNativePlatform()
+                    ? (Capacitor.getPlatform() as 'ios' | 'android')
+                    : 'web',
                 })}
                 target="_blank"
                 rel="noopener noreferrer"

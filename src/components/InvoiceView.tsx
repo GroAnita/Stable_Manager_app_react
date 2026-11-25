@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react'
+import { printPage } from '../lib/print'
 import { Badge } from './Badge'
 import { CreditNoteView } from './CreditNoteView'
 import { Icon } from './Icon'
 import { Modal } from './Modal'
 import { getPaymentDetail, type PaymentDetail } from '../features/payments/api'
-import { listCreditNotes, type CreditNote } from '../features/payments/creditNotes'
+import {
+  listCreditNotes,
+  type CreditNote,
+} from '../features/payments/creditNotes'
 import {
   formatBankAccountNumber,
   invoiceAmountDue,
@@ -96,9 +100,7 @@ export function InvoiceFields({ payment }: { payment: PaymentDetail }) {
             {t('invoice.issueDate')}
           </span>
           <p className="text-slate-900">{formatDate(payment.created_at)}</p>
-          <span className="field-label mt-3 block">
-            {t('invoice.dueDate')}
-          </span>
+          <span className="field-label mt-3 block">{t('invoice.dueDate')}</span>
           <p className="text-slate-900">{formatDate(payment.due_date)}</p>
         </div>
       </div>
@@ -205,36 +207,36 @@ export function InvoiceFields({ payment }: { payment: PaymentDetail }) {
           </tfoot>
         </table>
       ) : (
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-slate-200 text-left text-slate-500">
-            <th className="py-2 font-medium">{t('invoice.description')}</th>
-            <th className="py-2 text-right font-medium">
-              {t('invoice.amount')}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {lineItems.map((item, index) => (
-            <tr key={index} className="border-b border-slate-100">
-              <td className="py-2 text-slate-700">{item.description}</td>
-              <td className="py-2 text-right text-slate-700">
-                {formatCurrency(item.amount)}
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-slate-200 text-left text-slate-500">
+              <th className="py-2 font-medium">{t('invoice.description')}</th>
+              <th className="py-2 text-right font-medium">
+                {t('invoice.amount')}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {lineItems.map((item, index) => (
+              <tr key={index} className="border-b border-slate-100">
+                <td className="py-2 text-slate-700">{item.description}</td>
+                <td className="py-2 text-right text-slate-700">
+                  {formatCurrency(item.amount)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td className="pt-3 font-semibold text-slate-900">
+                {t('invoice.total')}
+              </td>
+              <td className="pt-3 text-right font-semibold text-slate-900">
+                {formatCurrency(payment.amount)}
               </td>
             </tr>
-          ))}
-        </tbody>
-        <tfoot>
-          <tr>
-            <td className="pt-3 font-semibold text-slate-900">
-              {t('invoice.total')}
-            </td>
-            <td className="pt-3 text-right font-semibold text-slate-900">
-              {formatCurrency(payment.amount)}
-            </td>
-          </tr>
-        </tfoot>
-      </table>
+          </tfoot>
+        </table>
       )}
 
       {stable && (
@@ -303,7 +305,9 @@ export function InvoiceView({
   const [payment, setPayment] = useState<PaymentDetail | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [creditNotes, setCreditNotes] = useState<CreditNote[]>([])
-  const [viewingCreditNote, setViewingCreditNote] = useState<string | null>(null)
+  const [viewingCreditNote, setViewingCreditNote] = useState<string | null>(
+    null,
+  )
   const loading = paymentId !== null && payment?.id !== paymentId && !error
 
   useEffect(() => {
@@ -350,11 +354,7 @@ export function InvoiceView({
         {payment && payment.id === paymentId && (
           <>
             <div className="mb-4 flex justify-end">
-              <button
-                type="button"
-                className="btn-ghost"
-                onClick={() => window.print()}
-              >
+              <button type="button" className="btn-ghost" onClick={printPage}>
                 <Icon name="fileText" className="h-4 w-4" />
                 {t('invoice.print')}
               </button>
