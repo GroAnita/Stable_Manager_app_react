@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Capacitor } from '@capacitor/core'
 import { Link } from 'react-router-dom'
 import { getStableBilling, type StableBilling } from '../features/settings/api'
 import { usePreferences } from '../lib/PreferencesContext'
@@ -10,6 +11,10 @@ const GRACE_DAYS = 14
 // means. Testers and stables with a working subscription never see it.
 export function BillingBanner({ canManage }: { canManage: boolean }) {
   const { t, formatDate } = usePreferences()
+  // The iPhone app states the facts only, without asking anyone to choose a
+  // subscription or linking to it (App Store guideline 3.1.1 / 3.1.3(f)).
+  const inApp = Capacitor.isNativePlatform()
+  const key = (name: string) => `billingBanner.${inApp ? 'app_' : ''}${name}`
   const [billing, setBilling] = useState<StableBilling | null>(null)
 
   useEffect(() => {
@@ -39,29 +44,29 @@ export function BillingBanner({ canManage }: { canManage: boolean }) {
   if (billing.status === 'tester' && billing.tester_until) {
     const trialEnd = new Date(billing.tester_until)
     trialEnd.setMonth(trialEnd.getMonth() + 1)
-    text = t('billingBanner.testerEnding', {
+    text = t(key('testerEnding'), {
       date: formatDate(billing.tester_until),
       trialEnd: formatDate(trialEnd.toISOString()),
     })
   } else if (billing.read_only) {
-    text = t('billingBanner.readOnly')
+    text = t(key('readOnly'))
   } else if (billing.status === 'past_due' && billing.past_due_since) {
-    text = t('billingBanner.pastDue', {
+    text = t(key('pastDue'), {
       date: formatDate(addDays(billing.past_due_since, GRACE_DAYS)),
     })
   } else if (billing.status === 'canceled' && billing.current_period_end) {
-    text = t('billingBanner.canceled', {
+    text = t(key('canceled'), {
       date: formatDate(addDays(billing.current_period_end, GRACE_DAYS)),
     })
   } else if (billing.status === 'trial' && billing.trial_ends_at) {
     const left =
       (new Date(billing.trial_ends_at).getTime() - Date.now()) / 86400000
     if (left <= 0) {
-      text = t('billingBanner.trialEnded', {
+      text = t(key('trialEnded'), {
         date: formatDate(addDays(billing.trial_ends_at, GRACE_DAYS)),
       })
     } else if (left <= WARN_DAYS) {
-      text = t('billingBanner.trialEnding', {
+      text = t(key('trialEnding'), {
         date: formatDate(billing.trial_ends_at.slice(0, 10)),
       })
     }
@@ -78,7 +83,7 @@ export function BillingBanner({ canManage }: { canManage: boolean }) {
       }`}
     >
       <span>{text}</span>
-      {canManage && (
+      {canManage && !inApp && (
         <Link
           to="/settings?section=subscription"
           className="font-medium underline"

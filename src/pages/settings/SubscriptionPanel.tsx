@@ -295,6 +295,76 @@ export function SubscriptionPanel({
     }
   }
 
+  // In the iPhone app the stable only sees its status: no prices, no buying and
+  // no pointing elsewhere to buy (App Store guideline 3.1.1 / 3.1.3(f)).
+  if (Capacitor.isNativePlatform()) {
+    const statusLines: string[] = []
+    if (isTester) {
+      statusLines.push(
+        billing?.tester_until
+          ? t('settings.appTesterUntil', {
+              date: formatDate(billing.tester_until),
+            })
+          : t('settings.appTester'),
+      )
+    } else if (isPaying && billing) {
+      if (billing.current_period_end) {
+        statusLines.push(
+          t(
+            billing.cancel_at_period_end
+              ? 'settings.billingEndsOn'
+              : 'settings.appRenewsOn',
+            { date: formatDate(billing.current_period_end.slice(0, 10)) },
+          ),
+        )
+      }
+    } else {
+      statusLines.push(
+        t(trialActive ? 'settings.appTrialUntil' : 'settings.appTrialEnded', {
+          date: formatDate(trialEnd.toISOString()),
+        }),
+      )
+    }
+    return (
+      <div className="panel p-6">
+        <div className="flex items-start gap-4 border-b border-slate-100 pb-5">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-forest/10 text-forest">
+            <Icon name="creditCard" className="h-6 w-6" />
+          </div>
+          <h2 className="text-lg font-semibold text-slate-900">
+            {t('settings.navSubscription')}
+          </h2>
+        </div>
+        <div className="mt-6 space-y-2 rounded-2xl bg-forest/10 p-6">
+          <p className="text-2xl font-bold text-forest">
+            {isTester
+              ? t('settings.testerTitle')
+              : isPaying && billing?.status === 'past_due'
+                ? t('settings.billingPastDue')
+                : isPaying
+                  ? t('settings.billingActive')
+                  : trialActive
+                    ? t('settings.appTrialTitle')
+                    : t('settings.trialEnded')}
+          </p>
+          {selectedPlan && (
+            <p className="text-sm text-slate-600">
+              {selectedPlan.name} · {formatPlanRange(selectedPlan, t)}
+            </p>
+          )}
+          {statusLines.map((line) => (
+            <p key={line} className="text-sm text-slate-600">
+              {line}
+            </p>
+          ))}
+          <p className="pt-2 text-sm text-slate-500">
+            {t('settings.appNotInApp')}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="panel p-6">
       <div className="flex items-start gap-4 border-b border-slate-100 pb-5">
