@@ -6,7 +6,7 @@
 //
 // Refuses a live key unless STRIPE_CONNECT_ALLOW_LIVE is 'true'.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import Stripe from 'npm:stripe@23.1.0'
+import { billingStripe } from '../_shared/billingStripe.ts'
 import { ensurePrice } from '../_shared/subscription.ts'
 import {
   hasFounderPrice,
@@ -44,15 +44,9 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const stripeKey = Deno.env.get('STRIPE_CONNECT_SECRET_KEY')
-    if (!stripeKey) {
+    const stripe = billingStripe()
+    if (!stripe) {
       return jsonResponse({ error: 'Stripe is not configured' }, 503)
-    }
-    if (
-      /^(sk|rk)_live_/.test(stripeKey) &&
-      Deno.env.get('STRIPE_CONNECT_ALLOW_LIVE') !== 'true'
-    ) {
-      return jsonResponse({ error: 'Live Stripe keys are not enabled' }, 503)
     }
 
     const authHeader = req.headers.get('Authorization')
@@ -102,7 +96,6 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: 'tester_account' }, 409)
     }
 
-    const stripe = new Stripe(stripeKey)
     const founder = hasFounderPrice(billing, Date.now())
     const origin = ALLOWED_RETURN_ORIGINS.includes(returnOrigin)
       ? returnOrigin

@@ -8,6 +8,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'npm:stripe@23.1.0'
 import { endCardAgreement, removeSavedCard } from '../_shared/endAgreement.ts'
 import { sendEmail } from '../_shared/sendEmail.ts'
+import { billingStripe } from '../_shared/billingStripe.ts'
 import { ensurePrice, syncSubscriptionPlan } from '../_shared/subscription.ts'
 import {
   FOUNDER_SWITCH_DAYS_BEFORE,
@@ -41,6 +42,8 @@ Deno.serve(async (req) => {
   }
 
   const stripe = new Stripe(stripeKey)
+  // Subscriptions have their own Stripe key; see _shared/billingStripe.ts.
+  const billing = billingStripe()
   const admin = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
@@ -178,7 +181,7 @@ Deno.serve(async (req) => {
         p_stable_id: account.stable_id,
       })
       if (finishError) throw finishError
-      await syncSubscriptionPlan(stripe, admin, account.stable_id)
+      if (billing) await syncSubscriptionPlan(billing, admin, account.stable_id)
       switched += 1
     } catch (error) {
       console.error('plan change failed:', error)
@@ -210,9 +213,9 @@ Deno.serve(async (req) => {
   if (foundersError) return jsonResponse({ error: foundersError.message }, 500)
 
   let foundersEnded = 0
-  for (const founder of founders ?? []) {
+  for (const founder of billing ? (founders ?? []) : []) {
     try {
-      const subscription = await stripe.subscriptions.retrieve(
+      const subscription = await billing!.subscriptions.retrieve(
         founder.stripe_subscription_id,
       )
       const item = subscription.items.data[0]
@@ -225,12 +228,12 @@ Deno.serve(async (req) => {
       if (stableError) throw stableError
       const interval =
         item.price.recurring?.interval === 'year' ? 'year' : 'month'
-      await stripe.subscriptions.update(subscription.id, {
+      await billing!.subscriptions.update(subscription.id, {
         items: [
           {
             id: item.id,
             price: await ensurePrice(
-              stripe,
+              billing!,
               admin,
               stable.plan,
               interval,

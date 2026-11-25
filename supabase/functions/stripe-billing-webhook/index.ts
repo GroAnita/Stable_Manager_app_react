@@ -4,6 +4,7 @@
 // event, so events arriving late, twice or out of order are harmless.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'npm:stripe@23.1.0'
+import { billingStripe } from '../_shared/billingStripe.ts'
 import {
   billingStatusFor,
   pastDueSince,
@@ -22,14 +23,13 @@ function jsonResponse(body: unknown, status = 200) {
 }
 
 Deno.serve(async (req) => {
-  const stripeKey = Deno.env.get('STRIPE_CONNECT_SECRET_KEY')
+  const stripe = billingStripe()
   const webhookSecret = Deno.env.get('STRIPE_BILLING_WEBHOOK_SECRET')
-  if (!stripeKey || !webhookSecret) {
+  if (!stripe || !webhookSecret) {
     return jsonResponse({ error: 'Webhook is not configured' }, 503)
   }
 
   const payload = await req.text()
-  const stripe = new Stripe(stripeKey)
   let event: Stripe.Event
   try {
     event = await stripe.webhooks.constructEventAsync(

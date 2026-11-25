@@ -17,6 +17,7 @@
 // Refuses a live Stripe key unless STRIPE_CONNECT_ALLOW_LIVE is 'true'.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'npm:stripe@23.1.0'
+import { billingStripe } from '../_shared/billingStripe.ts'
 import { endCardAgreement } from '../_shared/endAgreement.ts'
 import { sendEmail } from '../_shared/sendEmail.ts'
 
@@ -37,7 +38,8 @@ function jsonResponse(body: unknown, status = 200) {
   })
 }
 
-// Stripe is only needed when there's a subscription or a card agreement to end.
+// Stripe Connect is only needed when there's a card agreement to end; the
+// subscription uses billingStripe().
 function stripeOrThrow(): Stripe {
   const key = Deno.env.get('STRIPE_CONNECT_SECRET_KEY')
   if (!key) throw new Error('stripe_unavailable')
@@ -174,9 +176,9 @@ async function closeStables(
     if (billingError) throw billingError
     if (billing?.stripe_subscription_id) {
       try {
-        await stripeOrThrow().subscriptions.cancel(
-          billing.stripe_subscription_id,
-        )
+        const billingClient = billingStripe()
+        if (!billingClient) throw new Error('stripe_unavailable')
+        await billingClient.subscriptions.cancel(billing.stripe_subscription_id)
       } catch (error) {
         // Already gone or cancelled in Stripe is fine; anything else stops the
         // closing, so the stable isn't closed while still being billed.
