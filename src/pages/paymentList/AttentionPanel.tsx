@@ -11,6 +11,7 @@ import {
   setExpensePaid,
   type Expense,
 } from '../../features/expenses/api'
+import { notifyAttentionChanged } from '../../lib/attention'
 import { BILL_REMINDER_WINDOW_DAYS, daysUntilDue } from '../../lib/bills'
 import { usePreferences } from '../../lib/PreferencesContext'
 import { categoryLabel } from '../../lib/reports'
@@ -33,6 +34,7 @@ export function AttentionPanel() {
     try {
       await setExpensePaid(id, true)
       setBills((prev) => prev?.filter((bill) => bill.id !== id) ?? prev)
+      notifyAttentionChanged()
     } catch (err) {
       setBillError((err as Error).message)
     } finally {

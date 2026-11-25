@@ -25,6 +25,7 @@ import {
 } from '../features/payments/charge'
 import { useAuth } from '../lib/AuthContext'
 import { useConfirm } from '../lib/ConfirmContext'
+import { notifyAttentionChanged } from '../lib/attention'
 import { usePreferences } from '../lib/PreferencesContext'
 
 type StatusFilter = 'all' | 'paid' | 'due' | 'overdue'
@@ -220,6 +221,7 @@ export default function PaymentList() {
         ),
       )
       setSummary(await getPaymentSummary())
+      notifyAttentionChanged()
     } catch (err) {
       setError((err as Error).message)
     } finally {

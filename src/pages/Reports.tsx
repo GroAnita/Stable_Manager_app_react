@@ -21,6 +21,7 @@ import {
   type PriceListItem,
 } from '../features/priceList/api'
 import { AccountingPanel } from './reports/AccountingPanel'
+import { notifyAttentionChanged } from '../lib/attention'
 import { useAuth } from '../lib/AuthContext'
 import { useConfirm } from '../lib/ConfirmContext'
 import { usePreferences } from '../lib/PreferencesContext'
@@ -175,6 +176,7 @@ export default function Reports() {
         expense_date: form.expense_date,
         notes: form.notes || null,
       })
+      notifyAttentionChanged()
       if (created.expense_date >= from && created.expense_date <= to) {
         setExpenses((prev) =>
           [created, ...prev].sort((a, b) =>
@@ -200,6 +202,7 @@ export default function Reports() {
     try {
       const updated = await setExpensePaid(id, paid)
       setExpenses((prev) => prev.map((e) => (e.id === id ? updated : e)))
+      notifyAttentionChanged()
     } catch (err) {
       setError((err as Error).message)
     }
@@ -210,6 +213,7 @@ export default function Reports() {
     try {
       await deleteExpense(id)
       setExpenses((prev) => prev.filter((e) => e.id !== id))
+      notifyAttentionChanged()
     } catch (err) {
       setError((err as Error).message)
     }

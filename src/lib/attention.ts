@@ -7,6 +7,14 @@ function localIso(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 }
 
+const CHANGED_EVENT = 'stallorg:attention-changed'
+
+// Call after marking something paid, or adding or deleting a bill, so the menu
+// badge updates at once instead of on the next page change.
+export function notifyAttentionChanged(): void {
+  window.dispatchEvent(new Event(CHANGED_EVENT))
+}
+
 // How many things on the payments page need looking at: overdue invoices, and the
 // stable's own bills due within BILL_REMINDER_WINDOW_DAYS. Shown as a badge in the
 // menu. Checked again on every page change, so it clears once dealt with.
@@ -15,6 +23,13 @@ export function usePaymentsAttention(
   pathname: string,
 ): number {
   const [count, setCount] = useState(0)
+  const [refresh, setRefresh] = useState(0)
+
+  useEffect(() => {
+    const bump = () => setRefresh((n) => n + 1)
+    window.addEventListener(CHANGED_EVENT, bump)
+    return () => window.removeEventListener(CHANGED_EVENT, bump)
+  }, [])
 
   useEffect(() => {
     if (!enabled) return
@@ -44,7 +59,7 @@ export function usePaymentsAttention(
     return () => {
       cancelled = true
     }
-  }, [enabled, pathname])
+  }, [enabled, pathname, refresh])
 
   return enabled ? count : 0
 }
