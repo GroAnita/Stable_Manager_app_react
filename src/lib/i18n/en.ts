@@ -1411,13 +1411,6 @@ export const en = {
     loading: 'Loading price list…',
     noStableFound: 'No stable found for the current user. Please sign in.',
   },
-  testFlightInvite: {
-    title: 'StallOrg for iPhone and iPad',
-    body: 'The iPhone and iPad app is now ready for testing. Would you and your users like to try it?',
-    howTo: 'Send us the email addresses of everyone who’d like to take part, and we’ll send them an invitation. Please check with your users first.',
-    subject: 'Would like to try StallOrg on iPhone/iPad',
-    close: 'Close',
-  },
   whatsNew: {
     title: "What's new",
     titleWithCount: "What's new, {count} unread",
