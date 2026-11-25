@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>StallOrg – stallsystem for oppstalling og stalldrift</title>
-    <meta name="description" content="Samle hester, hesteeiere, kontrakter, fakturaer, fôringsturnus og oppgaver på ett sted. Stallsystem for deg som driver stall. Prøv gratis i 30 dager." />
+    <meta name="description" content="Stallsystem laget i Norge, for norske staller. Samle hester, hesteeiere, kontrakter, fakturaer, fôringsturnus og oppgaver på ett sted. Prøv gratis i 30 dager." />
     <link rel="canonical" href="https://www.stallorg.no/" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" href="/favicon.png" />
@@ -97,6 +97,23 @@
       details p { margin: 10px 0 0; color: var(--muted); }
       .shot { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 10px; overflow-x: auto; }
       .shot img { display: block; width: 100%; min-width: 760px; height: auto; }
+      .hero-grid { display: grid; gap: 32px; align-items: center; grid-template-columns: 1fr; }
+      @media (min-width: 860px) { .hero-grid { grid-template-columns: 1.35fr 1fr; } }
+      .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--forest); margin: 0 0 14px; }
+      .flag { display: inline-block; width: 22px; height: 16px; border-radius: 3px; background: linear-gradient(#ba0c2f, #ba0c2f) 0 0 / 100% 100%; position: relative; overflow: hidden; }
+      .flag::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 6px, #fff 6px, #fff 10px, transparent 10px), linear-gradient(transparent 6px, #fff 6px, #fff 10px, transparent 10px); }
+      .flag::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 7px, #00205b 7px, #00205b 9px, transparent 9px), linear-gradient(transparent 7px, #00205b 7px, #00205b 9px, transparent 9px); }
+      .photo { margin: 0; border-radius: 22px; overflow: hidden; box-shadow: 0 18px 40px rgba(36, 48, 42, 0.14); }
+      .photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+      .hero-photo { aspect-ratio: 4 / 5; max-width: 420px; justify-self: center; width: 100%; }
+      .story { display: grid; gap: 32px; align-items: center; grid-template-columns: 1fr; }
+      @media (min-width: 860px) { .story { grid-template-columns: 1.2fr 1fr; } }
+      .story p { color: var(--muted); max-width: 600px; }
+      .story .sign { color: var(--ink); font-weight: 600; }
+      .story-photos { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+      .story-photos .photo { aspect-ratio: 3 / 4; }
+      .sub { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 34px 0 14px; font-size: 21px; }
+      .sub .badge { margin: 0; }
       .hero-shot { margin: 8px 0 0; }
       .hero-shot img { min-width: 0; border-radius: 10px; }
       .phone { display: grid; gap: 28px; align-items: center; grid-template-columns: 1fr; }
@@ -124,17 +141,55 @@
         <a class="btn btn-ghost" href="/auth">Logg inn</a>
       </header>
       <main>
-        <div class="hero">
-          <h1>Stallsystemet som samler hele stalldriften på ett sted</h1>
-          <p class="lead">Hold orden på hester, hesteeiere, bokser, kontrakter, fakturaer og fôringsturnus, på mobilen, nettbrettet og PC-en. Laget for norske staller.</p>
-          <a class="btn btn-primary" href="/auth?mode=signup">Prøv gratis i 30 dager</a>
-          <p class="fine">Du trenger ikke betalingskort for å prøve.</p>
+        <div class="hero hero-grid">
+          <div>
+            <p class="eyebrow"><span class="flag" aria-hidden="true"></span> Laget i Norge, for norske staller</p>
+            <h1>Stallsystemet som samler hele stalldriften på ett sted</h1>
+            <p class="lead">Hold orden på hester, hesteeiere, bokser, kontrakter, fakturaer og fôringsturnus, på mobilen, nettbrettet og PC-en. På norsk, med norske regler og priser i kroner.</p>
+            <a class="btn btn-primary" href="/auth?mode=signup">Prøv gratis i 30 dager</a>
+            <p class="fine">Du trenger ikke betalingskort for å prøve.</p>
+          </div>
+          <figure class="photo hero-photo">
+            <img src="/photos/vinter.jpg" width="900" height="1200" alt="Grå hest med dekken spiser høy i snøen på en vinterdag" />
+          </figure>
         </div>
         <figure class="shot hero-shot">
           <img src="/screenshots/oversikt.jpg" width="2880" height="1624" alt="Oversikten i StallOrg: antall hester, dagens vakter, ubetalte fakturaer, oppslagstavle, ukens fôringsturnus og betalingsoversikt" />
         </figure>
       </main>
     </div>
+
+    <section class="band" id="norge">
+      <div class="wrap">
+        <h2>Laget for norske staller</h2>
+        <p class="intro">StallOrg er ikke et utenlandsk program oversatt til norsk. Det er laget her, rundt hvordan staller i Norge faktisk drives.</p>
+        <div class="grid">
+          <div class="card"><h3>Norsk fra første klikk</h3><p>Hele programmet er på norsk, med datoer, kroner og mva slik vi er vant til. Hesteeiere som foretrekker engelsk, kan velge det selv.</p></div>
+          <div class="card"><h3>Fôr i FEh</h3><p>Fôrkalkulatoren regner i FEh og bruker grovfôrklassene fra norske høyanalyser, så du ser hvor mange kilo høy hver hest trenger.</p></div>
+          <div class="card"><h3>Brannkrav for hestestaller</h3><p>Kravene i forskrift om velferd for hest er samlet i en sjekkliste, så du har oversikt uten å lete i regelverket.</p></div>
+          <div class="card"><h3>Priser i kroner, inkludert mva</h3><p>Ingen valutaomregning og ingen overraskelser. Prisen du ser, er prisen du betaler.</p></div>
+          <div class="card"><h3>Dataene lagres i EU</h3><p>Databasen ligger i Irland, og vi følger personvernreglene. Les <a href="/personvern">personvernerklæringen</a> og <a href="/databehandleravtale">databehandleravtalen</a>.</p></div>
+          <div class="card"><h3>Norsk firma, norsk support</h3><p>StallOrg lages av Nestun Digital, org.nr. 938 795 657. Du får svar på norsk fra de som lager programmet.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="om">
+      <div class="wrap story">
+        <div>
+          <h2>Laget av en som har drevet stall</h2>
+          <p>Jeg heter Gro Anita, og jeg har selv drevet større utleiestaller. Jeg vet hvordan det er med en whiteboardtavle som folk glemmer å sjekke, beskjeder som forsvinner i uendelige chattetråder, og jobben med å holde kontroll på stalleien. For utgiftene kommer alltid, selv om stalleien ikke er betalt. Det er vel det eneste sikre her i verden.</p>
+          <p>Derfor har jeg brukt de siste åtte månedene på å designe og kode StallOrg: et sted der stalleiere, driftsansvarlige, ansatte og hesteeiere ser det de trenger, og får påminnelser i god tid om oppgaver og stalleie.</p>
+          <p>Siden september har StallOrg vært i en testfase med ekte brukere, for å løse problemer og finne ut hva brukerne trenger i et slikt program. Nå er StallOrg klart for alle, og det blir en del av en større pakke med programvare for hestebransjen.</p>
+          <p>Har du spørsmål eller ønsker? Send meg en e-post på <a href="mailto:support@nestundigital.no">support@nestundigital.no</a>, så svarer jeg deg.</p>
+          <p class="sign">Hilsen Gro Anita Bråthen, utvikler</p>
+        </div>
+        <div class="story-photos">
+          <figure class="photo"><img src="/photos/stall-nysgjerrig.jpg" width="900" height="1200" loading="lazy" alt="Grå hest titter nysgjerrig over boksdøra" /></figure>
+          <figure class="photo"><img src="/photos/stall-naboer.jpg" width="900" height="1200" loading="lazy" alt="To hester i hver sin boks i stallgangen" /></figure>
+        </div>
+      </div>
+    </section>
 
     <section class="band" id="funksjoner">
       <div class="wrap">
@@ -192,16 +247,21 @@
 
     <section class="pay" id="kortbetaling">
       <div class="wrap">
-        <span class="badge">Kommer snart</span>
-        <h2>Kortbetaling av stalleie, rett i programmet</h2>
-        <p class="intro">Slipp å følge opp hvem som har betalt. Hesteeieren godkjenner en kortavtale, og du trekker stalleien med ett klikk. Fakturaen, betalingen og regnskapsgrunnlaget henger sammen på ett sted.</p>
+        <h2>Fakturering og kortbetaling</h2>
+        <p class="intro">Fakturaene lages fra kontraktene hver måned, hesteeierne ser dem i appen, og du ser med en gang hva som er betalt.</p>
+        <div class="grid">
+          <div class="card"><h3>Fakturaer fra kontraktene</h3><p>Stalleie og tillegg som grovfôr, strø og tjenester hentes fra kontrakten og prislisten, så du slipper å skrive fakturaene selv.</p></div>
+          <div class="card"><h3>Oversikt over hva som er betalt</h3><p>Se hva som er betalt, hva som forfaller snart og hva som er på overtid, og merk betalinger når pengene er kommet inn.</p></div>
+          <div class="card"><h3>Klart for regnskapet</h3><p>Kreditnotaer, rapporter og mva-grunnlag du kan laste ned til regnskapsføreren.</p></div>
+        </div>
+                <h3 class="sub"><span class="badge">Kommer snart</span> Kortbetaling av stalleie, rett i programmet</h3>
+        <p class="intro">Slipp å følge opp hvem som har betalt. Hesteeieren godkjenner en kortavtale, og du trekker stalleien med ett klikk.</p>
         <div class="grid">
           <div class="card"><h3>Digital kortavtale</h3><p>Hesteeieren signerer avtalen og lagrer kortet sitt selv. Du ser hvem som har signert.</p></div>
           <div class="card"><h3>Faktura før trekket</h3><p>Hesteeieren får en spesifisert faktura på e-post minst 7 dager før kortet trekkes.</p></div>
           <div class="card"><h3>Trekk med ett klikk</h3><p>Trekk fakturaen når den forfaller, eller la hesteeieren betale selv med «Betal nå».</p></div>
           <div class="card"><h3>Pengene går til stallen</h3><p>Betalingen går gjennom Stripe til stallens egen konto, ikke via oss.</p></div>
           <div class="card"><h3>Oversikt når et trekk feiler</h3><p>Hesteeieren får beskjed, og du ser hva som ikke er betalt.</p></div>
-          <div class="card"><h3>Klart for regnskapet</h3><p>Kreditnotaer, oversikt over utbetalinger og mva-grunnlag du kan laste ned til regnskapsføreren.</p></div>
         </div>
         <figure class="shot">
           <img src="/screenshots/fakturaer.png" width="1496" height="261" loading="lazy" alt="Fakturaoversikt i StallOrg med forfallsdato, beløp, status og knappen Betal nå" />
