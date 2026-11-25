@@ -29,7 +29,30 @@ export async function listUpcomingBills(windowDays = 30): Promise<Expense[]> {
   const today = new Date()
   const until = new Date(today)
   until.setDate(until.getDate() + windowDays)
-  return listExpenses(toIso(today), toIso(until))
+  const { data, error } = await supabase
+    .from('expenses')
+    .select('*')
+    .gte('expense_date', toIso(today))
+    .lte('expense_date', toIso(until))
+    .is('paid_at', null)
+    .order('expense_date')
+  if (error) throw error
+  return data
+}
+
+// Null puts the bill back among the ones still to pay.
+export async function setExpensePaid(
+  id: string,
+  paid: boolean,
+): Promise<Expense> {
+  const { data, error } = await supabase
+    .from('expenses')
+    .update({ paid_at: paid ? new Date().toISOString() : null })
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw error
+  return data
 }
 
 export async function createExpense(input: ExpenseInsert): Promise<Expense> {

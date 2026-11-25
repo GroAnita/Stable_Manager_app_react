@@ -12,6 +12,7 @@ import {
   createExpense,
   deleteExpense,
   listExpenses,
+  setExpensePaid,
   type Expense,
 } from '../features/expenses/api'
 import { listPayments, type PaymentListItem } from '../features/payments/api'
@@ -23,7 +24,12 @@ import { AccountingPanel } from './reports/AccountingPanel'
 import { useAuth } from '../lib/AuthContext'
 import { useConfirm } from '../lib/ConfirmContext'
 import { usePreferences } from '../lib/PreferencesContext'
-import { paymentMoneyTotals, categoryLabel, monthRange, usageByCategory } from '../lib/reports'
+import {
+  paymentMoneyTotals,
+  categoryLabel,
+  monthRange,
+  usageByCategory,
+} from '../lib/reports'
 
 const EXPENSE_CATEGORIES = [
   'Feed',
@@ -187,6 +193,15 @@ export default function Reports() {
       setFormError((err as Error).message)
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function handleExpensePaid(id: string, paid: boolean) {
+    try {
+      const updated = await setExpensePaid(id, paid)
+      setExpenses((prev) => prev.map((e) => (e.id === id ? updated : e)))
+    } catch (err) {
+      setError((err as Error).message)
     }
   }
 
@@ -436,6 +451,7 @@ export default function Reports() {
                       <th>{t('reports.expenseDate')}</th>
                       <th>{t('reports.expenseCategory')}</th>
                       <th>{t('reports.expenseNotes')}</th>
+                      <th>{t('reports.expenseStatus')}</th>
                       <th className="text-right">
                         {t('reports.expenseAmount')}
                       </th>
@@ -448,6 +464,39 @@ export default function Reports() {
                         <td>{formatDate(expense.expense_date)}</td>
                         <td>{categoryLabel(t, expense.category)}</td>
                         <td>{expense.notes ?? '—'}</td>
+                        <td>
+                          {expense.paid_at ? (
+                            <span className="inline-flex items-center gap-2 text-sm text-emerald-700">
+                              {t('reports.expensePaidOn', {
+                                date: formatDate(expense.paid_at),
+                              })}
+                              <button
+                                type="button"
+                                className="text-xs text-slate-400 hover:underline print:hidden"
+                                onClick={() =>
+                                  handleExpensePaid(expense.id, false)
+                                }
+                              >
+                                {t('reports.expenseUndoPaid')}
+                              </button>
+                            </span>
+                          ) : expense.expense_date >= todayIso() ? (
+                            <span className="inline-flex items-center gap-2 text-sm text-amber-700">
+                              {t('reports.expenseUnpaid')}
+                              <button
+                                type="button"
+                                className="btn-ghost px-2 py-1 text-xs print:hidden"
+                                onClick={() =>
+                                  handleExpensePaid(expense.id, true)
+                                }
+                              >
+                                {t('common.markPaid')}
+                              </button>
+                            </span>
+                          ) : (
+                            <span className="text-sm text-slate-400">—</span>
+                          )}
+                        </td>
                         <td className="text-right">
                           {formatCurrency(expense.amount)}
                         </td>
@@ -470,7 +519,6 @@ export default function Reports() {
           </div>
         </>
       )}
-
 
       {profile?.role === 'stable_owner' && (
         <AccountingPanel from={from} to={to} payments={payments} />

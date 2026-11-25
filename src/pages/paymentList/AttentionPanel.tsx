@@ -6,7 +6,11 @@ import {
   type OverduePayment,
   type UpcomingPayment,
 } from '../../features/dashboard/api'
-import { listUpcomingBills, type Expense } from '../../features/expenses/api'
+import {
+  listUpcomingBills,
+  setExpensePaid,
+  type Expense,
+} from '../../features/expenses/api'
 import { BILL_REMINDER_WINDOW_DAYS, daysUntilDue } from '../../lib/bills'
 import { usePreferences } from '../../lib/PreferencesContext'
 import { categoryLabel } from '../../lib/reports'
@@ -20,6 +24,21 @@ export function AttentionPanel() {
     (UpcomingPayment | OverduePayment)[] | null
   >(null)
   const [bills, setBills] = useState<Expense[] | null>(null)
+  const [markingBill, setMarkingBill] = useState<string | null>(null)
+  const [billError, setBillError] = useState<string | null>(null)
+
+  async function handleBillPaid(id: string) {
+    setMarkingBill(id)
+    setBillError(null)
+    try {
+      await setExpensePaid(id, true)
+      setBills((prev) => prev?.filter((bill) => bill.id !== id) ?? prev)
+    } catch (err) {
+      setBillError((err as Error).message)
+    } finally {
+      setMarkingBill(null)
+    }
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -85,6 +104,11 @@ export function AttentionPanel() {
             {t('dashboard.next30Days')}
           </span>
         </div>
+        {billError && (
+          <p role="alert" className="mb-3 text-sm text-red-600">
+            {billError}
+          </p>
+        )}
         {bills.length === 0 ? (
           <p className="text-sm text-slate-500">
             {t('dashboard.nothingBillsDue')}
@@ -113,12 +137,24 @@ export function AttentionPanel() {
                       {bill.notes ? ` · ${bill.notes}` : ''}
                     </p>
                   </div>
-                  <Badge
-                    status={
-                      days <= BILL_REMINDER_WINDOW_DAYS ? 'high' : 'due soon'
-                    }
-                    label={dueLabel}
-                  />
+                  <div className="flex shrink-0 flex-col items-end gap-2">
+                    <Badge
+                      status={
+                        days <= BILL_REMINDER_WINDOW_DAYS ? 'high' : 'due soon'
+                      }
+                      label={dueLabel}
+                    />
+                    <button
+                      type="button"
+                      className="btn-ghost px-3 py-1.5 text-sm"
+                      disabled={markingBill === bill.id}
+                      onClick={() => handleBillPaid(bill.id)}
+                    >
+                      {markingBill === bill.id
+                        ? t('paymentList.marking')
+                        : t('common.markPaid')}
+                    </button>
+                  </div>
                 </div>
               )
             })}

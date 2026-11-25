@@ -31,7 +31,8 @@ export function usePaymentsAttention(
         .from('expenses')
         .select('id', { count: 'exact', head: true })
         .gte('expense_date', localIso(today))
-        .lte('expense_date', localIso(until)),
+        .lte('expense_date', localIso(until))
+        .is('paid_at', null),
     ])
       .then(([overdue, bills]) => {
         if (cancelled) return
