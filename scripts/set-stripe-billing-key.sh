@@ -8,10 +8,20 @@ printf "Lim inn Stripe-nøkkelen (rk_live_...) og trykk Enter: "
 read -rs KEY
 echo
 
+# Spaces and line breaks from copying aren't part of the key.
+KEY="$(printf '%s' "$KEY" | tr -d '[:space:]')"
+
+# Stripe's key list shows a shortened key (rk_live_51…ab12); only the full key works.
+if [[ "$KEY" == *"…"* || "$KEY" == *"..."* || "$KEY" == *"•"* || ${#KEY} -lt 60 ]] && [ -n "$KEY" ]; then
+  echo "Dette ser ut som den forkortede nøkkelen fra listen i Stripe (${#KEY} tegn). Den hele nøkkelen er rundt 100 tegn. Ingenting er lagret."
+  unset KEY
+  exit 1
+fi
+
 case "$KEY" in
   rk_live_*|sk_live_*)
     if supabase secrets set STRIPE_BILLING_SECRET_KEY="$KEY"; then
-      echo "Lagret."
+      echo "Lagret (${#KEY} tegn)."
     else
       echo "Supabase sa nei, se meldingen over. Ingenting er lagret."
     fi

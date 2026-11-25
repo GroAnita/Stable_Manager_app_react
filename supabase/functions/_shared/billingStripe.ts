@@ -7,9 +7,22 @@
 // A live key is refused unless the matching *_ALLOW_LIVE secret is 'true'.
 import Stripe from 'npm:stripe@23.1.0'
 
+function billingKey(): string | undefined {
+  return (
+    Deno.env.get('STRIPE_BILLING_SECRET_KEY') ??
+    Deno.env.get('STRIPE_CONNECT_SECRET_KEY')
+  )
+}
+
+// Whether the subscription key is a live key, so test-mode events can be told
+// apart from live ones.
+export function billingStripeIsLive(): boolean {
+  return /^(sk|rk)_live_/.test(billingKey() ?? '')
+}
+
 export function billingStripe(): Stripe | null {
   const ownKey = Deno.env.get('STRIPE_BILLING_SECRET_KEY')
-  const key = ownKey ?? Deno.env.get('STRIPE_CONNECT_SECRET_KEY')
+  const key = billingKey()
   if (!key) return null
   const allowLive = Deno.env.get(
     ownKey ? 'STRIPE_BILLING_ALLOW_LIVE' : 'STRIPE_CONNECT_ALLOW_LIVE',

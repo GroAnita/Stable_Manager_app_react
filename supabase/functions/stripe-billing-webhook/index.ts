@@ -4,7 +4,7 @@
 // event, so events arriving late, twice or out of order are harmless.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'npm:stripe@23.1.0'
-import { billingStripe } from '../_shared/billingStripe.ts'
+import { billingStripe, billingStripeIsLive } from '../_shared/billingStripe.ts'
 import {
   billingStatusFor,
   pastDueSince,
@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: 'Invalid signature' }, 400)
   }
 
-  const isLiveKey = /^(sk|rk)_live_/.test(stripeKey)
+  const isLiveKey = billingStripeIsLive()
   if (event.livemode !== isLiveKey) return jsonResponse({ ignored: true })
   // Boarders' payments on stables' own accounts go to stripe-connect-webhook.
   if (event.account) return jsonResponse({ ignored: true })
