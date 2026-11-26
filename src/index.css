@@ -262,3 +262,15 @@
     width: 100%;
   }
 }
+
+/* Outside the layers on purpose, so it beats .field and text-sm.
+   iPhone and iPad zoom in when a field with text under 16px is tapped, and
+   stay zoomed afterwards, so the page looks cut off and slides sideways.
+   Only iOS matches this @supports, so other devices keep their sizes. */
+@supports (-webkit-touch-callout: none) {
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+}

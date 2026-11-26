@@ -72,7 +72,7 @@ export function WhatsNewBell() {
               <p className="px-1 text-sm font-semibold text-slate-800">
                 {t('whatsNew.title')}
               </p>
-              <div className="mt-2 max-h-[70vh] space-y-2 overflow-y-auto lg:max-h-96">
+              <div className="mt-2 max-h-[70vh] space-y-2 overflow-x-hidden overflow-y-auto break-words lg:max-h-96">
                 {WHATS_NEW_ENTRIES.map((entry) => (
                   <div
                     key={entry.id}

@@ -97,7 +97,7 @@ export function NotificationBell() {
                   </button>
                 )}
               </div>
-              <div className="mt-2 max-h-[70vh] space-y-1 overflow-y-auto lg:max-h-80">
+              <div className="mt-2 max-h-[70vh] space-y-1 overflow-x-hidden overflow-y-auto break-words lg:max-h-80">
                 {notifications.length === 0 ? (
                   <p className="px-1 py-3 text-sm text-slate-500">
                     {t('feedingRota.noNotifications')}
