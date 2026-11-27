@@ -7,7 +7,14 @@ import { supabase } from '../lib/supabaseClient'
 const CONFIRM_WORD = 'SLETT'
 
 // Required by the App Store: every user can delete their own account in the app.
-export function DeleteAccountSection({ ownsStable }: { ownsStable: boolean }) {
+export function DeleteAccountSection({
+  ownsStable,
+  noStable = false,
+}: {
+  ownsStable: boolean
+  // Signed up but no stable yet, so nothing is kept anywhere.
+  noStable?: boolean
+}) {
   const { t } = usePreferences()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
@@ -40,9 +47,11 @@ export function DeleteAccountSection({ ownsStable }: { ownsStable: boolean }) {
     <div className="panel p-5">
       <h2 className="section-title">{t('deleteAccount.title')}</h2>
       <p className="mt-2 text-sm text-slate-600">
-        {ownsStable
-          ? t('deleteAccount.ownerBody')
-          : t('deleteAccount.memberBody')}
+        {noStable
+          ? t('deleteAccount.noStableBody')
+          : ownsStable
+            ? t('deleteAccount.ownerBody')
+            : t('deleteAccount.memberBody')}
       </p>
       {!open ? (
         <button

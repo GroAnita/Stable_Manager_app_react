@@ -1564,6 +1564,7 @@ export const en = {
       'Hay class by FEh per kg DM: H1 over 0.62, H2 0.58–0.62, H3 0.52–0.57, H4 0.46–0.51 and H5 under 0.46.',
   },
   deleteAccount: {
+    noStableBody: 'Your account and login are deleted for good, and you can’t sign in again. You haven’t created a stable yet, so nothing else is left behind.',
     title: 'Delete account',
     memberBody: 'Your login and profile are deleted, and you can’t sign in again. What the stable has registered about you, such as your owner card, contracts and invoices, stays with the stable, because it is responsible for them and must keep its accounts. An active card agreement ends and your card is removed. The stable is told.',
     ownerBody: 'Your account is deleted and the stable closes straight away. The subscription is cancelled, all card agreements end, and nobody can sign in to the stable any more. Everything about the stable is deleted for good after 3 months. Download what you need for your accounts under Reports before you delete. If you change your mind, support can reopen the stable within 3 months.',
@@ -1761,7 +1762,7 @@ export const en = {
     paymentsSignedStatus_notSigned: 'Not signed',
     paymentsOpenDashboard: 'Open Stripe',
     navIntegrations: 'Integrations',
-    navAccount: 'My account & two-factor',
+    navAccount: 'My account & deletion',
     navLanguageAppearance: 'Language & appearance',
     navSupport: 'Support',
     backToSettings: 'Back to settings',

@@ -1,7 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { DeleteAccountSection } from '../components/DeleteAccountSection'
 import { createStable, type StableType } from '../features/settings/api'
 import { useAuth } from '../lib/AuthContext'
+import { signOut } from '../lib/authService'
 import { STABLE_TYPES } from '../lib/features'
 import { usePreferences } from '../lib/PreferencesContext'
 
@@ -29,6 +31,11 @@ export default function CreateStable() {
   const { t } = usePreferences()
   const { refreshProfile } = useAuth()
   const navigate = useNavigate()
+
+  async function handleSignOut() {
+    await signOut()
+    navigate('/auth', { replace: true })
+  }
   const [form, setForm] = useState<FormState>(emptyForm)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -61,7 +68,7 @@ export default function CreateStable() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-cream px-4 pt-[calc(2.5rem+env(safe-area-inset-top))] pb-[calc(2.5rem+env(safe-area-inset-bottom))]">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-cream px-4 pt-[calc(2.5rem+env(safe-area-inset-top))] pb-[calc(2.5rem+env(safe-area-inset-bottom))]">
       <div className="panel w-full max-w-lg p-6">
         <h1 className="text-2xl font-semibold text-slate-900">
           {t('onboarding.title')}
@@ -148,6 +155,17 @@ export default function CreateStable() {
             {saving ? t('common.saving') : t('onboarding.createStable')}
           </button>
         </form>
+      </div>
+      {/* App Store rule: a new account can be deleted before a stable exists. */}
+      <div className="w-full max-w-lg space-y-4">
+        <DeleteAccountSection ownsStable={false} noStable />
+        <button
+          type="button"
+          className="btn-ghost w-full"
+          onClick={handleSignOut}
+        >
+          {t('nav.signOut')}
+        </button>
       </div>
     </main>
   )

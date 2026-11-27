@@ -1565,6 +1565,7 @@ export const no: typeof en = {
       'H-klasse etter FEh per kg TS: H1 over 0,62, H2 0,58–0,62, H3 0,52–0,57, H4 0,46–0,51 og H5 under 0,46.',
   },
   deleteAccount: {
+    noStableBody: 'Kontoen og innloggingen din slettes for godt, og du kan ikke logge inn igjen. Du har ikke opprettet noen stall ennå, så ingenting annet blir liggende igjen.',
     title: 'Slett konto',
     memberBody: 'Innloggingen og profilen din slettes, og du kan ikke logge inn igjen. Det stallen har registrert om deg, som eierkort, kontrakter og fakturaer, blir hos stallen, fordi stallen er ansvarlig for dem og må ta vare på regnskapet. En aktiv kortavtale avsluttes, og kortet ditt fjernes. Stallen får beskjed.',
     ownerBody: 'Kontoen din slettes, og stallen stenges med en gang. Abonnementet sies opp, alle kortavtaler avsluttes, og ingen kan lenger logge inn i stallen. Alle opplysninger om stallen slettes for godt etter 3 måneder. Last ned det du trenger til regnskapet under Rapporter før du sletter. Ombestemmer du deg, kan support åpne stallen igjen innen 3 måneder.',
@@ -1762,7 +1763,7 @@ export const no: typeof en = {
     paymentsSignedStatus_notSigned: 'Ikke signert',
     paymentsOpenDashboard: 'Åpne Stripe',
     navIntegrations: 'Integrasjoner',
-    navAccount: 'Min konto og tofaktor',
+    navAccount: 'Min konto og sletting',
     navLanguageAppearance: 'Språk og utseende',
     navSupport: 'Support',
     backToSettings: 'Tilbake til innstillinger',
